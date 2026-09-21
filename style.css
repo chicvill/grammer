@@ -1092,3 +1092,428 @@ body {
   font-size: 11px;
   font-weight: 700;
 }
+
+/* ========================================================
+   1. 2인 가족 대전 모드 (Family Battle HUD)
+   ======================================================== */
+.battle-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mode-toggle-btn {
+  background: rgba(18, 24, 52, 0.9);
+  border: 1.5px solid var(--accent-gold);
+  border-radius: 12px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 12px rgba(255, 200, 0, 0.2);
+}
+
+.mode-toggle-btn:hover,
+.mode-toggle-btn:focus {
+  background: rgba(255, 200, 0, 0.25);
+  transform: scale(1.05);
+  box-shadow: 0 0 18px var(--accent-gold);
+}
+
+.battle-scoreboard {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 14, 30, 0.9);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 6px 14px;
+}
+
+.player-score-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 15px;
+}
+
+.player-score-tag.p1 {
+  color: var(--accent-cyan);
+}
+
+.player-score-tag.p2 {
+  color: #ff3366;
+}
+
+.player-score-tag .p-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.player-score-tag.active-turn {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 6px;
+  animation: turnPulse 1.2s infinite;
+}
+
+@keyframes turnPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.vs-tag {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--text-dim);
+}
+
+/* ========================================================
+   2. 단어 어순 배열 블록 자리바꾸기 (Scramble Track & Blocks)
+   ======================================================== */
+.scramble-stage-wrap {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.scramble-prompt-card {
+  background: rgba(14, 20, 44, 0.85);
+  border: 2px solid rgba(0, 240, 255, 0.3);
+  border-radius: 20px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+.scramble-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.scramble-badge {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--accent-gold);
+  background: rgba(255, 200, 0, 0.15);
+  border: 1px solid rgba(255, 200, 0, 0.4);
+  padding: 4px 14px;
+  border-radius: 20px;
+}
+
+.scramble-hint-tag {
+  font-size: 14px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.scramble-sentence-preview {
+  font-size: clamp(24px, 2.8vw, 34px);
+  font-weight: 800;
+  color: #fff;
+  margin: 8px 0 16px 0;
+  text-align: center;
+  min-height: 44px;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+/* 단어 블록 트랙 */
+.scramble-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  min-height: 80px;
+  background: rgba(8, 12, 28, 0.6);
+  border: 1.5px dashed rgba(100, 150, 255, 0.3);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.scramble-track.shake-anim {
+  animation: shakeTrack 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  border-color: var(--accent-red);
+}
+
+@keyframes shakeTrack {
+  10%, 90% { transform: translate3d(-3px, 0, 0); }
+  20%, 80% { transform: translate3d(5px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+  40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
+/* 단어 블록 개별 카드 */
+.scramble-block {
+  background: linear-gradient(145deg, rgba(26, 38, 80, 0.95), rgba(16, 24, 54, 0.95));
+  border: 2.5px solid rgba(120, 160, 255, 0.4);
+  border-radius: 14px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: grab;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.scramble-block:active {
+  cursor: grabbing;
+}
+
+.scramble-block:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 8px 20px rgba(0, 240, 255, 0.3);
+}
+
+.scramble-block .block-num-pill {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.scramble-block .block-word-text {
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.scramble-block .block-drag-handle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-left: 4px;
+}
+
+/* 리모컨 포커스 상태 */
+.scramble-block.focused {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 20px var(--accent-cyan);
+  transform: scale(1.05);
+  z-index: 2;
+}
+
+/* 리모컨으로 집어 든(Lifted) 공중 부양 상태 */
+.scramble-block.lifted {
+  border-color: var(--accent-gold) !important;
+  background: linear-gradient(145deg, rgba(50, 40, 10, 0.95), rgba(70, 50, 10, 0.95)) !important;
+  transform: translateY(-10px) scale(1.12) !important;
+  box-shadow: 0 14px 28px rgba(255, 200, 0, 0.5), 0 0 20px var(--accent-gold) !important;
+  animation: liftedBob 1.2s infinite ease-in-out alternate;
+  z-index: 10;
+}
+
+@keyframes liftedBob {
+  0% { transform: translateY(-8px) scale(1.1); }
+  100% { transform: translateY(-13px) scale(1.13); }
+}
+
+/* 마우스 드래그 중인 상태 */
+.scramble-block.dragging {
+  opacity: 0.45;
+  transform: scale(0.95) rotate(-3deg);
+}
+
+/* 마우스 드래그 오버된 타겟 자리 */
+.scramble-block.drag-hover {
+  border-color: var(--accent-green) !important;
+  box-shadow: 0 0 24px var(--accent-green) !important;
+  transform: scale(1.08);
+}
+
+/* 정답 시 블록 전체 그린 글로우 */
+.scramble-block.correct-glow {
+  border-color: var(--accent-green) !important;
+  background: rgba(0, 255, 136, 0.2) !important;
+  box-shadow: 0 0 24px var(--accent-green) !important;
+}
+
+/* 액션 버튼 바 */
+.scramble-action-bar {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.scramble-btn {
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.scramble-btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-dim);
+  border: 1px solid var(--panel-border);
+}
+
+.scramble-btn.secondary:hover,
+.scramble-btn.secondary:focus {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: scale(1.04);
+}
+
+.scramble-btn.primary {
+  background: linear-gradient(90deg, var(--accent-cyan), #0077ff);
+  color: #000;
+  font-weight: 900;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+}
+
+.scramble-btn.primary:hover,
+.scramble-btn.primary:focus {
+  transform: scale(1.05);
+  box-shadow: 0 0 26px var(--accent-cyan);
+}
+
+.scramble-btn.primary.ready-pulse {
+  background: linear-gradient(90deg, var(--accent-green), #00bb66);
+  animation: readyGlow 1s infinite alternate;
+}
+
+@keyframes readyGlow {
+  0% { box-shadow: 0 0 12px var(--accent-green); }
+  100% { box-shadow: 0 0 28px var(--accent-green); }
+}
+
+/* ========================================================
+   3. 문장 전체 섀도잉 & 발음 점수 평가 (Shadowing Panel)
+   ======================================================== */
+.shadowing-panel {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shadowing-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shadowing-badge {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 900;
+  color: #ff007f;
+  background: rgba(255, 0, 127, 0.15);
+  border: 1px solid rgba(255, 0, 127, 0.4);
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.shadowing-guide {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.shadowing-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.shadow-btn {
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.shadow-btn.shadow-listen {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid var(--accent-cyan);
+}
+
+.shadow-btn.shadow-record {
+  background: rgba(255, 0, 127, 0.15);
+  color: #ff007f;
+  border: 1px solid #ff007f;
+}
+
+.shadow-btn.shadow-record.recording {
+  background: #ff007f;
+  color: #fff;
+  animation: recPulse 1s infinite alternate;
+}
+
+@keyframes recPulse {
+  0% { box-shadow: 0 0 8px #ff007f; }
+  100% { box-shadow: 0 0 20px #ff007f; }
+}
+
+.shadow-btn:hover,
+.shadow-btn:focus {
+  transform: scale(1.05);
+}
+
+.shadow-result-box {
+  background: rgba(10, 14, 30, 0.9);
+  border: 1.5px solid var(--accent-gold);
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: fadeIn 0.3s ease;
+}
+
+.score-stars {
+  font-size: 20px;
+  filter: drop-shadow(0 0 6px #ffc800);
+}
+
+.score-number-pill {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--accent-gold);
+}
+
+.shadow-heard-text {
+  font-size: 14px;
+  color: #fff;
+  font-style: italic;
+}

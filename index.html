@@ -20,6 +20,19 @@
         <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag">중1 영문법</span></h1>
       </div>
 
+      <!-- 2인 가족 대전 모드 토글 & 듀얼 스코어 HUD -->
+      <div class="battle-toggle-wrap">
+        <button class="mode-toggle-btn focusable" id="modeToggleBtn" title="1인 솔로 / 2인 가족 대전 전환">
+          <span class="mode-icon">👥</span>
+          <span class="mode-text" id="modeToggleText">1인 솔로</span>
+        </button>
+        <div class="battle-scoreboard" id="battleScoreboard" style="display: none;">
+          <div class="player-score-tag p1" id="p1Tag"><span class="p-dot"></span>1P: <span id="p1Score">0</span></div>
+          <div class="vs-tag">VS</div>
+          <div class="player-score-tag p2" id="p2Tag"><span class="p-dot"></span>2P: <span id="p2Score">0</span></div>
+        </div>
+      </div>
+
       <div class="hud-stats">
         <div class="stat-card">
           <span class="stat-label">QUESTION</span>
@@ -178,6 +191,36 @@
           </div>
         </div>
 
+        <!-- 단어 어순 배열 (Sentence Scramble) 블록 자리바꾸기 스테이지 -->
+        <div class="scramble-stage-wrap" id="scrambleStageWrap" style="display: none;">
+          <div class="scramble-prompt-card">
+            <div class="scramble-header">
+              <span class="scramble-badge">🧩 단어 어순 배열 퀘스트</span>
+              <span class="scramble-hint-tag">마우스로 끌거나 리모컨 [OK]로 집어서 자리를 맞바꿔보세요!</span>
+            </div>
+
+            <!-- 실시간 문장 조립 미리보기 -->
+            <div class="scramble-sentence-preview" id="scrambleSentencePreview">
+              "Tom and Jerry are good friends."
+            </div>
+
+            <!-- 단어 블록 트랙 (마우스 드래그 & 리모컨 스왑 영역) -->
+            <div class="scramble-track" id="scrambleTrack" role="group" aria-label="단어 어순 배열 블록">
+              <!-- scrambleManager에 의해 동적 렌더링 -->
+            </div>
+
+            <!-- 조작 액션 바 -->
+            <div class="scramble-action-bar">
+              <button class="scramble-btn secondary focusable" id="scrambleResetBtn" tabindex="0">
+                <span>🔄 다시 섞기</span>
+              </button>
+              <button class="scramble-btn primary focusable" id="scrambleSubmitBtn" tabindex="0">
+                <span>✅ 완성 확인 (OK / "완성")</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- 문제 해설 및 피드백 바 (정답 확인 시 하단에 등장) -->
         <div class="explanation-box" id="explanationBox">
           <div class="exp-header">
@@ -188,6 +231,28 @@
           <p class="exp-content" id="expContent">
             주어가 'Tom and Jerry'로 2명(복수)이므로 복수형 be동사 'are'를 씁니다.
           </p>
+
+          <!-- 3. 문장 전체 섀도잉 & 발음 점수 평가 패널 -->
+          <div class="shadowing-panel" id="shadowingPanel">
+            <div class="shadowing-header">
+              <span class="shadowing-badge">🎙️ 문장 전체 섀도잉 도전</span>
+              <span class="shadowing-guide">원어민 발음을 듣고 마이크로 문장 전체를 따라 읽어보세요!</span>
+            </div>
+            <div class="shadowing-controls">
+              <button class="shadow-btn shadow-listen focusable" id="shadowListenBtn" tabindex="0">
+                <span>🔊 원문 전체 듣기</span>
+              </button>
+              <button class="shadow-btn shadow-record focusable" id="shadowRecordBtn" tabindex="0">
+                <span>🎙️ 따라 말하기 시작</span>
+              </button>
+            </div>
+            <!-- 발음 채점 결과 카드 -->
+            <div class="shadow-result-box" id="shadowResultBox" style="display: none;">
+              <div class="score-stars" id="shadowScoreStars">⭐⭐⭐</div>
+              <div class="score-number-pill" id="shadowScoreNumber">발음 점수: 95점</div>
+              <div class="shadow-heard-text" id="shadowHeardText">"Tom and Jerry are good friends"</div>
+            </div>
+          </div>
         </div>
 
         <!-- 오버레이 화면 (시작 / 결과 리포트) -->
@@ -287,9 +352,10 @@
 
   </div>
 
-  <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 렌더러 -> 효과음 -> 음성 인식 -> 게임 코어 -->
+  <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 -> 어순 배열 -> 효과음 -> 음성 인식 -> 게임 코어 -->
   <script src="grammarGenerator.js"></script>
   <script src="visualClueManager.js"></script>
+  <script src="scrambleManager.js"></script>
   <script src="audio.js"></script>
   <script src="voice.js"></script>
   <script src="game.js"></script>

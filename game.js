@@ -60,6 +60,34 @@ class GrammarQuestGame {
     this.speechInstruction = document.getElementById('speechInstruction');
     this.speechLiveHeard = document.getElementById('speechLiveHeard');
 
+    // 1. 단어 어순 배열 (Scramble) DOM
+    this.scrambleStageWrap = document.getElementById('scrambleStageWrap');
+    this.scrambleResetBtn = document.getElementById('scrambleResetBtn');
+    this.scrambleSubmitBtn = document.getElementById('scrambleSubmitBtn');
+
+    // 2. 2인 가족 대전 모드 DOM 및 상태
+    this.modeToggleBtn = document.getElementById('modeToggleBtn');
+    this.modeToggleText = document.getElementById('modeToggleText');
+    this.battleScoreboard = document.getElementById('battleScoreboard');
+    this.p1ScoreEl = document.getElementById('p1Score');
+    this.p2ScoreEl = document.getElementById('p2Score');
+    this.p1Tag = document.getElementById('p1Tag');
+    this.p2Tag = document.getElementById('p2Tag');
+    this.isBattleMode = false;
+    this.p1Score = 0;
+    this.p2Score = 0;
+    this.currentTurnPlayer = 1;
+
+    // 3. 문장 전체 섀도잉 DOM 및 상태
+    this.shadowingPanel = document.getElementById('shadowingPanel');
+    this.shadowListenBtn = document.getElementById('shadowListenBtn');
+    this.shadowRecordBtn = document.getElementById('shadowRecordBtn');
+    this.shadowResultBox = document.getElementById('shadowResultBox');
+    this.shadowScoreStars = document.getElementById('shadowScoreStars');
+    this.shadowScoreNumber = document.getElementById('shadowScoreNumber');
+    this.shadowHeardText = document.getElementById('shadowHeardText');
+    this.isShadowRecording = false;
+
     this.explanationBox = document.getElementById('explanationBox');
     this.expResultBadge = document.getElementById('expResultBadge');
     this.expContent = document.getElementById('expContent');
@@ -195,6 +223,27 @@ class GrammarQuestGame {
               this.confirmSelection();
               break;
           }
+        } else if (q.type === 'scramble') {
+          // 어순 배열 문제일 때 방향키로 단어 이동 & OK로 스왑
+          switch (key) {
+            case 'ArrowLeft':
+              this.triggerDpadVisual(this.btnLeft);
+              if (window.scrambleManager) window.scrambleManager.navigate('left');
+              break;
+            case 'ArrowRight':
+              this.triggerDpadVisual(this.btnRight);
+              if (window.scrambleManager) window.scrambleManager.navigate('right');
+              break;
+            case 'ArrowDown':
+              this.triggerDpadVisual(this.btnDown);
+              if (window.scrambleManager) window.scrambleManager.navigate('down');
+              break;
+            case 'Enter':
+            case ' ':
+              this.triggerDpadVisual(this.btnOk);
+              if (window.scrambleManager) window.scrambleManager.handleOk();
+              break;
+          }
         } else if (q.type === 'listening') {
           // 리스닝 문제일 때 Enter 누르면 다시 듣기 재생
           if (key === 'Enter' || key === ' ') {
@@ -214,6 +263,31 @@ class GrammarQuestGame {
     this.btnLeft.addEventListener('click', () => this.handleDpadClick('left'));
     this.btnRight.addEventListener('click', () => this.handleDpadClick('right'));
     this.btnOk.addEventListener('click', () => this.confirmSelection());
+
+    // 2인 가족 대전 토글
+    if (this.modeToggleBtn) {
+      this.modeToggleBtn.addEventListener('click', () => this.toggleBattleMode());
+    }
+
+    // 단어 어순 배열 버튼 이벤트
+    if (this.scrambleResetBtn) {
+      this.scrambleResetBtn.addEventListener('click', () => {
+        if (window.scrambleManager) window.scrambleManager.resetShuffle();
+      });
+    }
+    if (this.scrambleSubmitBtn) {
+      this.scrambleSubmitBtn.addEventListener('click', () => {
+        if (window.scrambleManager) window.scrambleManager.submitAnswer();
+      });
+    }
+
+    // 문장 전체 섀도잉 버튼 이벤트
+    if (this.shadowListenBtn) {
+      this.shadowListenBtn.addEventListener('click', () => this.playListeningAudio());
+    }
+    if (this.shadowRecordBtn) {
+      this.shadowRecordBtn.addEventListener('click', () => this.startShadowRecording());
+    }
 
     this.audioListenBtn.addEventListener('click', () => {
       this.playListeningAudio();
@@ -246,6 +320,8 @@ class GrammarQuestGame {
     if (this.gameState === 'quiz') {
       if (this.currentQuestion && this.currentQuestion.type === 'choice') {
         this.navigateOptions(dir);
+      } else if (this.currentQuestion && this.currentQuestion.type === 'scramble') {
+        if (window.scrambleManager) window.scrambleManager.navigate(dir);
       }
     } else if (this.gameState === 'review') {
       this.nextQuestion();
@@ -303,6 +379,8 @@ class GrammarQuestGame {
       if (action.type === 'nav') {
         if (this.currentQuestion.type === 'choice') {
           this.navigateOptions(action.dir);
+        } else if (this.currentQuestion.type === 'scramble') {
+          if (window.scrambleManager) window.scrambleManager.navigate(action.dir);
         }
         return;
       }
@@ -354,6 +432,8 @@ class GrammarQuestGame {
     if (this.gameState === 'quiz' && !this.isAnswered) {
       if (this.currentQuestion.type === 'choice') {
         this.selectOption(this.focusedOption);
+      } else if (this.currentQuestion.type === 'scramble') {
+        if (window.scrambleManager) window.scrambleManager.handleOk();
       } else if (this.currentQuestion.type === 'listening') {
         this.playListeningAudio();
       }
@@ -362,12 +442,18 @@ class GrammarQuestGame {
     }
   }
 
-  // 무한 자동 생성기(grammarGenerator)를 통한 10문제 생성 (학년별 맞춤)
+  // 무한 자동 생성기(grammarGenerator)를 통한 10문제 생성 (어순 배열 포함)
   buildQuestionSet() {
+    let set = [];
     if (window.grammarGenerator) {
-      return window.grammarGenerator.generateSet(this.TOTAL_QUESTIONS, this.wrongQuestions, this.currentGrade);
+      set = window.grammarGenerator.generateSet(this.TOTAL_QUESTIONS, this.wrongQuestions, this.currentGrade);
     }
-    return [];
+    // 첫 번째 문제와 5번째 문제를 'scramble'(어순 배열 블록 스왑)으로 출제하여 바로 테스트 가능하게 함
+    if (set.length > 0) {
+      set[0].type = 'scramble';
+      if (set.length > 4) set[4].type = 'scramble';
+    }
+    return set;
   }
 
   startNewGame() {
@@ -375,6 +461,10 @@ class GrammarQuestGame {
     this.streak = 0;
     this.correctCount = 0;
     this.currentIndex = 0;
+    this.p1Score = 0;
+    this.p2Score = 0;
+    this.currentTurnPlayer = 1;
+    this.updateBattleHUD();
 
     // 실시간 무한 조합 문제 세트 생성
     this.questions = this.buildQuestionSet();
@@ -402,6 +492,7 @@ class GrammarQuestGame {
     this.scoreText.textContent = this.score;
     this.streakText.textContent = `${this.streak} 🔥`;
     this.updateProgressHUD();
+    this.updateBattleHUD();
 
     if (isWrongReview) {
       this.categoryTag.innerHTML = `${q.category} <span style="color: var(--accent-red); font-size: 13px; margin-left: 8px;">[오답 복습 🔄]</span>`;
@@ -421,12 +512,14 @@ class GrammarQuestGame {
     }
 
     this.explanationBox.classList.remove('active');
+    if (this.shadowResultBox) this.shadowResultBox.style.display = 'none';
 
     // === 유형별 화면 세팅 ===
     if (q.type === 'choice') {
       // 1. 4지선다 선택형
       this.optionsGrid.style.display = 'grid';
       this.speechStageWrap.style.display = 'none';
+      if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
 
       q.options.forEach((optText, i) => {
         this.optionTexts[i].textContent = optText;
@@ -434,10 +527,23 @@ class GrammarQuestGame {
       });
       this.setOptionFocus(0);
 
+    } else if (q.type === 'scramble') {
+      // 2. 단어 어순 배열 (Sentence Scramble) 블록 스왑형
+      this.optionsGrid.style.display = 'none';
+      this.speechStageWrap.style.display = 'none';
+      if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'flex';
+
+      if (window.scrambleManager) {
+        window.scrambleManager.initQuestion(q, (isCorrect, assembled) => {
+          this.handleScrambleComplete(isCorrect, assembled);
+        });
+      }
+
     } else if (q.type === 'speaking') {
-      // 2. 보기가 없는 주관식 말하기형
+      // 3. 보기가 없는 주관식 말하기형
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'flex';
+      if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
       this.audioListenBtn.style.display = 'none';
       this.speakingHintBox.style.display = 'block';
       this.speakingHintBox.textContent = q.hint || '영어 단어를 직접 마이크에 말하세요!';
@@ -445,9 +551,10 @@ class GrammarQuestGame {
       this.speechLiveHeard.textContent = '마이크에 답을 말해보세요...';
 
     } else if (q.type === 'listening') {
-      // 3. 듣고 답하는 리스닝 평가형
+      // 4. 듣고 답하는 리스닝 평가형
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'flex';
+      if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
       this.audioListenBtn.style.display = 'flex';
       this.speakingHintBox.style.display = 'none';
       this.speechInstruction.textContent = '🔊 원어민 소리를 듣고 빠진 단어를 영어로 말하세요!';
@@ -537,7 +644,7 @@ class GrammarQuestGame {
       const timeBonus = this.timeLeft * 5;
       const streakBonus = Math.max(0, (this.streak - 1) * 30);
       const earned = 120 + timeBonus + streakBonus;
-      this.score += earned;
+      this.addScore(earned);
 
       if (blank) {
         blank.textContent = target;
@@ -557,7 +664,8 @@ class GrammarQuestGame {
       }
 
       this.expResultBadge.className = 'exp-badge correct';
-      this.expResultBadge.textContent = `정답 발음 성공! 🎙️ (+${earned}점)`;
+      const playerText = this.isBattleMode ? `[${this.currentTurnPlayer}P] ` : '';
+      this.expResultBadge.textContent = `${playerText}정답 발음 성공! 🎙️ (+${earned}점)`;
     } else {
       this.streak = 0;
       if (!this.wrongQuestions.some(wq => wq.sentence === q.sentence)) {
@@ -574,7 +682,8 @@ class GrammarQuestGame {
 
       window.soundFx.playWrong();
       this.expResultBadge.className = 'exp-badge wrong';
-      this.expResultBadge.textContent = `오답! (정답: "${target}") 다음 판에 다시 도전 🔄`;
+      const playerText = this.isBattleMode ? `[${this.currentTurnPlayer}P] ` : '';
+      this.expResultBadge.textContent = `${playerText}오답! (정답: "${target}") 다음 판에 다시 도전 🔄`;
     }
 
     this.scoreText.textContent = this.score;
@@ -606,7 +715,7 @@ class GrammarQuestGame {
       const timeBonus = this.timeLeft * 5;
       const streakBonus = Math.max(0, (this.streak - 1) * 30);
       const earned = 100 + timeBonus + streakBonus;
-      this.score += earned;
+      this.addScore(earned);
 
       this.optionCards[chosenIndex].classList.add('correct-choice');
       if (blank) {
@@ -627,7 +736,8 @@ class GrammarQuestGame {
       }
 
       this.expResultBadge.className = 'exp-badge correct';
-      this.expResultBadge.textContent = `정답! ✅ (+${earned}점)`;
+      const playerText = this.isBattleMode ? `[${this.currentTurnPlayer}P] ` : '';
+      this.expResultBadge.textContent = `${playerText}정답! ✅ (+${earned}점)`;
     } else {
       this.streak = 0;
       if (!this.wrongQuestions.some(wq => wq.sentence === q.sentence)) {
@@ -647,13 +757,173 @@ class GrammarQuestGame {
 
       window.soundFx.playWrong();
       this.expResultBadge.className = 'exp-badge wrong';
-      this.expResultBadge.textContent = `오답! 다음 판에 다시 출제됩니다 🔄`;
+      const playerText = this.isBattleMode ? `[${this.currentTurnPlayer}P] ` : '';
+      this.expResultBadge.textContent = `${playerText}오답! 다음 판에 다시 출제됩니다 🔄`;
     }
 
     this.scoreText.textContent = this.score;
     this.streakText.textContent = `${this.streak} 🔥`;
     this.expContent.textContent = q.explanation;
     this.explanationBox.classList.add('active');
+  }
+
+  // 1. 단어 어순 배열 (Sentence Scramble) 완성 결과 처리
+  handleScrambleComplete(isCorrect, assembled) {
+    if (this.isAnswered || this.gameState !== 'quiz') return;
+    this.isAnswered = true;
+    this.gameState = 'review';
+    if (this.timer) clearInterval(this.timer);
+
+    const q = this.currentQuestion;
+    const blank = document.getElementById('activeBlank');
+
+    if (isCorrect) {
+      this.correctCount++;
+      this.streak++;
+      this.totalSolvedCount++;
+      this.wrongQuestions = this.wrongQuestions.filter(wq => wq.sentence !== q.sentence);
+      this.saveStorageArray('GRAMMAR_WRONG_QUESTIONS', this.wrongQuestions);
+      localStorage.setItem('GRAMMAR_TOTAL_SOLVED', this.totalSolvedCount.toString());
+      this.updateProgressHUD();
+
+      const timeBonus = this.timeLeft * 6;
+      const streakBonus = Math.max(0, (this.streak - 1) * 30);
+      const earned = 150 + timeBonus + streakBonus;
+      this.addScore(earned);
+
+      if (blank) {
+        blank.textContent = q.answerWord || '완성';
+        blank.style.color = 'var(--accent-green)';
+        blank.style.borderColor = 'var(--accent-green)';
+        blank.style.boxShadow = '0 0 20px var(--accent-green)';
+      }
+
+      if (window.visualClueManager) {
+        window.visualClueManager.triggerSuccessReaction();
+      }
+
+      window.soundFx.playCorrect();
+      this.expResultBadge.className = 'exp-badge correct';
+      const playerText = this.isBattleMode ? `[${this.currentTurnPlayer}P] ` : '';
+      this.expResultBadge.textContent = `${playerText}어순 완성 대성공! 🧩 (+${earned}점)`;
+
+      // 정답 완성 문장 원어민 TTS 자동 발음
+      setTimeout(() => {
+        this.playListeningAudio();
+      }, 300);
+
+    } else {
+      this.streak = 0;
+      if (!this.wrongQuestions.some(wq => wq.sentence === q.sentence)) {
+        this.wrongQuestions.push(q);
+      }
+      this.saveStorageArray('GRAMMAR_WRONG_QUESTIONS', this.wrongQuestions);
+      this.updateProgressHUD();
+
+      window.soundFx.playWrong();
+      this.expResultBadge.className = 'exp-badge wrong';
+      const playerText = this.isBattleMode ? `[${this.currentTurnPlayer}P] ` : '';
+      this.expResultBadge.textContent = `${playerText}순서가 틀렸습니다! 🔄 올바른 문장을 확인해보세요.`;
+    }
+
+    this.scoreText.textContent = this.score;
+    this.streakText.textContent = `${this.streak} 🔥`;
+    this.expContent.textContent = q.explanation;
+    this.explanationBox.classList.add('active');
+  }
+
+  // 2. 점수 가산 & 2인 배틀 모드 스코어 관리
+  addScore(earned) {
+    this.score += earned;
+    if (this.isBattleMode) {
+      if (this.currentTurnPlayer === 1) {
+        this.p1Score += earned;
+      } else {
+        this.p2Score += earned;
+      }
+      this.updateBattleHUD();
+    }
+  }
+
+  updateBattleHUD() {
+    if (!this.battleScoreboard) return;
+    this.p1ScoreEl.textContent = this.p1Score;
+    this.p2ScoreEl.textContent = this.p2Score;
+    if (this.isBattleMode) {
+      this.p1Tag.classList.toggle('active-turn', this.currentTurnPlayer === 1);
+      this.p2Tag.classList.toggle('active-turn', this.currentTurnPlayer === 2);
+    }
+  }
+
+  toggleBattleMode() {
+    this.isBattleMode = !this.isBattleMode;
+    this.modeToggleText.textContent = this.isBattleMode ? '2인 대전 ON ⚔️' : '1인 솔로';
+    this.battleScoreboard.style.display = this.isBattleMode ? 'flex' : 'none';
+    window.soundFx.playCorrect();
+    this.startNewGame();
+  }
+
+  // 3. 문장 전체 섀도잉 & 발음 점수 평가 엔진
+  startShadowRecording() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('현재 브라우저에서는 음성 인식을 지원하지 않습니다. Chrome 또는 Edge 브라우저를 사용해 주세요.');
+      return;
+    }
+
+    const q = this.currentQuestion;
+    const targetFull = (q.audioText || q.full || q.sentence.replace('_____', q.answerWord)).replace(/[.?!]/g, '').trim().toLowerCase();
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognizer = new SpeechRecognition();
+    recognizer.lang = 'en-US';
+    recognizer.interimResults = false;
+    recognizer.maxAlternatives = 1;
+
+    this.shadowRecordBtn.classList.add('recording');
+    this.shadowRecordBtn.innerHTML = '<span>🎙️ 귀 기울여 듣는 중... 말씀하세요!</span>';
+
+    recognizer.onresult = (e) => {
+      const heard = e.results[0][0].transcript.toLowerCase().trim();
+      const score = this.calculateSimilarity(heard, targetFull);
+
+      this.shadowResultBox.style.display = 'flex';
+      this.shadowScoreNumber.textContent = `발음 정확도: ${score}점`;
+      this.shadowHeardText.textContent = `인식된 발음: "${heard}"`;
+
+      if (score >= 90) {
+        this.shadowScoreStars.textContent = '⭐⭐⭐ (원어민 수준!)';
+        window.soundFx.playCombo();
+      } else if (score >= 70) {
+        this.shadowScoreStars.textContent = '⭐⭐ (훌륭해요!)';
+        window.soundFx.playCorrect();
+      } else {
+        this.shadowScoreStars.textContent = '⭐ (조금 더 또박또박!)';
+        window.soundFx.playWrong();
+      }
+    };
+
+    recognizer.onerror = () => {
+      this.shadowRecordBtn.classList.remove('recording');
+      this.shadowRecordBtn.innerHTML = '<span>🎙️ 다시 따라 말하기</span>';
+    };
+
+    recognizer.onend = () => {
+      this.shadowRecordBtn.classList.remove('recording');
+      this.shadowRecordBtn.innerHTML = '<span>🎙️ 다시 따라 말하기</span>';
+    };
+
+    recognizer.start();
+  }
+
+  calculateSimilarity(s1, s2) {
+    const words1 = s1.split(/\s+/);
+    const words2 = s2.split(/\s+/);
+    let matches = 0;
+    words1.forEach(w => {
+      if (words2.includes(w)) matches++;
+    });
+    const ratio = matches / Math.max(words1.length, words2.length);
+    return Math.min(100, Math.max(60, Math.round(ratio * 100)));
   }
 
   timeOut() {
@@ -692,6 +962,12 @@ class GrammarQuestGame {
 
   nextQuestion() {
     this.currentIndex++;
+    if (this.isBattleMode) {
+      // 턴 교체
+      this.currentTurnPlayer = this.currentTurnPlayer === 1 ? 2 : 1;
+      this.updateBattleHUD();
+    }
+
     if (this.currentIndex >= this.questions.length) {
       this.showFinalReport();
     } else {
@@ -711,30 +987,45 @@ class GrammarQuestGame {
     let grade = 'A+';
     let icon = '🏆';
 
-    if (percent >= 90) {
-      grade = 'MASTER (A+)';
-      icon = '👑';
-    } else if (percent >= 70) {
-      grade = 'EXCELLENT (A)';
-      icon = '🌟';
-    } else if (percent >= 50) {
-      grade = 'GOOD (B)';
-      icon = '👍';
+    if (this.isBattleMode) {
+      const winner = this.p1Score > this.p2Score ? '1P (BLUE)' : (this.p2Score > this.p1Score ? '2P (RED)' : '공동 무승부');
+      icon = '⚔️';
+      this.overlayIcon.textContent = icon;
+      this.overlayTitle.textContent = `2인 대전 종료: ${winner} 승리!`;
+      this.overlayDesc.innerHTML = `
+        <div style="font-size: 22px; margin-bottom: 12px;">
+          <span style="color: var(--accent-cyan); font-weight: 900;">1P: ${this.p1Score}점</span> VS 
+          <span style="color: #ff3366; font-weight: 900;">2P: ${this.p2Score}점</span>
+        </div>
+        온 가족과 함께 총 <strong>${this.questions.length}</strong>문제를 멋지게 완료했습니다!<br>
+        누적 해결한 영문법 문제: <strong style="color: var(--accent-cyan); font-size: 20px;">총 ${this.totalSolvedCount}개</strong>
+      `;
     } else {
-      grade = 'TRY AGAIN (C)';
-      icon = '💪';
-    }
+      if (percent >= 90) {
+        grade = 'MASTER (A+)';
+        icon = '👑';
+      } else if (percent >= 70) {
+        grade = 'EXCELLENT (A)';
+        icon = '🌟';
+      } else if (percent >= 50) {
+        grade = 'GOOD (B)';
+        icon = '👍';
+      } else {
+        grade = 'TRY AGAIN (C)';
+        icon = '💪';
+      }
 
-    this.overlayIcon.textContent = icon;
-    this.overlayTitle.textContent = `무한 퀘스트 완료: ${grade}`;
-    this.overlayDesc.innerHTML = `
-      이번 라운드: <strong>${this.questions.length}</strong>문제 중 <strong>${this.correctCount}</strong>문제 정답! (${percent}%)<br>
-      누적 해결한 영문법 문제: <strong style="color: var(--accent-cyan); font-size: 20px;">총 ${this.totalSolvedCount}개</strong><br>
-      <span style="color: var(--accent-red); font-size: 14px;">
-        ${wrongCount > 0 ? `⚠️ 틀린 문제 ${wrongCount}개는 다음 게임에 최우선 다시 출제됩니다.` : '🎉 현재 누적된 오답이 없습니다!'}
-      </span><br>
-      획득 점수: <span style="color: var(--accent-gold); font-size: 24px; font-weight: 800;">${this.score}점</span>
-    `;
+      this.overlayIcon.textContent = icon;
+      this.overlayTitle.textContent = `무한 퀘스트 완료: ${grade}`;
+      this.overlayDesc.innerHTML = `
+        이번 라운드: <strong>${this.questions.length}</strong>문제 중 <strong>${this.correctCount}</strong>문제 정답! (${percent}%)<br>
+        누적 해결한 영문법 문제: <strong style="color: var(--accent-cyan); font-size: 20px;">총 ${this.totalSolvedCount}개</strong><br>
+        <span style="color: var(--accent-red); font-size: 14px;">
+          ${wrongCount > 0 ? `⚠️ 틀린 문제 ${wrongCount}개는 다음 게임에 최우선 다시 출제됩니다.` : '🎉 현재 누적된 오답이 없습니다!'}
+        </span><br>
+        획득 점수: <span style="color: var(--accent-gold); font-size: 24px; font-weight: 800;">${this.score}점</span>
+      `;
+    }
 
     this.startBtnText.textContent = '새로운 문장 생성 & 도전 (OK / "시작")';
     this.gameOverlay.classList.add('active');
