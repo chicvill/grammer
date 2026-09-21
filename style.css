@@ -347,44 +347,195 @@ body {
   color: var(--text-dim);
 }
 
-/* 영어 문장 보드 */
+/* === 영문법 Hero 문제 쇼케이스 보드 (비주얼 일러스트 + 문장 집중) === */
+.hero-question-showcase {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  margin-bottom: 12px;
+  min-height: 180px;
+}
+
+/* 좌측: 비주얼 일러스트 힌트 스테이지 */
+.visual-clue-stage {
+  flex: 0 0 clamp(190px, 18vw, 240px);
+  display: flex;
+  flex-direction: column;
+}
+
+.visual-clue-card {
+  flex: 1;
+  background: radial-gradient(circle at 50% 30%, rgba(26, 36, 78, 0.95), rgba(10, 14, 32, 0.95));
+  border: 2px solid var(--clue-theme, rgba(0, 240, 255, 0.5));
+  border-radius: 20px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 0 24px rgba(0, 0, 0, 0.6),
+    0 0 16px var(--clue-theme, rgba(0, 240, 255, 0.3)),
+    inset 0 0 16px rgba(0, 240, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: clueFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes clueFloat {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-4px); }
+}
+
+/* 정답 시 일러스트 축하 팝 애니메이션 */
+.visual-clue-card.clue-success-pop {
+  animation: clueSuccessPop 0.8s ease-in-out forwards;
+}
+
+@keyframes clueSuccessPop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.08) rotate(-2deg); box-shadow: 0 0 35px var(--accent-green), 0 0 15px #fff; }
+  60% { transform: scale(1.05) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.clue-artwork-wrap {
+  width: 100%;
+  height: 116px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.clue-svg {
+  width: 100%;
+  height: 100%;
+  max-height: 116px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+.clue-hint-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(10, 15, 35, 0.85);
+  border: 1.5px solid var(--clue-theme, rgba(0, 240, 255, 0.4));
+  border-radius: 20px;
+  padding: 5px 12px;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.clue-icon-bulb {
+  font-size: 13px;
+  filter: drop-shadow(0 0 5px #ffc800);
+}
+
+.clue-tag-text {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 우측: 메인 영어 문장 & 번역 포커스 보드 */
 .sentence-board {
-  background: rgba(12, 16, 34, 0.7);
-  border: 1px solid rgba(120, 150, 255, 0.2);
-  border-radius: 18px;
-  padding: 26px 34px;
+  flex: 1;
+  background: linear-gradient(140deg, rgba(18, 26, 58, 0.95) 0%, rgba(10, 15, 34, 0.95) 100%);
+  border: 2px solid rgba(120, 160, 255, 0.35);
+  border-radius: 20px;
+  padding: 18px 28px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  text-align: center;
-  min-height: 150px;
+  position: relative;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+/* 문장 상단 퀘스트 뱃지 헤더 */
+.question-pill-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.q-focus-badge {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.q-clue-guide {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
 }
 
 .target-sentence {
-  font-size: clamp(34px, 4.2vw, 50px);
+  font-size: clamp(30px, 3.6vw, 44px);
   font-weight: 900;
   color: #ffffff;
-  line-height: 1.4;
+  line-height: 1.35;
   letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
+/* 빈칸 슬롯: 펄스 애니메이션이 적용된 3D 네온 골드 박스 */
 .blank-box {
   display: inline-block;
-  min-width: 140px;
-  border-bottom: 5px solid var(--accent-gold);
+  min-width: 130px;
+  background: linear-gradient(180deg, rgba(255, 200, 0, 0.28) 0%, rgba(255, 120, 0, 0.15) 100%);
+  border: 2.5px dashed var(--accent-gold);
   color: var(--accent-gold);
-  background: rgba(255, 200, 0, 0.15);
-  padding: 2px 20px;
-  border-radius: 10px 10px 0 0;
+  padding: 3px 22px;
+  border-radius: 14px;
   margin: 0 8px;
   font-weight: 900;
-  text-shadow: 0 0 12px rgba(255, 200, 0, 0.5);
+  text-align: center;
+  text-shadow: 0 0 16px rgba(255, 200, 0, 0.7);
+  box-shadow: 0 0 16px rgba(255, 200, 0, 0.3), inset 0 0 10px rgba(255, 200, 0, 0.2);
+  animation: blankPulse 2s infinite ease-in-out;
+  vertical-align: middle;
+}
+
+@keyframes blankPulse {
+  0% {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 12px rgba(255, 200, 0, 0.3), inset 0 0 8px rgba(255, 200, 0, 0.15);
+    transform: scale(1);
+  }
+  50% {
+    border-color: #ffffff;
+    box-shadow: 0 0 24px rgba(255, 200, 0, 0.7), inset 0 0 16px rgba(255, 200, 0, 0.35);
+    transform: scale(1.02);
+  }
+  100% {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 12px rgba(255, 200, 0, 0.3), inset 0 0 8px rgba(255, 200, 0, 0.15);
+    transform: scale(1);
+  }
 }
 
 .sentence-translation {
-  margin-top: 14px;
-  font-size: clamp(20px, 2.4vw, 28px);
-  color: var(--text-dim);
+  margin-top: 10px;
+  font-size: clamp(18px, 2.2vw, 24px);
+  color: #b0c2de;
   font-weight: 600;
 }
 

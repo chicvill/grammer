@@ -101,14 +101,26 @@
           <span class="rule-hint-pill">D-Pad로 선택 후 OK (또는 음성으로 "1번")</span>
         </div>
 
-        <!-- 영어 문장 카드 -->
-        <div class="sentence-board">
-          <p class="target-sentence" id="targetSentence">
-            Tom and Jerry <span class="blank-box">[ ? ]</span> good friends.
-          </p>
-          <p class="sentence-translation" id="sentenceTranslation">
-            "톰과 제리는 좋은 친구들이다."
-          </p>
+        <!-- 영문법 Hero 문제 쇼케이스 보드 (비주얼 일러스트 + 문장 집중 2-컬럼 구조) -->
+        <div class="hero-question-showcase">
+          <!-- 좌측: 답 유추를 돕는 비주얼 일러스트 & 상황 힌트 태그 -->
+          <div class="visual-clue-stage" id="visualClueStage">
+            <!-- visualClueManager에 의해 동적으로 고해상도 SVG 일러스트가 주입됩니다 -->
+          </div>
+
+          <!-- 우측: 메인 타겟 문장 & 번역 포커스 보드 -->
+          <div class="sentence-board">
+            <div class="question-pill-header">
+              <span class="q-focus-badge">TARGET SENTENCE</span>
+              <span class="q-clue-guide">💡 그림 단서를 보고 빈칸에 들어갈 알맞은 말을 찾아보세요!</span>
+            </div>
+            <p class="target-sentence" id="targetSentence">
+              Tom and Jerry <span class="blank-box">[ ? ]</span> good friends.
+            </p>
+            <p class="sentence-translation" id="sentenceTranslation">
+              "톰과 제리는 좋은 친구들이다."
+            </p>
+          </div>
         </div>
 
         <!-- 2x2 보기 카드 그리드 (선택형 문제일 때 노출) -->
@@ -275,8 +287,9 @@
 
   </div>
 
-  <!-- 스크립트 로드 순서: 문법 생성기 -> 효과음 -> 음성 인식 -> 게임 코어 -->
+  <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 렌더러 -> 효과음 -> 음성 인식 -> 게임 코어 -->
   <script src="grammarGenerator.js"></script>
+  <script src="visualClueManager.js"></script>
   <script src="audio.js"></script>
   <script src="voice.js"></script>
   <script src="game.js"></script>

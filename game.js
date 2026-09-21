@@ -35,6 +35,7 @@ class GrammarQuestGame {
     this.categoryTag = document.getElementById('categoryTag');
     this.targetSentence = document.getElementById('targetSentence');
     this.sentenceTranslation = document.getElementById('sentenceTranslation');
+    this.visualClueStage = document.getElementById('visualClueStage');
     
     // 선택형 2x2 그리드
     this.optionsGrid = document.getElementById('optionsGrid');
@@ -90,6 +91,15 @@ class GrammarQuestGame {
     this.updateProgressHUD();
     this.updateGradeTabsUI();
     this.bindEvents();
+
+    // 초기 화면용 기본 비주얼 단서 렌더링
+    if (window.visualClueManager && this.visualClueStage) {
+      window.visualClueManager.renderInto(this.visualClueStage, {
+        sentence: "Tom and Jerry _____ good friends.",
+        translation: "톰과 제리는 좋은 친구들이다.",
+        category: "Be동사 현재형"
+      });
+    }
     
     setTimeout(() => {
       this.startBtn.focus();
@@ -405,6 +415,11 @@ class GrammarQuestGame {
     this.targetSentence.innerHTML = blankHtml;
     this.sentenceTranslation.textContent = `"${q.translation}"`;
 
+    // 비주얼 일러스트 & 상황 단서 렌더링
+    if (window.visualClueManager && this.visualClueStage) {
+      window.visualClueManager.renderInto(this.visualClueStage, q);
+    }
+
     this.explanationBox.classList.remove('active');
 
     // === 유형별 화면 세팅 ===
@@ -527,7 +542,12 @@ class GrammarQuestGame {
       if (blank) {
         blank.textContent = target;
         blank.style.color = 'var(--accent-green)';
-        blank.style.borderBottomColor = 'var(--accent-green)';
+        blank.style.borderColor = 'var(--accent-green)';
+        blank.style.boxShadow = '0 0 20px var(--accent-green)';
+      }
+
+      if (window.visualClueManager) {
+        window.visualClueManager.triggerSuccessReaction();
       }
 
       if (this.streak >= 3) {
@@ -548,8 +568,8 @@ class GrammarQuestGame {
 
       if (blank) {
         blank.textContent = target;
-        blank.style.color = 'var(--accent-green)';
-        blank.style.borderBottomColor = 'var(--accent-green)';
+        blank.style.color = 'var(--accent-red)';
+        blank.style.borderColor = 'var(--accent-red)';
       }
 
       window.soundFx.playWrong();
@@ -592,7 +612,12 @@ class GrammarQuestGame {
       if (blank) {
         blank.textContent = q.options[chosenIndex];
         blank.style.color = 'var(--accent-green)';
-        blank.style.borderBottomColor = 'var(--accent-green)';
+        blank.style.borderColor = 'var(--accent-green)';
+        blank.style.boxShadow = '0 0 20px var(--accent-green)';
+      }
+
+      if (window.visualClueManager) {
+        window.visualClueManager.triggerSuccessReaction();
       }
 
       if (this.streak >= 3) {
@@ -616,8 +641,8 @@ class GrammarQuestGame {
 
       if (blank) {
         blank.textContent = q.options[q.answer];
-        blank.style.color = 'var(--accent-green)';
-        blank.style.borderBottomColor = 'var(--accent-green)';
+        blank.style.color = 'var(--accent-red)';
+        blank.style.borderColor = 'var(--accent-red)';
       }
 
       window.soundFx.playWrong();
