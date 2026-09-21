@@ -28,6 +28,21 @@ const server = http.createServer((req, res) => {
   });
 });
 
+const os = require('os');
+
 server.listen(PORT, () => {
-  console.log(`TV Game Server running at http://localhost:${PORT}`);
+  console.log('====================================================');
+  console.log(` TV Game Server running on port ${PORT}`);
+  console.log('====================================================');
+  console.log(` - Local:   http://localhost:${PORT}`);
+  const nets = os.networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        console.log(` - Network: http://${net.address}:${PORT}`);
+      }
+    }
+  }
+  console.log('====================================================');
+  console.log(' Press Ctrl+C to stop the server.');
 });
