@@ -1042,25 +1042,34 @@ class GrammarQuestGame {
 
   // 3. 문장 전체 섀도잉 & 발음 점수 평가 엔진 + 학생 실제 음성 녹음 (MediaRecorder)
   async startShadowRecording() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('현재 브라우저에서는 음성 인식을 지원하지 않습니다. Chrome 또는 Edge 브라우저를 사용해 주세요.');
+    // 이미 녹음 중인 상태에서 버튼을 다시 누르면 녹음 완료 처리!
+    if (this.isShadowRecording) {
+      this.stopShadowRecording();
       return;
+    }
+
+    // 전역 음성인식기 일시 중지 (마이크 독점 충돌 방지)
+    if (this.voiceCommander) {
+      this.voiceCommander.stop();
     }
 
     const q = this.currentQuestion;
     const targetFull = (q.audioText || q.full || q.sentence.replace('_____', q.answerWord)).replace(/[.?!]/g, '').trim().toLowerCase();
 
-    // 1. 마이크 스트림 획득 & MediaRecorder 세팅
-    let stream = null;
+    this.isShadowRecording = true;
     this.audioChunks = [];
+    this.shadowRecordBtn.classList.add('recording');
+    this.shadowRecordBtn.innerHTML = '<span>⏹️ 녹음 중... (다 읽고 클릭 시 완료)</span>';
+
+    // 1. 마이크 스트림 획득 & MediaRecorder 세팅
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        this.shadowStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
           ? 'audio/webm;codecs=opus'
           : (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus') ? 'audio/ogg;codecs=opus' : '');
         
-        this.mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+        this.mediaRecorder = mimeType ? new MediaRecorder(this.shadowStream, { mimeType }) : new MediaRecorder(this.shadowStream);
         
         this.mediaRecorder.ondataavailable = (e) => {
           if (e.data && e.data.size > 0) {
@@ -1069,10 +1078,6 @@ class GrammarQuestGame {
         };
 
         this.mediaRecorder.onstop = () => {
-          try {
-            stream.getTracks().forEach(track => track.stop());
-          } catch (e) {}
-
           if (this.audioChunks.length > 0) {
             if (this.currentUserAudioUrl) {
               URL.revokeObjectURL(this.currentUserAudioUrl);
@@ -1082,45 +1087,92 @@ class GrammarQuestGame {
             if (this.playUserVoiceBtn) {
               this.playUserVoiceBtn.classList.add('ready');
             }
+            if (this.shadowResultBox) {
+              this.shadowResultBox.style.display = 'flex';
+            }
           }
         };
 
         this.mediaRecorder.start(100);
       }
     } catch (err) {
-      console.warn('MediaRecorder 오디오 녹음 스트림 접근 불가 (SpeechRecognition만 진행):', err);
+      console.warn('MediaRecorder 오디오 녹음 스트림 접근 불가:', err);
     }
 
     // 2. 음성 인식기 (SpeechRecognition) 시작
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognizer = new SpeechRecognition();
-    recognizer.lang = 'en-US';
-    recognizer.interimResults = false;
-    recognizer.maxAlternatives = 1;
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      try {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this.shadowRecognizer = new SpeechRecognition();
+        this.shadowRecognizer.lang = 'en-US';
+        this.shadowRecognizer.interimResults = false;
+        this.shadowRecognizer.maxAlternatives = 1;
 
-    this.shadowRecordBtn.classList.add('recording');
-    this.shadowRecordBtn.innerHTML = '<span>🎙️ 귀 기울여 듣는 중... 말씀하세요!</span>';
+        this.shadowRecognizer.onresult = (e) => {
+          const heard = e.results[0][0].transcript.toLowerCase().trim();
+          const score = this.calculateSimilarity(heard, targetFull);
+          this.stopShadowRecording(score, heard);
+        };
 
-    const stopAllRecording = () => {
-      this.shadowRecordBtn.classList.remove('recording');
-      this.shadowRecordBtn.innerHTML = '<span>🎙️ 다시 따라 말하기</span>';
-      if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-        try {
-          this.mediaRecorder.stop();
-        } catch (e) {}
+        this.shadowRecognizer.onerror = (e) => {
+          console.warn('[Shadow STT Error]:', e);
+          if (this.isShadowRecording) {
+            this.stopShadowRecording();
+          }
+        };
+
+        this.shadowRecognizer.onend = () => {
+          if (this.isShadowRecording) {
+            this.stopShadowRecording();
+          }
+        };
+
+        this.shadowRecognizer.start();
+      } catch (e) {
+        console.warn('SpeechRecognition 시작 오류:', e);
       }
-    };
+    }
+  }
 
-    recognizer.onresult = (e) => {
-      const heard = e.results[0][0].transcript.toLowerCase().trim();
-      const score = this.calculateSimilarity(heard, targetFull);
+  // 섀도잉 녹음 종료 처리
+  stopShadowRecording(score = null, heard = '') {
+    if (!this.isShadowRecording) return;
+    this.isShadowRecording = false;
 
-      stopAllRecording();
+    this.shadowRecordBtn.classList.remove('recording');
+    this.shadowRecordBtn.innerHTML = '<span>🎙️ 다시 따라 말하기</span>';
 
-      this.shadowResultBox.style.display = 'flex';
+    // 1. STT 중지
+    if (this.shadowRecognizer) {
+      try { this.shadowRecognizer.stop(); } catch (e) {}
+      this.shadowRecognizer = null;
+    }
+
+    // 2. MediaRecorder 중지
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try { this.mediaRecorder.stop(); } catch (e) {}
+    }
+
+    // 3. 마이크 트랙 해제
+    if (this.shadowStream) {
+      try {
+        this.shadowStream.getTracks().forEach(t => t.stop());
+        this.shadowStream = null;
+      } catch (e) {}
+    }
+
+    // 4. 전역 음성 인식기 복구
+    setTimeout(() => {
+      if (this.voiceCommander && !this.voiceCommander.isListening) {
+        this.voiceCommander.start();
+      }
+    }, 400);
+
+    // 5. 결과 UI 표시
+    this.shadowResultBox.style.display = 'flex';
+    if (score !== null) {
       this.shadowScoreNumber.textContent = `발음 정확도: ${score}점`;
       this.shadowHeardText.textContent = `인식된 발음: "${heard}"`;
-
       if (score >= 90) {
         this.shadowScoreStars.textContent = '⭐⭐⭐ (원어민 수준!)';
         window.soundFx.playCombo();
@@ -1131,28 +1183,20 @@ class GrammarQuestGame {
         this.shadowScoreStars.textContent = '⭐ (조금 더 또박또박!)';
         window.soundFx.playWrong();
       }
-
-      // 발음 채점 완료 후 '내 목소리 다시 듣기' 버튼으로 포커스 유도
-      setTimeout(() => {
-        if (this.playUserVoiceBtn) {
-          this.playUserVoiceBtn.focus();
-        }
-      }, 350);
-    };
-
-    recognizer.onerror = () => {
-      stopAllRecording();
-    };
-
-    recognizer.onend = () => {
-      stopAllRecording();
-    };
-
-    try {
-      recognizer.start();
-    } catch (e) {
-      stopAllRecording();
+    } else {
+      this.shadowScoreStars.textContent = '🎙️ 녹음 완료!';
+      this.shadowScoreNumber.textContent = '내 목소리 확인';
+      this.shadowHeardText.textContent = '녹음이 저장되었습니다. 옆의 [내 목소리 다시 듣기]를 눌러보세요!';
+      window.soundFx.playCorrect();
     }
+
+    // 6. [내 목소리 다시 듣기] 버튼으로 자동 포커스
+    setTimeout(() => {
+      if (this.playUserVoiceBtn) {
+        this.playUserVoiceBtn.classList.add('ready');
+        this.playUserVoiceBtn.focus();
+      }
+    }, 300);
   }
 
   // 방금 녹음된 사용자 실제 목소리 재생
