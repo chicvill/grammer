@@ -245,34 +245,34 @@
               <span class="shadowing-guide">원어민 발음을 듣고 마이크로 문장 전체를 따라 읽어보세요!</span>
             </div>
             <div class="shadowing-controls">
-              <button class="shadow-btn shadow-listen focusable" id="shadowListenBtn" tabindex="0">
+              <button class="shadow-btn shadow-listen focusable" id="shadowListenBtn" tabindex="0" title="원문 전체 듣기">
                 <span>🔊 원문 전체 듣기</span>
               </button>
-              <button class="shadow-btn shadow-record focusable" id="shadowRecordBtn" tabindex="0">
+              <button class="shadow-btn shadow-record focusable" id="shadowRecordBtn" tabindex="0" title="따라 말하기 시작 (마이크 녹음)">
                 <span>🎙️ 따라 말하기 시작</span>
               </button>
+              <button class="shadow-btn shadow-user-voice focusable" id="playUserVoiceBtn" tabindex="0" title="방금 내가 녹음한 목소리 다시 듣기">
+                <span class="icon">🎧</span>
+                <span class="text" id="playUserVoiceText">내 목소리 다시 듣기</span>
+                <span class="audio-wave-anim" id="userAudioWave">
+                  <i></i><i></i><i></i><i></i>
+                </span>
+              </button>
+              <button class="shadow-btn shadow-compare focusable" id="playNativeCompareBtn" tabindex="0" title="원어민 발음과 나란히 비교해서 듣기">
+                <span class="icon">🔊</span>
+                <span class="text">원어민 발음 비교</span>
+              </button>
             </div>
-            <!-- 발음 채점 결과 카드 및 내 목소리 다시 듣기 오디오 바 -->
+
+            <!-- 발음 채점 결과 카드 -->
             <div class="shadow-result-box" id="shadowResultBox" style="display: none;">
               <div class="shadow-result-header">
                 <div class="score-stars" id="shadowScoreStars">⭐⭐⭐</div>
                 <div class="score-number-pill" id="shadowScoreNumber">발음 점수: 95점</div>
                 <div class="shadow-heard-text" id="shadowHeardText">"Tom and Jerry are good friends"</div>
               </div>
-
-              <!-- 내 목소리 재생 & 원어민 발음 비교 버튼 바 -->
-              <div class="shadow-audio-actions">
-                <button class="shadow-audio-btn play-user-voice focusable" id="playUserVoiceBtn" tabindex="0" title="방금 내가 녹음한 목소리 다시 듣기">
-                  <span class="icon">🎧</span>
-                  <span class="text" id="playUserVoiceText">내 목소리 다시 듣기</span>
-                  <span class="audio-wave-anim" id="userAudioWave">
-                    <i></i><i></i><i></i><i></i>
-                  </span>
-                </button>
-                <button class="shadow-audio-btn play-native-voice focusable" id="playNativeCompareBtn" tabindex="0" title="원어민 발음과 나란히 비교해서 듣기">
-                  <span class="icon">🔊</span>
-                  <span class="text">원어민 발음 비교</span>
-                </button>
+              <div class="shadow-result-tip">
+                💡 <strong>[🎧 내 목소리 다시 듣기]</strong>와 <strong>[🔊 원어민 발음 비교]</strong>를 눌러 억양과 발음 차이를 직접 비교해 보세요!
               </div>
             </div>
           </div>

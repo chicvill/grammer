@@ -681,7 +681,7 @@ class GrammarQuestGame {
       this.currentUserAudioUrl = null;
     }
     if (this.playUserVoiceBtn) {
-      this.playUserVoiceBtn.classList.remove('playing');
+      this.playUserVoiceBtn.classList.remove('playing', 'ready');
     }
     if (this.playUserVoiceText) {
       this.playUserVoiceText.textContent = '내 목소리 다시 듣기';
@@ -1080,7 +1080,7 @@ class GrammarQuestGame {
             const blob = new Blob(this.audioChunks, { type: this.mediaRecorder.mimeType || 'audio/webm' });
             this.currentUserAudioUrl = URL.createObjectURL(blob);
             if (this.playUserVoiceBtn) {
-              this.playUserVoiceBtn.style.display = 'inline-flex';
+              this.playUserVoiceBtn.classList.add('ready');
             }
           }
         };
@@ -1158,7 +1158,7 @@ class GrammarQuestGame {
   // 방금 녹음된 사용자 실제 목소리 재생
   playUserRecordedVoice() {
     if (!this.currentUserAudioUrl) {
-      alert('녹음된 목소리가 없습니다. 먼저 "따라 말하기 시작" 버튼을 눌러 문장을 읽어보세요!');
+      alert('🎙️ 먼저 바로 옆의 [따라 말하기 시작] 버튼을 눌러 마이크로 문장을 읽고 녹음해 보세요!');
       return;
     }
 

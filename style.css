@@ -1524,6 +1524,51 @@ body {
   animation: recPulse 1s infinite alternate;
 }
 
+.shadow-btn.shadow-user-voice {
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid var(--accent-cyan);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shadow-btn.shadow-user-voice.ready {
+  background: rgba(0, 240, 255, 0.35);
+  border-color: #00f0ff;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.6);
+  animation: userVoiceGlow 1.5s infinite alternate;
+}
+
+.shadow-btn.shadow-user-voice.playing {
+  background: var(--accent-cyan) !important;
+  color: #080a16 !important;
+  border-color: #fff !important;
+  box-shadow: 0 0 24px var(--accent-cyan) !important;
+}
+
+.shadow-btn.shadow-compare {
+  background: rgba(255, 200, 0, 0.15);
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shadow-btn.shadow-compare:hover,
+.shadow-btn.shadow-compare:focus {
+  background: rgba(255, 200, 0, 0.35);
+  box-shadow: 0 0 16px var(--accent-gold);
+  color: #fff;
+}
+
+@keyframes userVoiceGlow {
+  0% { box-shadow: 0 0 8px #00f0ff; }
+  100% { box-shadow: 0 0 22px #00f0ff; }
+}
+
 @keyframes recPulse {
   0% { box-shadow: 0 0 8px #ff007f; }
   100% { box-shadow: 0 0 20px #ff007f; }
@@ -1541,7 +1586,7 @@ body {
   padding: 12px 18px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   animation: fadeIn 0.3s ease;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
@@ -1571,67 +1616,11 @@ body {
   font-style: italic;
 }
 
-/* 내 목소리 재생 & 원어민 비교 버튼 바 */
-.shadow-audio-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 2px;
-}
-
-.shadow-audio-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 16px;
-  border-radius: 20px;
+.shadow-result-tip {
   font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-  outline: none;
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  border: 1.5px solid transparent;
-}
-
-.shadow-audio-btn.play-user-voice {
-  background: rgba(0, 240, 255, 0.15);
-  color: var(--accent-cyan);
-  border-color: var(--accent-cyan);
-}
-
-.shadow-audio-btn.play-native-voice {
-  background: rgba(255, 200, 0, 0.15);
-  color: var(--accent-gold);
-  border-color: var(--accent-gold);
-}
-
-.shadow-audio-btn:hover,
-.shadow-audio-btn:focus,
-.shadow-audio-btn.focused {
-  transform: scale(1.05);
-}
-
-.shadow-audio-btn.play-user-voice:hover,
-.shadow-audio-btn.play-user-voice:focus,
-.shadow-audio-btn.play-user-voice.focused {
-  background: rgba(0, 240, 255, 0.35);
-  box-shadow: 0 0 16px var(--accent-cyan);
-  color: #fff;
-}
-
-.shadow-audio-btn.play-native-voice:hover,
-.shadow-audio-btn.play-native-voice:focus,
-.shadow-audio-btn.play-native-voice.focused {
-  background: rgba(255, 200, 0, 0.35);
-  box-shadow: 0 0 16px var(--accent-gold);
-  color: #fff;
-}
-
-.shadow-audio-btn.playing {
-  background: var(--accent-cyan) !important;
-  color: #080a16 !important;
-  border-color: #fff !important;
-  box-shadow: 0 0 24px var(--accent-cyan) !important;
+  color: #a8bfe8;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(255, 200, 0, 0.2);
 }
 
 .audio-wave-anim {
@@ -1642,7 +1631,7 @@ body {
   margin-left: 2px;
 }
 
-.shadow-audio-btn.playing .audio-wave-anim {
+.shadow-btn.playing .audio-wave-anim {
   display: inline-flex;
 }
 
