@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>중1 기초 영문법 TV 퀘스트 - 리모컨 & 음성 학습 게임</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Pretendard:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- TV 오버스캔 방지 세이프 에어리어 -->
+  <div class="tv-safe-area">
+    
+    <!-- 상단 헤더 & HUD -->
+    <header class="hud-header">
+      <div class="logo-area">
+        <span class="game-badge">XIAOMI TV EDU EDITION</span>
+        <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag">중1 영문법</span></h1>
+      </div>
+
+      <div class="hud-stats">
+        <div class="stat-card">
+          <span class="stat-label">QUESTION</span>
+          <span class="stat-value" id="qNumText">1 / 10</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">SOLVED</span>
+          <span class="stat-value master-val" id="masteredProgressText">0 pts</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">SCORE</span>
+          <span class="stat-value" id="scoreText">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">STREAK</span>
+          <span class="stat-value streak-val" id="streakText">0 🔥</span>
+        </div>
+        <div class="stat-card timer-card">
+          <span class="stat-label">TIME</span>
+          <div class="timer-bar-wrap">
+            <div class="timer-bar-fill" id="timerBar" style="width: 100%;"></div>
+          </div>
+          <span class="timer-number" id="timerNumber">20s</span>
+        </div>
+      </div>
+
+      <!-- 음성 인식 상태 뱃지 -->
+      <div class="voice-status-card" id="voiceStatusCard">
+        <div class="mic-icon-wrap" id="micIconWrap">
+          <svg class="mic-svg" viewBox="0 0 24 24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        </div>
+        <div class="voice-text-info">
+          <span class="voice-status-title" id="voiceStatusText">음성 대기중</span>
+          <span class="voice-recognized-word" id="voiceHeardText">"초3", "중2", "고등" 말해보세요</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 6단계 학년별 선택 탭 바 -->
+    <nav class="grade-selector-bar" id="gradeSelectorBar" aria-label="학년 선택">
+      <button class="grade-tab focusable" data-grade="elem-low" tabindex="0">
+        <span class="tab-badge">초등 3~4</span>
+        <span class="tab-sub">파닉스·Be동사</span>
+      </button>
+      <button class="grade-tab focusable" data-grade="elem-high" tabindex="0">
+        <span class="tab-badge">초등 5~6</span>
+        <span class="tab-sub">진행형·조동사</span>
+      </button>
+      <button class="grade-tab focusable active" data-grade="mid-1" tabindex="0">
+        <span class="tab-badge">중학 1학년</span>
+        <span class="tab-sub">3인칭단수·과거</span>
+      </button>
+      <button class="grade-tab focusable" data-grade="mid-2" tabindex="0">
+        <span class="tab-badge">중학 2학년</span>
+        <span class="tab-sub">to부정사·수동태</span>
+      </button>
+      <button class="grade-tab focusable" data-grade="mid-3" tabindex="0">
+        <span class="tab-badge">중학 3학년</span>
+        <span class="tab-sub">현재완료·관계사</span>
+      </button>
+      <button class="grade-tab focusable" data-grade="high" tabindex="0">
+        <span class="tab-badge">고등 / 수능</span>
+        <span class="tab-sub">수일치·어법실전</span>
+      </button>
+    </nav>
+
+    <!-- 메인 레이아웃: 영문법 문제 스테이지 + 리모컨 컨트롤러 -->
+    <main class="main-content">
+      
+      <!-- 문법 퀘스트 문제 스테이지 -->
+      <section class="grammar-stage-section">
+        
+        <!-- 문법 카테고리 태그 -->
+        <div class="category-pill-wrap">
+          <span class="category-pill" id="categoryTag">Be동사 현재형</span>
+          <span class="rule-hint-pill">D-Pad로 선택 후 OK (또는 음성으로 "1번")</span>
+        </div>
+
+        <!-- 영어 문장 카드 -->
+        <div class="sentence-board">
+          <p class="target-sentence" id="targetSentence">
+            Tom and Jerry <span class="blank-box">[ ? ]</span> good friends.
+          </p>
+          <p class="sentence-translation" id="sentenceTranslation">
+            "톰과 제리는 좋은 친구들이다."
+          </p>
+        </div>
+
+        <!-- 2x2 보기 카드 그리드 (선택형 문제일 때 노출) -->
+        <div class="options-grid" id="optionsGrid" role="radiogroup">
+          <!-- 1번: 좌상 -->
+          <div class="option-card focusable" id="opt-0" tabindex="0" data-idx="0">
+            <div class="opt-key-badge">1 (▲ ◀)</div>
+            <div class="opt-text" id="optText-0">is</div>
+          </div>
+          <!-- 2번: 우상 -->
+          <div class="option-card focusable" id="opt-1" tabindex="0" data-idx="1">
+            <div class="opt-key-badge">2 (▲ ▶)</div>
+            <div class="opt-text" id="optText-1">are</div>
+          </div>
+          <!-- 3번: 좌하 -->
+          <div class="option-card focusable" id="opt-2" tabindex="0" data-idx="2">
+            <div class="opt-key-badge">3 (▼ ◀)</div>
+            <div class="opt-text" id="optText-2">am</div>
+          </div>
+          <!-- 4번: 우하 -->
+          <div class="option-card focusable" id="opt-3" tabindex="0" data-idx="3">
+            <div class="opt-key-badge">4 (▼ ▶)</div>
+            <div class="opt-text" id="optText-3">be</div>
+          </div>
+        </div>
+
+        <!-- 주관식 말하기 & 듣기 평가 전용 대형 보이스 패널 (보기가 없는 문제일 때 노출) -->
+        <div class="speech-stage-wrap" id="speechStageWrap" style="display: none;">
+          <div class="speech-prompt-card">
+            <!-- 리스닝 오디오 다시 듣기 버튼 -->
+            <button class="audio-listen-btn focusable" id="audioListenBtn" tabindex="0">
+              <span class="sound-icon">🔊</span>
+              <span class="btn-caption" id="audioBtnCaption">원어민 발음 다시 듣기 (OK / "다시 들려줘")</span>
+            </button>
+            
+            <div class="speaking-hint-box" id="speakingHintBox">
+              힌트: go의 과거형 (w _ _ _)
+            </div>
+
+            <!-- 마이크 비주얼라이저 -->
+            <div class="voice-wave-container">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+
+            <div class="speech-instruction" id="speechInstruction">
+              🎙️ 마이크에 영어로 정답 단어를 직접 말씀하세요!
+            </div>
+            <div class="speech-live-heard" id="speechLiveHeard">
+              인식 대기중...
+            </div>
+          </div>
+        </div>
+
+        <!-- 문제 해설 및 피드백 바 (정답 확인 시 하단에 등장) -->
+        <div class="explanation-box" id="explanationBox">
+          <div class="exp-header">
+            <span class="exp-badge correct" id="expResultBadge">정답! 🎉</span>
+            <span class="exp-title">핵심 문법 공식</span>
+            <span class="next-guide-tag">리모컨 [OK] 또는 "다음"을 말하세요</span>
+          </div>
+          <p class="exp-content" id="expContent">
+            주어가 'Tom and Jerry'로 2명(복수)이므로 복수형 be동사 'are'를 씁니다.
+          </p>
+        </div>
+
+        <!-- 오버레이 화면 (시작 / 결과 리포트) -->
+        <div class="game-overlay active" id="gameOverlay">
+          <div class="overlay-card">
+            <div class="overlay-icon-badge" id="overlayIcon">📚</div>
+            <h2 class="overlay-title" id="overlayTitle">중1 기초 영문법 퀘스트</h2>
+            <p class="overlay-desc" id="overlayDesc">
+              샤오미 TV 리모컨의 방향키와 OK 버튼 또는<br>
+              음성("1번", "2번", "시작")으로 10개의 영문법 퀘스트를 풀어보세요!
+            </p>
+
+            <div class="overlay-controls-guide">
+              <div class="guide-item"><span class="key-pill">▲▼◀▶</span> 방향키로 4개 보기 탐색</div>
+              <div class="guide-item"><span class="key-pill">OK / Enter</span> 보기 확정 / 다음 문제</div>
+              <div class="guide-item"><span class="key-pill">음성 제어</span> "1번", "2번", "시작", "다음"</div>
+            </div>
+
+            <button class="tv-btn focusable" id="startBtn" tabindex="0">
+              <span class="btn-text" id="startBtnText">퀘스트 시작 (OK / "시작")</span>
+            </button>
+            <button class="tv-btn voice-toggle-btn focusable" id="micToggleBtn" tabindex="0">
+              <span class="btn-text" id="micToggleBtnText">🎙️ 마이크 음성 제어 켜기</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 우측 사이드바: 샤오미 TV 리모컨 인터페이스 패널 -->
+      <aside class="controller-panel">
+        <h3 class="controller-title">샤오미 TV 리모컨</h3>
+        <p class="controller-hint">화면을 직접 누르거나 리모컨으로 조작하세요</p>
+
+        <!-- 원형 D-Pad -->
+        <div class="dpad-wrapper">
+          <button class="dpad-btn dpad-up" id="btnUp" title="위로 이동 / 1, 2번 라인">
+            <span class="arrow">▲</span>
+            <span class="label">위</span>
+          </button>
+          <div class="dpad-middle-row">
+            <button class="dpad-btn dpad-left" id="btnLeft" title="왼쪽 보기 (1번, 3번)">
+              <span class="arrow">◀</span>
+              <span class="label">왼쪽</span>
+            </button>
+            <button class="dpad-btn dpad-center" id="btnOk" title="정답 확정 / 다음 (OK)">
+              <span class="label">OK</span>
+            </button>
+            <button class="dpad-btn dpad-right" id="btnRight" title="오른쪽 보기 (2번, 4번)">
+              <span class="arrow">▶</span>
+              <span class="label">오른쪽</span>
+            </button>
+          </div>
+          <button class="dpad-btn dpad-down" id="btnDown" title="아래로 이동 / 3, 4번 라인">
+            <span class="arrow">▼</span>
+            <span class="label">아래</span>
+          </button>
+        </div>
+
+        <!-- 보기 단축 가이드 -->
+        <div class="dpad-shortcuts">
+          <div class="shortcut-chip" id="chip-1">1번: ▲ ◀</div>
+          <div class="shortcut-chip" id="chip-2">2번: ▲ ▶</div>
+          <div class="shortcut-chip" id="chip-3">3번: ▼ ◀</div>
+          <div class="shortcut-chip" id="chip-4">4번: ▼ ▶</div>
+        </div>
+
+        <!-- 음성 치트시트 -->
+        <div class="command-cheatsheet">
+          <h4>🗣️ 지원 음성 명령어</h4>
+          <ul>
+            <li><strong>영어 직접 발음:</strong> "went", "is", "speak" 등</li>
+            <li><strong>보기 선택:</strong> "1번", "2번", "3번", "4번"</li>
+            <li><strong>리스닝 명령:</strong> "다시 들려줘", "소리"</li>
+            <li><strong>진행:</strong> "다음", "선택", "시작"</li>
+          </ul>
+        </div>
+      </aside>
+
+    </main>
+
+    <!-- 하단 TV 풋터 바 -->
+    <footer class="footer-bar">
+      <div class="key-indicator">
+        <span class="key-tag">▲▼◀▶</span> 보기 이동
+      </div>
+      <div class="key-indicator">
+        <span class="key-tag">OK / ENTER</span> 정답 선택 및 다음 문제
+      </div>
+      <div class="key-indicator">
+        <span class="key-tag">1~4 숫자키</span> 보기 바로 선택
+      </div>
+      <div class="key-indicator">
+        <span class="key-tag">🎙️ 음성</span> "1번", "2번", "다음" 한국어 지원
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- 스크립트 로드 순서: 문법 생성기 -> 효과음 -> 음성 인식 -> 게임 코어 -->
+  <script src="grammarGenerator.js"></script>
+  <script src="audio.js"></script>
+  <script src="voice.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

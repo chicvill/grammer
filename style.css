@@ -1,0 +1,943 @@
+/* === 중1 기초 영문법 TV 퀘스트 - 10-Foot UI 디자인 시스템 === */
+:root {
+  --bg-color: #080a16;
+  --panel-bg: rgba(18, 24, 46, 0.85);
+  --panel-border: rgba(90, 120, 200, 0.28);
+  --accent-cyan: #00f0ff;
+  --accent-magenta: #ff007f;
+  --accent-gold: #ffc800;
+  --accent-green: #00ff88;
+  --accent-red: #ff3366;
+  --text-main: #f2f6ff;
+  --text-dim: #94a5c4;
+  --card-bg: rgba(26, 34, 66, 0.7);
+  --card-border: rgba(100, 130, 220, 0.3);
+  --focus-glow: 0 0 26px rgba(0, 240, 255, 0.85), 0 0 8px #00f0ff;
+  --correct-glow: 0 0 26px rgba(0, 255, 136, 0.8), 0 0 8px #00ff88;
+  --wrong-glow: 0 0 26px rgba(255, 51, 102, 0.8), 0 0 8px #ff3366;
+  --font-main: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  --font-display: 'Orbitron', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  background-color: var(--bg-color);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(255, 200, 0, 0.08) 0%, transparent 45%),
+    linear-gradient(180deg, #070913 0%, #0d1226 100%);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* === TV 오버스캔 방지 세이프 에어리어 (5% Safe Margin) === */
+.tv-safe-area {
+  width: 100%;
+  height: 100%;
+  padding: 2.5vh 3.5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* === 상단 헤더 & HUD === */
+.hud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 12px 28px;
+  backdrop-filter: blur(12px);
+}
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.game-badge {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.game-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.grade-tag {
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(255, 200, 0, 0.2);
+  color: var(--accent-gold);
+  border: 1px solid rgba(255, 200, 0, 0.4);
+  padding: 2px 10px;
+  border-radius: 20px;
+  letter-spacing: 0;
+}
+
+/* HUD 스탯 카드 */
+.hud-stats {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.stat-card {
+  background: rgba(10, 14, 30, 0.85);
+  border: 1px solid var(--panel-border);
+  padding: 6px 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 95px;
+}
+
+.stat-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.master-val {
+  color: var(--accent-cyan);
+  font-size: 19px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+.streak-val {
+  color: #ff9900;
+  text-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+}
+
+/* 타이머 카드 */
+.timer-card {
+  min-width: 130px;
+}
+
+.timer-bar-wrap {
+  width: 100px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 4px 0 2px 0;
+}
+
+.timer-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+  transition: width 0.3s linear, background-color 0.3s ease;
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.timer-number {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+/* 음성 인식 뱃지 */
+.voice-status-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(10, 15, 30, 0.85);
+  border: 1px solid var(--panel-border);
+  padding: 8px 16px;
+  border-radius: 14px;
+  transition: all 0.3s ease;
+}
+
+.voice-status-card.listening {
+  border-color: var(--accent-magenta);
+  box-shadow: 0 0 16px rgba(255, 0, 127, 0.4);
+}
+
+.mic-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background 0.3s;
+}
+
+.mic-svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--text-dim);
+  transition: fill 0.3s;
+}
+
+.voice-status-card.listening .mic-icon-wrap {
+  background: var(--accent-magenta);
+  animation: pulseMic 1.2s infinite;
+}
+
+.voice-status-card.listening .mic-svg {
+  fill: #fff;
+}
+
+@keyframes pulseMic {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 127, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 0, 127, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 127, 0); }
+}
+
+.voice-text-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.voice-status-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.voice-recognized-word {
+  font-size: 13px;
+  color: #fff;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === 6단계 학년 선택 탭 바 === */
+.grade-selector-bar {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  overflow-x: auto;
+}
+
+.grade-tab {
+  flex: 1;
+  background: rgba(18, 24, 52, 0.75);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.grade-tab .tab-badge {
+  font-family: var(--font-main);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-dim);
+}
+
+.grade-tab .tab-sub {
+  font-size: 11px;
+  color: #6b7c96;
+}
+
+.grade-tab:focus {
+  transform: scale(1.05);
+  border-color: var(--accent-cyan);
+  box-shadow: var(--focus-glow);
+  background: rgba(30, 42, 85, 0.95);
+}
+
+.grade-tab.active {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(18, 24, 60, 0.9));
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+}
+
+.grade-tab.active .tab-badge {
+  color: #ffffff;
+}
+
+.grade-tab.active .tab-sub {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+/* === 메인 영역: 문제 스테이지 + 컨트롤러 사이드바 === */
+.main-content {
+  display: flex;
+  flex: 1;
+  gap: 24px;
+  margin: 16px 0;
+  align-items: stretch;
+  min-height: 0;
+}
+
+/* 문법 문제 풀이 스테이지 */
+.grammar-stage-section {
+  position: relative;
+  flex: 1;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+/* 카테고리 태그 영역 */
+.category-pill-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.category-pill {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.15);
+  border: 1.5px solid rgba(0, 240, 255, 0.4);
+  padding: 8px 22px;
+  border-radius: 30px;
+}
+
+.rule-hint-pill {
+  font-size: 15px;
+  color: var(--text-dim);
+}
+
+/* 영어 문장 보드 */
+.sentence-board {
+  background: rgba(12, 16, 34, 0.7);
+  border: 1px solid rgba(120, 150, 255, 0.2);
+  border-radius: 18px;
+  padding: 26px 34px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  min-height: 150px;
+}
+
+.target-sentence {
+  font-size: clamp(34px, 4.2vw, 50px);
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+}
+
+.blank-box {
+  display: inline-block;
+  min-width: 140px;
+  border-bottom: 5px solid var(--accent-gold);
+  color: var(--accent-gold);
+  background: rgba(255, 200, 0, 0.15);
+  padding: 2px 20px;
+  border-radius: 10px 10px 0 0;
+  margin: 0 8px;
+  font-weight: 900;
+  text-shadow: 0 0 12px rgba(255, 200, 0, 0.5);
+}
+
+.sentence-translation {
+  margin-top: 14px;
+  font-size: clamp(20px, 2.4vw, 28px);
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+/* 2x2 보기 선택지 그리드 */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 18px;
+  margin: 18px 0;
+  flex: 1;
+}
+
+.option-card {
+  background: var(--card-bg);
+  border: 2.5px solid var(--card-border);
+  border-radius: 18px;
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+}
+
+.option-card .opt-key-badge {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 6px 14px;
+  transition: all 0.18s ease;
+}
+
+.option-card .opt-text {
+  font-size: clamp(30px, 3.8vw, 44px);
+  font-weight: 900;
+  color: #fff;
+  flex: 1;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* 리모컨 탐색 시 포커스 상태 */
+.option-card.focused,
+.option-card:focus {
+  background: rgba(36, 50, 96, 0.95);
+  border-color: var(--accent-cyan);
+  transform: scale(1.03);
+  box-shadow: var(--focus-glow);
+  z-index: 2;
+}
+
+.option-card.focused .opt-key-badge,
+.option-card:focus .opt-key-badge {
+  background: var(--accent-cyan);
+  color: #000;
+}
+
+/* 정답/오답 강조 상태 */
+.option-card.correct-choice {
+  background: rgba(0, 255, 136, 0.25) !important;
+  border-color: var(--accent-green) !important;
+  box-shadow: var(--correct-glow) !important;
+  animation: pulseCorrect 0.8s ease infinite alternate;
+}
+
+.option-card.wrong-choice {
+  background: rgba(255, 51, 102, 0.25) !important;
+  border-color: var(--accent-red) !important;
+  box-shadow: var(--wrong-glow) !important;
+}
+
+@keyframes pulseCorrect {
+  from { transform: scale(1.02); }
+  to { transform: scale(1.05); }
+}
+
+/* === 주관식 말하기 & 듣기 평가 스테이지 스타일 === */
+.speech-stage-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 14px 0;
+}
+
+.speech-prompt-card {
+  width: 100%;
+  background: rgba(14, 20, 44, 0.8);
+  border: 2px dashed rgba(0, 240, 255, 0.4);
+  border-radius: 20px;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.4);
+}
+
+/* 리스닝 다시 듣기 버튼 */
+.audio-listen-btn {
+  background: linear-gradient(135deg, #00d2ff, #0055ff);
+  border: 2px solid transparent;
+  color: #fff;
+  border-radius: 40px;
+  padding: 16px 36px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  outline: none;
+  margin-bottom: 20px;
+  font-family: var(--font-main);
+  font-size: 22px;
+  font-weight: 800;
+  box-shadow: 0 4px 18px rgba(0, 150, 255, 0.45);
+  transition: all 0.2s ease;
+}
+
+.audio-listen-btn .sound-icon {
+  font-size: 30px;
+}
+
+.audio-listen-btn:focus,
+.audio-listen-btn.playing {
+  transform: scale(1.06);
+  border-color: #fff;
+  box-shadow: var(--focus-glow);
+  background: linear-gradient(135deg, var(--accent-magenta), #9900ff);
+}
+
+.speaking-hint-box {
+  background: rgba(255, 200, 0, 0.15);
+  border: 1.5px solid rgba(255, 200, 0, 0.4);
+  color: var(--accent-gold);
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 18px;
+}
+
+/* 음성 파형 애니메이션 */
+.voice-wave-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 56px;
+  margin-bottom: 14px;
+}
+
+.wave-bar {
+  width: 10px;
+  height: 20px;
+  background: var(--accent-cyan);
+  border-radius: 5px;
+  animation: wavePulse 1.2s infinite ease-in-out;
+}
+
+.wave-bar:nth-child(1) { animation-delay: 0.0s; }
+.wave-bar:nth-child(2) { animation-delay: 0.2s; }
+.wave-bar:nth-child(3) { animation-delay: 0.4s; }
+.wave-bar:nth-child(4) { animation-delay: 0.6s; }
+.wave-bar:nth-child(5) { animation-delay: 0.8s; }
+
+@keyframes wavePulse {
+  0%, 100% { height: 16px; background: rgba(0, 240, 255, 0.4); }
+  50% { height: 50px; background: var(--accent-magenta); box-shadow: 0 0 16px var(--accent-magenta); }
+}
+
+.speech-instruction {
+  font-size: 24px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.speech-live-heard {
+  font-size: 18px;
+  color: var(--accent-cyan);
+  min-height: 26px;
+  font-weight: 600;
+}
+
+/* 문제 해설 박스 */
+.explanation-box {
+  background: rgba(10, 16, 36, 0.95);
+  border: 2px solid var(--accent-cyan);
+  border-radius: 16px;
+  padding: 18px 26px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  animation: slideUp 0.25s ease-out;
+}
+
+.explanation-box.active {
+  display: flex;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.exp-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.exp-badge {
+  font-size: 15px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.exp-badge.correct {
+  background: var(--accent-green);
+  color: #000;
+}
+
+.exp-badge.wrong {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+.exp-title {
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--accent-gold);
+}
+
+.next-guide-tag {
+  margin-left: auto;
+  font-size: 15px;
+  color: var(--accent-cyan);
+  font-weight: 700;
+  animation: blinkText 1.5s infinite;
+}
+
+@keyframes blinkText {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.exp-content {
+  font-size: 20px;
+  color: var(--text-main);
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+/* 오버레이 (시작 및 결과창) */
+.game-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(6, 9, 20, 0.92);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.game-overlay.active {
+  display: flex;
+}
+
+.overlay-card {
+  background: #121832;
+  border: 2px solid var(--accent-cyan);
+  border-radius: 20px;
+  padding: 32px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 560px;
+  box-shadow: 0 0 40px rgba(0, 240, 255, 0.25);
+}
+
+.overlay-icon-badge {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.overlay-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.overlay-desc {
+  font-size: 17px;
+  color: var(--text-dim);
+  line-height: 1.55;
+  margin-bottom: 22px;
+}
+
+.overlay-controls-guide {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px 20px;
+  margin-bottom: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.key-pill {
+  display: inline-block;
+  background: rgba(0, 240, 255, 0.2);
+  color: var(--accent-cyan);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+/* TV 전용 버튼 */
+.tv-btn {
+  background: linear-gradient(135deg, #00d2ff, #0077ff);
+  border: 3px solid transparent;
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 19px;
+  font-weight: 800;
+  padding: 13px 32px;
+  border-radius: 12px;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.tv-btn.voice-toggle-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--panel-border);
+  color: var(--text-main);
+  font-size: 16px;
+  margin-bottom: 0;
+}
+
+.focusable:focus,
+.tv-btn:focus {
+  transform: scale(1.05);
+  border-color: #fff !important;
+  box-shadow: var(--focus-glow);
+}
+
+/* === 우측 컨트롤러 패널 (샤오미 리모컨 D-Pad) === */
+.controller-panel {
+  width: 320px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  backdrop-filter: blur(12px);
+}
+
+.controller-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  margin-bottom: 4px;
+}
+
+.controller-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* 원형 D-Pad */
+.dpad-wrapper {
+  width: 200px;
+  height: 200px;
+  background: #14182e;
+  border-radius: 50%;
+  border: 3px solid rgba(80, 100, 170, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.dpad-btn {
+  background: #1f2648;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  border-radius: 12px;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.dpad-btn .arrow {
+  font-size: 15px;
+  color: var(--accent-cyan);
+}
+
+.dpad-btn .label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.dpad-up, .dpad-down {
+  width: 65px;
+  height: 44px;
+}
+
+.dpad-middle-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dpad-left, .dpad-right {
+  width: 44px;
+  height: 65px;
+}
+
+.dpad-center {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #253058, #161c36);
+  border: 2px solid var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+.dpad-center .label {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: #fff;
+  font-weight: 900;
+}
+
+.dpad-btn.active-press {
+  background: var(--accent-cyan) !important;
+  transform: scale(0.92);
+  box-shadow: 0 0 16px var(--accent-cyan);
+}
+
+.dpad-btn.active-press .arrow,
+.dpad-btn.active-press .label {
+  color: #000 !important;
+}
+
+/* 단축키 칩 */
+.dpad-shortcuts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.shortcut-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dim);
+  transition: all 0.2s ease;
+}
+
+.shortcut-chip.active {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* 음성 치트시트 */
+.command-cheatsheet {
+  background: rgba(10, 14, 28, 0.7);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  width: 100%;
+  font-size: 12px;
+}
+
+.command-cheatsheet h4 {
+  color: var(--accent-gold);
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.command-cheatsheet ul {
+  list-style: none;
+  line-height: 1.55;
+}
+
+.command-cheatsheet strong {
+  color: #fff;
+}
+
+/* === 하단 TV 풋터 바 === */
+.footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 8px 24px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.key-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.key-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+}
