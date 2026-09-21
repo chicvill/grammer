@@ -29,28 +29,28 @@ class MultiGradeGrammarGenerator {
   }
 
   // ========================================================
-  // 1. [초등 3~4학년] Be동사 기초 & 지시대명사
+  // 1. [초등 3~4학년] Be동사 기초 & 지시대명사 (AI & 미래 기술)
   // ========================================================
   genElemLow(type) {
     const templates = [
       // Be동사 현재형
       () => {
         const items = [
-          { sub: "I", ans: "am", comp: "a student", ko: "나는 학생이다" },
-          { sub: "You", ans: "are", comp: "tall", ko: "너는 키가 크다" },
-          { sub: "He", ans: "is", comp: "my best friend", ko: "그는 내 가장 친한 친구이다" },
-          { sub: "She", ans: "is", comp: "a nice teacher", ko: "그녀는 좋은 선생님이다" },
-          { sub: "We", ans: "are", comp: "happy today", ko: "우리는 오늘 행복하다" },
-          { sub: "They", ans: "are", comp: "good singers", ko: "그들은 노래를 잘하는 가수들이다" },
-          { sub: "This", ans: "is", comp: "an apple", ko: "이것은 사과이다" },
-          { sub: "That", ans: "is", comp: "a cute cat", ko: "저것은 귀여운 고양이이다" }
+          { sub: "I", ans: "am", comp: "a future AI programmer", ko: "나는 미래의 AI 프로그래머이다" },
+          { sub: "You", ans: "are", comp: "a young scientist", ko: "너는 어린 과학자이다" },
+          { sub: "Python", ans: "is", comp: "a powerful coding language", ko: "파이썬은 강력한 코딩 언어이다" },
+          { sub: "Robots", ans: "are", comp: "helpful assistants", ko: "로봇들은 유용한 조수들이다" },
+          { sub: "We", ans: "are", comp: "future space explorers", ko: "우리는 미래의 우주 탐험가들이다" },
+          { sub: "This computer", ans: "is", comp: "very fast", ko: "이 컴퓨터는 매우 빠르다" },
+          { sub: "Smart algorithms", ans: "are", comp: "everywhere", ko: "스마트 알고리즘은 어디에나 있다" },
+          { sub: "Data", ans: "is", comp: "important for science", ko: "데이터는 과학에 중요하다" }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.sub} _____ ${item.comp}.`;
         const full = `${item.sub} ${item.ans} ${item.comp}.`;
         const options = this.shuffle(["am", "are", "is", "be"]);
         return {
-          category: "초등 3~4 Be동사",
+          category: "초등 3~4 Be동사 [미래 테크 💻]",
           sentence, full, ko: item.ko, ans: item.ans, options,
           tip: `주어 '${item.sub}' 뒤에 오는 알맞은 짝꿍 Be동사는 '${item.ans}'입니다.`
         };
@@ -58,16 +58,16 @@ class MultiGradeGrammarGenerator {
       // 지시대명사 This / These / That / Those
       () => {
         const items = [
-          { sub: "This", verb: "is", obj: "my pencil", ko: "이것은 내 연필이다", options: ["is", "are", "am", "be"], ans: "is" },
-          { sub: "These", verb: "are", obj: "my books", ko: "이것들은 내 책들이다", options: ["are", "is", "am", "be"], ans: "are" },
-          { sub: "That", verb: "is", obj: "a big tree", ko: "저것은 큰 나무이다", options: ["is", "are", "am", "be"], ans: "is" },
-          { sub: "Those", verb: "are", obj: "yellow flowers", ko: "저것들은 노란 꽃들이다", options: ["are", "is", "am", "be"], ans: "are" }
+          { sub: "This", verb: "is", obj: "a new microchip", ko: "이것은 새로운 마이크로칩이다", options: ["is", "are", "am", "be"], ans: "is" },
+          { sub: "These", verb: "are", obj: "solar panels", ko: "이것들은 태양광 패널들이다", options: ["are", "is", "am", "be"], ans: "are" },
+          { sub: "That", verb: "is", obj: "a space satellite", ko: "저것은 우주 인공위성이다", options: ["is", "are", "am", "be"], ans: "is" },
+          { sub: "Those", verb: "are", obj: "quantum computers", ko: "저것들은 양자 컴퓨터들이다", options: ["are", "is", "am", "be"], ans: "are" }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.sub} _____ ${item.obj}.`;
         const full = `${item.sub} ${item.ans} ${item.obj}.`;
         return {
-          category: "초등 3~4 지시대명사",
+          category: "초등 3~4 지시대명사 [과학 장비 🔬]",
           sentence, full, ko: item.ko, ans: item.ans, options: this.shuffle(item.options),
           tip: `'${item.sub}'는 ${item.sub.endsWith('e') || item.sub === 'These' ? '복수' : '단수'}이므로 '${item.ans}'를 씁니다.`
         };
@@ -77,25 +77,25 @@ class MultiGradeGrammarGenerator {
   }
 
   // ========================================================
-  // 2. [초등 5~6학년] 현재진행형(be + ing) & 조동사 can
+  // 2. [초등 5~6학년] 현재진행형(be + ing) & 조동사 can (AI & 로봇)
   // ========================================================
   genElemHigh(type) {
     const templates = [
       // 현재진행형 (be + -ing)
       () => {
         const items = [
-          { sub: "He is", base: "listen", ing: "listening", obj: "to music now", ko: "그는 지금 음악을 듣고 있다" },
-          { sub: "She is", base: "read", ing: "reading", obj: "a comic book", ko: "그녀는 만화책을 읽고 있다" },
-          { sub: "They are", base: "play", ing: "playing", obj: "soccer in the park", ko: "그들은 공원에서 축구를 하고 있다" },
-          { sub: "We are", base: "eat", ing: "eating", obj: "dinner together", ko: "우리는 함께 저녁을 먹고 있다" },
-          { sub: "I am", base: "watch", ing: "watching", obj: "TV right now", ko: "나는 지금 TV를 보고 있다" }
+          { sub: "The robot is", base: "clean", ing: "cleaning", obj: "the science lab now", ko: "그 로봇은 지금 과학 연구실을 청소하고 있다" },
+          { sub: "The scientist is", base: "test", ing: "testing", obj: "the flying drone", ko: "그 과학자는 비행 드론을 테스트하고 있다" },
+          { sub: "The AI system is", base: "analyze", ing: "analyzing", obj: "big data in real time", ko: "AI 시스템은 실시간으로 빅데이터를 분석하고 있다" },
+          { sub: "We are", base: "code", ing: "coding", obj: "a new space game together", ko: "우리는 함께 새 우주 게임을 코딩하고 있다" },
+          { sub: "The astronomer is", base: "observe", ing: "observing", obj: "Mars right now", ko: "천문학자는 지금 화성을 관측하고 있다" }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.sub} _____ ${item.obj}.`;
         const full = `${item.sub} ${item.ing} ${item.obj}.`;
         const options = this.shuffle([item.ing, item.base, `${item.base}s`, `${item.base}ed`]);
         return {
-          category: "초등 5~6 현재진행형",
+          category: "초등 5~6 현재진행형 [스마트 연구소 🤖]",
           sentence, full, ko: item.ko, ans: item.ing, options,
           tip: "'지금 ~하는 중이다'라는 현재진행형은 be동사 + 동사-ing 형태를 씁니다."
         };
@@ -103,17 +103,17 @@ class MultiGradeGrammarGenerator {
       // 조동사 can + 동사원형
       () => {
         const items = [
-          { sub: "She can", base: "swim", s: "swims", obj: "very fast", ko: "그녀는 아주 빠르게 수영할 수 있다" },
-          { sub: "He can", base: "speak", s: "speaks", obj: "English well", ko: "그는 영어를 잘 말할 수 있다" },
-          { sub: "They can", base: "play", s: "plays", obj: "the guitar", ko: "그들은 기타를 칠 수 있다" },
-          { sub: "My brother can", base: "ride", s: "rides", obj: "a bicycle", ko: "내 남동생은 자전거를 탈 수 있다" }
+          { sub: "AI can", base: "solve", s: "solves", obj: "complex math puzzles", ko: "AI는 복잡한 수학 퍼즐을 풀 수 있다" },
+          { sub: "The drone can", base: "fly", s: "flies", obj: "autonomously in the sky", ko: "드론은 하늘을 자율 비행할 수 있다" },
+          { sub: "Robots can", base: "assist", s: "assists", obj: "doctors in smart hospitals", ko: "로봇은 스마트 병원에서 의사를 보조할 수 있다" },
+          { sub: "Supercomputers can", base: "process", s: "processes", obj: "huge data at light speed", ko: "슈퍼컴퓨터는 거대한 데이터를 빛의 속도로 처리할 수 있다" }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.sub} _____ ${item.obj}.`;
         const full = `${item.sub} ${item.base} ${item.obj}.`;
         const options = this.shuffle([item.base, item.s, `${item.base}ing`, `${item.base}ed`]);
         return {
-          category: "초등 5~6 조동사 can",
+          category: "초등 5~6 조동사 can [미래 컴퓨팅 ⚡]",
           sentence, full, ko: item.ko, ans: item.base, options,
           tip: "조동사 can 뒤에는 언제나 '동사원형'을 씁니다."
         };
@@ -123,23 +123,23 @@ class MultiGradeGrammarGenerator {
   }
 
   // ========================================================
-  // 3. [중학 1학년] 3인칭 단수, Be/일반과거, do/does
+  // 3. [중학 1학년] 3인칭 단수, Be/일반과거, do/does (알고리즘 & 우주과학)
   // ========================================================
   genMid1(type) {
     const templates = [
       () => {
         const subjects = [
-          { name: "My sister", isThird: true, ko: "내 여동생은" },
-          { name: "Tom", isThird: true, ko: "톰은" },
-          { name: "She", isThird: true, ko: "그녀는" },
-          { name: "They", isThird: false, ko: "그들은" },
-          { name: "The students", isThird: false, ko: "학생들은" }
+          { name: "The algorithm", isThird: true, ko: "그 알고리즘은" },
+          { name: "The robotic arm", isThird: true, ko: "그 로봇 팔은" },
+          { name: "The space probe", isThird: true, ko: "그 우주 탐사선은" },
+          { name: "The AI engineers", isThird: false, ko: "AI 엔지니어들은" },
+          { name: "The scientists", isThird: false, ko: "과학자들은" }
         ];
         const verbs = [
-          { base: "play", s: "plays", obj: "soccer every Sunday", ko: "매주 일요일에 축구를 한다" },
-          { base: "watch", s: "watches", obj: "TV in the evening", ko: "저녁에 TV를 본다" },
-          { base: "have", s: "has", obj: "a cute puppy", ko: "귀여운 강아지를 가지고 있다" },
-          { base: "study", s: "studies", obj: "English every day", ko: "매일 영어를 공부한다" }
+          { base: "analyze", s: "analyzes", obj: "data accurately", ko: "데이터를 정확하게 분석한다" },
+          { base: "build", s: "builds", obj: "electric cars in the factory", ko: "공장에서 전기차를 조립한다" },
+          { base: "calculate", s: "calculates", obj: "complex math formulas", ko: "복잡한 수학 공식을 계산한다" },
+          { base: "explore", s: "explores", obj: "deep space every year", ko: "매년 심우주를 탐사한다" }
         ];
         const sub = this.pickRandom(subjects);
         const v = this.pickRandom(verbs);
@@ -148,24 +148,24 @@ class MultiGradeGrammarGenerator {
         const full = `${sub.name} ${ans} ${v.obj}.`;
         const options = this.shuffle([v.base, v.s, `${v.base}ing`, `${v.base}ed`]);
         return {
-          category: "중1 일반동사 현재형",
+          category: "중1 일반동사 현재형 [빅데이터 & AI 📈]",
           sentence, full, ko: `${sub.ko} ${v.ko}.`, ans, options,
           tip: sub.isThird ? `주어 '${sub.name}'가 3인칭 단수이므로 동사에 -s/-es를 붙인 '${ans}'가 정답입니다.` : `주어가 복수/1,2인칭이므로 동사원형 '${ans}'를 씁니다.`
         };
       },
       () => {
         const pasts = [
-          { sub: "We", base: "go", ans: "went", obj: "to the zoo last weekend", ko: "우리는 지난 주말에 동물원에 갔다" },
-          { sub: "I", base: "see", ans: "saw", obj: "an interesting movie yesterday", ko: "나는 어제 흥미로운 영화를 보았다" },
-          { sub: "He", base: "buy", ans: "bought", obj: "a new bike two days ago", ko: "그는 이틀 전에 새 자전거를 샀다" },
-          { sub: "She", base: "eat", ans: "ate", obj: "pizza for dinner last night", ko: "그녀는 어젯밤에 저녁으로 피자를 먹었다" }
+          { sub: "The rover", base: "go", ans: "went", obj: "to Mars last year", ko: "그 탐사선은 작년에 화성에 갔다" },
+          { sub: "The astronomer", base: "see", ans: "saw", obj: "a new galaxy yesterday", ko: "그 천문학자는 어제 새로운 은하를 관측했다" },
+          { sub: "NASA", base: "build", ans: "built", obj: "a quantum satellite two years ago", ko: "NASA는 2년 전에 양자 위성을 건조했다" },
+          { sub: "The developer", base: "write", ans: "wrote", obj: "a Python script last night", ko: "그 개발자는 어젯밤에 파이썬 스크립트를 작성했다" }
         ];
         const item = this.pickRandom(pasts);
         const sentence = `${item.sub} _____ ${item.obj}.`;
         const full = `${item.sub} ${item.ans} ${item.obj}.`;
         const options = this.shuffle([item.base, item.ans, `${item.base}s`, `${item.base}ing`]);
         return {
-          category: "중1 불규칙 과거시제",
+          category: "중1 불규칙 과거시제 [우주 탐사 🚀]",
           sentence, full, ko: item.ko, ans: item.ans, options,
           tip: `과거 표현이 있으므로 '${item.base}'의 불규칙 과거형인 '${item.ans}'를 씁니다.`
         };
@@ -175,24 +175,24 @@ class MultiGradeGrammarGenerator {
   }
 
   // ========================================================
-  // 4. [중학 2학년] to부정사, 동명사, 수동태(be p.p.), 비교급
+  // 4. [중학 2학년] to부정사, 동명사, 수동태(be p.p.), 비교급 (소프트웨어 & 물리)
   // ========================================================
   genMid2(type) {
     const templates = [
       // 동명사만을 목적어로 취하는 동사 (enjoy, finish, practice, avoid, mind)
       () => {
         const items = [
-          { v: "enjoy", ing: "reading", to: "to read", obj: "comic books", ko: "나는 만화책 읽는 것을 즐긴다" },
-          { v: "finish", ing: "doing", to: "to do", obj: "my homework", ko: "나는 내 숙제하는 것을 끝마쳤다" },
-          { v: "practice", ing: "playing", to: "to play", obj: "the piano every day", ko: "그녀는 매일 피아노 치는 것을 연습한다" },
-          { v: "keep", ing: "running", to: "to run", obj: "in the playground", ko: "그들은 운동장에서 계속 달렸다" }
+          { v: "enjoy", ing: "coding", to: "to code", obj: "Python algorithms", ko: "나는 파이썬 알고리즘 코딩하는 것을 즐긴다" },
+          { v: "finish", ing: "training", to: "to train", obj: "the AI neural network", ko: "그녀는 AI 신경망 훈련시키는 것을 끝마쳤다" },
+          { v: "practice", ing: "flying", to: "to fly", obj: "autonomous drones every day", ko: "그들은 매일 자율주행 드론 조종을 연습한다" },
+          { v: "keep", ing: "calculating", to: "to calculate", obj: "supercomputer climate models", ko: "슈퍼컴퓨터는 기후 시뮬레이션을 계속 계산했다" }
         ];
         const item = this.pickRandom(items);
         const sentence = `I ${item.v} _____ ${item.obj}.`;
         const full = `I ${item.v} ${item.ing} ${item.obj}.`;
         const options = this.shuffle([item.ing, item.to, item.ing.replace('ing', ''), `${item.ing.replace('ing', '')}ed`]);
         return {
-          category: "중2 동명사 목적어",
+          category: "중2 동명사 목적어 [AI 프로그래밍 💾]",
           sentence, full, ko: item.ko, ans: item.ing, options,
           tip: `'${item.v}' 동사 뒤에는 to부정사가 아닌 '동명사(-ing)'를 목적어로 씁니다.`
         };
@@ -200,17 +200,17 @@ class MultiGradeGrammarGenerator {
       // 수동태 (be + 과거분사 p.p.)
       () => {
         const items = [
-          { sub: "The window", be: "was", pp: "broken", base: "break", by: "by Tom", ko: "그 창문은 톰에 의해 깨졌다" },
-          { sub: "This book", be: "was", pp: "written", base: "write", by: "by a famous writer", ko: "이 책은 유명한 작가에 의해 쓰였다" },
-          { sub: "The cake", be: "was", pp: "made", base: "make", by: "my grandmother", ko: "그 케이크는 할머니에 의해 만들어졌다" },
-          { sub: "English", be: "is", pp: "spoken", base: "speak", by: "many people", ko: "영어는 많은 사람들에 의해 쓰인다" }
+          { sub: "The satellite", be: "was", pp: "launched", base: "launch", by: "into orbit by the rocket", ko: "그 인공위성은 로켓에 의해 궤도로 발사되었다" },
+          { sub: "This code", be: "was", pp: "written", base: "write", by: "by a talented AI engineer", ko: "이 코드는 재능 있는 AI 엔지니어에 의해 작성되었다" },
+          { sub: "Solar energy", be: "is", pp: "used", base: "use", by: "by modern electric cars", ko: "태양광 에너지는 현대 전기차들에 의해 사용된다" },
+          { sub: "The math formula", be: "was", pp: "discovered", base: "discover", by: "famous physicists", ko: "그 수학 공식은 유명한 물리학자들에 의해 발견되었다" }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.sub} ${item.be} _____ ${item.by}.`;
         const full = `${item.sub} ${item.be} ${item.pp} ${item.by}.`;
         const options = this.shuffle([item.pp, item.base, `${item.base}s`, `${item.base}ing`]);
         return {
-          category: "중2 수동태 (be + p.p.)",
+          category: "중2 수동태 (be + p.p.) [과학 기술 🛰️]",
           sentence, full, ko: item.ko, ans: item.pp, options,
           tip: "수동태는 'be동사 + 과거분사(p.p.)' 형태이며 '~에 의해 되다'라는 뜻입니다."
         };
@@ -218,17 +218,17 @@ class MultiGradeGrammarGenerator {
       // 비교급 (than)
       () => {
         const items = [
-          { sub: "Tom is", ans: "taller", base: "tall", than: "than Minho", ko: "톰은 민호보다 키가 더 크다" },
-          { sub: "Summer is", ans: "hotter", base: "hot", than: "than spring", ko: "여름은 봄보다 더 덥다" },
-          { sub: "This book is", ans: "easier", base: "easy", than: "than that one", ko: "이 책은 저 책보다 더 쉽다" },
-          { sub: "A train is", ans: "faster", base: "fast", than: "a bus", ko: "기차는 버스보다 더 빠르다" }
+          { sub: "A quantum computer is", ans: "faster", base: "fast", than: "than a standard PC", ko: "양자 컴퓨터는 일반 PC보다 더 빠르다" },
+          { sub: "AI is", ans: "smarter", base: "smart", than: "than old calculator programs", ko: "인공지능은 이전의 계산기 프로그램보다 더 똑똑하다" },
+          { sub: "Mars is", ans: "colder", base: "cold", than: "than Earth", ko: "화성은 지구보다 더 춥다" },
+          { sub: "Big data is", ans: "larger", base: "large", than: "than traditional spreadsheets", ko: "빅데이터는 기존의 스프레드시트보다 훨씬 방대하다" }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.sub} _____ ${item.than}.`;
         const full = `${item.sub} ${item.ans} ${item.than}.`;
         const options = this.shuffle([item.ans, item.base, `${item.base}est`, `more ${item.base}`]);
         return {
-          category: "중2 비교급",
+          category: "중2 비교급 [컴퓨팅 성능 🚀]",
           sentence, full, ko: item.ko, ans: item.ans, options,
           tip: "뒤에 '~보다'를 뜻하는 than이 있으므로 형용사의 비교급(-er)을 씁니다."
         };
@@ -238,24 +238,24 @@ class MultiGradeGrammarGenerator {
   }
 
   // ========================================================
-  // 5. [중학 3학년] 현재완료(have p.p.), 관계대명사(who/which/that)
+  // 5. [중학 3학년] 현재완료(have p.p.), 관계대명사(who/which/that) (첨단 연구 & AI)
   // ========================================================
   genMid3(type) {
     const templates = [
       // 현재완료 시제 (have/has + p.p.)
       () => {
         const items = [
-          { sub: "I have", ans: "lived", base: "live", obj: "in Seoul for five years", ko: "나는 5년 동안 서울에서 살아왔다 (계속)" },
-          { sub: "She has", ans: "visited", base: "visit", obj: "Paris twice", ko: "그녀는 파리를 두 번 방문해 본 적이 있다 (경험)" },
-          { sub: "They have", ans: "finished", base: "finish", obj: "their lunch already", ko: "그들은 이미 점심 식사를 마쳤다 (완료)" },
-          { sub: "He has", ans: "lost", base: "lose", obj: "his smartphone", ko: "그는 스마트폰을 잃어버렸다 (결과)" }
+          { sub: "Scientists have", ans: "explored", base: "explore", obj: "deep space for decades", ko: "과학자들은 수십 년 동안 심우주를 탐사해 오고 있다 (계속)" },
+          { sub: "The AI system has", ans: "analyzed", base: "analyze", obj: "millions of medical images", ko: "그 AI 시스템은 수백만 장의 의료 영상을 분석해 냈다 (완료/경험)" },
+          { sub: "Engineers have", ans: "designed", base: "design", obj: "autonomous solar drones", ko: "엔지니어들은 자율 비행 태양광 드론을 설계했다 (완료)" },
+          { sub: "NASA has", ans: "launched", base: "launch", obj: "new telescopes into deep orbit", ko: "NASA는 심우주 궤도로 새 망원경들을 발사했다 (결과)" }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.sub} _____ ${item.obj}.`;
         const full = `${item.sub} ${item.ans} ${item.obj}.`;
         const options = this.shuffle([item.ans, item.base, `${item.base}s`, `${item.base}ing`]);
         return {
-          category: "중3 현재완료 (have + p.p.)",
+          category: "중3 현재완료 (have + p.p.) [우주 탐사 역사 🌌]",
           sentence, full, ko: item.ko, ans: item.ans, options,
           tip: "과거부터 현재까지의 경험/계속/완료를 나타내는 현재완료는 have/has + 과거분사(p.p.)를 씁니다."
         };
@@ -263,17 +263,17 @@ class MultiGradeGrammarGenerator {
       // 관계대명사 (who vs which)
       () => {
         const items = [
-          { ant: "The boy", ans: "who", wrong: "which", rest: "is standing over there is my cousin", ko: "저기 서 있는 그 소년은 내 사촌이다", tip: "선행사가 사람(The boy)이므로 관계대명사 'who'를 씁니다." },
-          { ant: "The girl", ans: "who", wrong: "which", rest: "won the gold medal is Jane", ko: "금메달을 딴 그 소녀는 제인이다", tip: "선행사가 사람(The girl)이므로 주격 관계대명사 'who'를 씁니다." },
-          { ant: "I like the movie", ans: "which", wrong: "who", rest: "was released last week", ko: "나는 지난주에 개봉한 그 영화를 좋아한다", tip: "선행사가 사물(the movie)이므로 관계대명사 'which'를 씁니다." },
-          { ant: "This is the computer", ans: "which", wrong: "who", rest: "my father bought for me", ko: "이것은 아버지가 나에게 사주신 컴퓨터이다", tip: "선행사가 사물(the computer)이므로 'which'를 씁니다." }
+          { ant: "The scientist", ans: "who", wrong: "which", rest: "created the neural network won the award", ko: "신경망 모델을 개발한 그 과학자는 상을 받았다", tip: "선행사가 사람(The scientist)이므로 주격 관계대명사 'who'를 씁니다." },
+          { ant: "The roboticist", ans: "who", wrong: "which", rest: "designs humanoid robots is my role model", ko: "휴머노이드 로봇을 설계하는 로봇공학자는 나의 롤모델이다", tip: "선행사가 사람(The roboticist)이므로 주격 관계대명사 'who'를 씁니다." },
+          { ant: "This is the supercomputer", ans: "which", wrong: "who", rest: "simulates global climate change", ko: "이것은 전 지구 기후 변화를 시뮬레이션하는 슈퍼컴퓨터이다", tip: "선행사가 사물(the supercomputer)이므로 관계대명사 'which'를 씁니다." },
+          { ant: "We developed an algorithm", ans: "which", wrong: "who", rest: "solves quantum equations quickly", ko: "우리는 양자 방정식을 빠르게 푸는 알고리즘을 개발했다", tip: "선행사가 사물(an algorithm)이므로 'which'를 씁니다." }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.ant} _____ ${item.rest}.`;
         const full = `${item.ant} ${item.ans} ${item.rest}.`;
         const options = this.shuffle([item.ans, item.wrong, "what", "where"]);
         return {
-          category: "중3 관계대명사",
+          category: "중3 관계대명사 [AI 연구진 & 시스템 🤖]",
           sentence, full, ko: item.ko, ans: item.ans, options, tip: item.tip
         };
       }
@@ -282,55 +282,55 @@ class MultiGradeGrammarGenerator {
   }
 
   // ========================================================
-  // 6. [고등 1~3 / 수능] 수능 어법 5대 유형 (수일치, what vs that, 가정법, 분사구문)
+  // 6. [고등 1~3 / 수능] 수능 어법 5대 유형 (수일치, what vs that, 가정법) (미래 과학 철학)
   // ========================================================
   genHigh(type) {
     const templates = [
-      // 수능 1순위: 복잡한 주어-동사 수일치 (수식어 거품 걷어내기)
+      // 수능 1순위: 복잡한 주어-동사 수일치
       () => {
         const items = [
-          { sub: "The number of students in this school", ans: "is", wrong: "are", rest: "increasing every year", ko: "이 학교의 학생 수는 매년 증가하고 있다", tip: "'The number of(~의 수)'가 핵심 주어이므로 단수동사 'is'를 씁니다." },
-          { sub: "A number of volunteers", ans: "are", wrong: "is", rest: "helping the poor people", ko: "많은 자원봉사자들이 가난한 사람들을 돕고 있다", tip: "'A number of(많은)'는 복수 취급하므로 복수동사 'are'를 씁니다." },
-          { sub: "The discovery of new treatments for diseases", ans: "requires", wrong: "require", rest: "deep scientific research", ko: "질병 치료법의 발견은 깊은 과학적 연구를 필요로 한다", tip: "주어의 핵(head)은 단수명사 'The discovery'이므로 단수동사 'requires'가 정답입니다." },
-          { sub: "Reading books written by great thinkers", ans: "broadens", wrong: "broaden", rest: "our perspectives", ko: "위대한 사상가들의 책을 읽는 것은 우리의 시야를 넓혀준다", tip: "동명사구(Reading ~)가 주어일 때는 단수 취급하므로 'broadens'를 씁니다." }
+          { sub: "The number of parameters in modern AI models", ans: "is", wrong: "are", rest: "increasing exponentially every year", ko: "현대 AI 모델의 파라미터 수는 매년 기하급수적으로 증가하고 있다", tip: "'The number of(~의 수)'가 핵심 주어이므로 단수동사 'is'를 씁니다." },
+          { sub: "A number of data scientists", ans: "are", wrong: "is", rest: "researching next-generation quantum neural networks", ko: "많은 데이터 과학자들이 차세대 양자 신경망을 연구하고 있다", tip: "'A number of(많은)'는 복수 취급하므로 복수동사 'are'를 씁니다." },
+          { sub: "The development of humanoid robots", ans: "requires", wrong: "require", rest: "precise mathematical calculations and engineering", ko: "휴머노이드 로봇의 개발은 정밀한 수학적 계산과 공학을 필요로 한다", tip: "주어의 핵은 단수명사 'The development'이므로 단수동사 'requires'가 정답입니다." },
+          { sub: "Analyzing massive datasets from particle colliders", ans: "broadens", wrong: "broaden", rest: "our scientific perspectives on the cosmos", ko: "입자 가속기의 거대한 데이터 세트를 분석하는 것은 우주에 대한 우리의 과학적 시야를 넓혀준다", tip: "동명사구(Analyzing ~)가 주어일 때는 단수 취급하므로 'broadens'를 씁니다." }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.sub} _____ ${item.rest}.`;
         const full = `${item.sub} ${item.ans} ${item.rest}.`;
         const options = this.shuffle([item.ans, item.wrong, "being", "been"]);
         return {
-          category: "수능 어법: 주어-동사 수일치",
+          category: "수능 어법: 주어-동사 수일치 [빅데이터 & 물리 🌌]",
           sentence, full, ko: item.ko, ans: item.ans, options, tip: item.tip
         };
       },
       // 수능 2순위: 관계사 what vs 접속사 that
       () => {
         const items = [
-          { lead: "She told me", ans: "what", wrong: "that", rest: "she experienced in France", ko: "그녀는 자신이 프랑스에서 겪었던 것을 내게 말했다", tip: "experienced의 목적어가 빠진 불완전한 문장이며 선행사가 없으므로 선행사를 포함한 관계대명사 'what'이 정답입니다." },
-          { lead: "We must focus on", ans: "what", wrong: "that", rest: "is really important for our future", ko: "우리는 우리 미래에 정말 중요한 것에 집중해야 한다", tip: "전치사 on의 목적어 자리이며 주어가 없는 불완전한 절이므로 'what'을 씁니다." },
-          { lead: "I believe", ans: "that", wrong: "what", rest: "honesty is the best policy", ko: "나는 정직이 최선의 방책이라는 것을 믿는다", tip: "뒤에 완전한 절(주어+동사+보어)이 이어지므로 명사절 접속사 'that'을 씁니다." }
+          { lead: "The researcher demonstrated", ans: "what", wrong: "that", rest: "the neural network learned from quantum simulations", ko: "그 연구원은 신경망이 양자 시뮬레이션으로부터 학습한 것을 시연했다", tip: "learned의 목적어가 빠진 불완전한 문장이며 선행사가 없으므로 선행사를 포함한 관계대명사 'what'이 정답입니다." },
+          { lead: "Engineers must focus on", ans: "what", wrong: "that", rest: "optimizes energy efficiency in quantum computing", ko: "엔지니어들은 양자 컴퓨팅에서 에너지 효율을 최적화하는 것에 집중해야 한다", tip: "전치사 on의 목적어 자리이며 주어가 없는 불완전한 절이므로 'what'을 씁니다." },
+          { lead: "Physicists believe", ans: "that", wrong: "what", rest: "artificial intelligence will accelerate scientific breakthroughs", ko: "물리학자들은 인공지능이 과학적 혁신을 가속화할 것이라 믿는다", tip: "뒤에 완전한 절(주어+동사+목적어)이 이어지므로 명사절 접속사 'that'을 씁니다." }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.lead} _____ ${item.rest}.`;
         const full = `${item.lead} ${item.ans} ${item.rest}.`;
         const options = this.shuffle([item.ans, item.wrong, "which", "how"]);
         return {
-          category: "수능 어법: that vs what 구별",
+          category: "수능 어법: that vs what [AI 과학 연구 🔬]",
           sentence, full, ko: item.ko, ans: item.ans, options, tip: item.tip
         };
       },
       // 수능 3순위: 가정법 과거 및 과거완료
       () => {
         const items = [
-          { ifClause: "If I", ans: "were", wrong: "am", main: "in your shoes, I would accept the proposal", ko: "내가 네 입장이라면, 나는 그 제안을 수락할 텐데", tip: "현재 사실의 반대를 나타내는 가정법 과거에서는 be동사로 인칭에 관계없이 'were'를 씁니다." },
-          { ifClause: "If he had known the truth, he", ans: "would have told", wrong: "will tell", main: "us about it", ko: "만약 그가 진실을 알았더라면, 우리에게 말해주었을 텐데", tip: "과거 사실의 반대를 나타내는 가정법 과거완료 귀결절은 '조동사 과거 + have p.p.'를 씁니다." }
+          { ifClause: "If quantum computers", ans: "were", wrong: "am", main: "commercially available, scientists could simulate complex molecules instantly", ko: "만약 양자 컴퓨터가 상용화된다면, 과학자들은 복잡한 분자 구조를 즉시 시뮬레이션할 텐데", tip: "현재 사실의 반대를 나타내는 가정법 과거에서는 be동사로 인칭에 관계없이 'were'를 씁니다." },
+          { ifClause: "If the space rover had detected the anomaly earlier, it", ans: "would have adjusted", wrong: "will adjust", main: "its orbital path automatically", ko: "만약 그 우주 탐사선이 이상 현상을 더 일찍 감지했더라면, 궤도를 자동으로 조정했을 텐데", tip: "과거 사실의 반대를 나타내는 가정법 과거완료 귀결절은 '조동사 과거 + have p.p.'를 씁니다." }
         ];
         const item = this.pickRandom(items);
         const sentence = `${item.ifClause} _____ ${item.main}.`;
         const full = `${item.ifClause} ${item.ans} ${item.main}.`;
-        const options = this.shuffle([item.ans, item.wrong, "was", "would tell"]);
+        const options = this.shuffle([item.ans, item.wrong, "was", "would adjust"]);
         return {
-          category: "고등 어법: 가정법",
+          category: "고등 어법: 가정법 [양자 & 우주 시뮬레이션 ⚛️]",
           sentence, full, ko: item.ko, ans: item.ans, options, tip: item.tip
         };
       }

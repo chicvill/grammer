@@ -11,6 +11,109 @@ class VisualClueManager {
   // 상황별 SVG 일러스트 및 메타데이터 레지스트리
   initRegistry() {
     return {
+      // 0-1. 인공지능 & 휴머노이드 로봇 (AI, Robot, Humanoid, Sensor)
+      'ai_robot': {
+        tag: '🤖 인공지능 & 첨단 로봇 (AI Tech)',
+        color: '#00f0ff',
+        svg: `
+          <svg viewBox="0 0 160 140" class="clue-svg">
+            <defs>
+              <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00f0ff" />
+                <stop offset="100%" stop-color="#7928ca" />
+              </linearGradient>
+            </defs>
+            <circle cx="80" cy="70" r="58" fill="rgba(0, 240, 255, 0.1)" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1.5" stroke-dasharray="4 4" />
+            <!-- 로봇 머리 -->
+            <rect x="52" y="38" width="56" height="46" rx="10" fill="url(#aiGrad)" />
+            <!-- 안테나 -->
+            <line x1="80" y1="38" x2="80" y2="24" stroke="#00f0ff" stroke-width="3" />
+            <circle cx="80" cy="22" r="5" fill="#ff007f" />
+            <!-- 디지털 바이저 / 눈 -->
+            <rect x="60" y="50" width="40" height="14" rx="7" fill="#080a16" />
+            <circle cx="68" cy="57" r="4" fill="#00ffcc" />
+            <circle cx="92" cy="57" r="4" fill="#00ffcc" />
+            <!-- 입 그리드 -->
+            <line x1="68" y1="74" x2="92" y2="74" stroke="#00f0ff" stroke-width="2" stroke-dasharray="3 2" />
+            <!-- 몸통 -->
+            <path d="M44 94 C44 88 116 88 116 94 L122 125 L38 125 Z" fill="url(#aiGrad)" opacity="0.9" />
+            <circle cx="80" cy="108" r="8" fill="#080a16" stroke="#00ffcc" stroke-width="2" />
+          </svg>
+        `
+      },
+
+      // 0-2. 컴퓨터 코딩 & 알고리즘 (Python, Coding, Algorithm, Software)
+      'coding': {
+        tag: '💻 알고리즘 & 파이썬 코딩 (Software)',
+        color: '#ffc800',
+        svg: `
+          <svg viewBox="0 0 160 140" class="clue-svg">
+            <defs>
+              <linearGradient id="codeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffc800" />
+                <stop offset="100%" stop-color="#ff007f" />
+              </linearGradient>
+            </defs>
+            <circle cx="80" cy="70" r="58" fill="rgba(255, 200, 0, 0.1)" stroke="rgba(255, 200, 0, 0.3)" stroke-width="1.5" />
+            <!-- 노트북 모니터 -->
+            <rect x="36" y="32" width="88" height="58" rx="6" fill="#080a16" stroke="url(#codeGrad)" stroke-width="2.5" />
+            <!-- 화면 안 코드 기호 -->
+            <path d="M52 52 L44 60 L52 68" stroke="#00f0ff" stroke-width="3" fill="none" stroke-linecap="round" />
+            <path d="M72 52 L80 60 L72 68" stroke="#00f0ff" stroke-width="3" fill="none" stroke-linecap="round" />
+            <line x1="64" y1="50" x2="60" y2="70" stroke="#ff007f" stroke-width="2.5" stroke-linecap="round" />
+            <!-- 키보드 베이스 -->
+            <path d="M26 92 L134 92 L142 108 L18 108 Z" fill="url(#codeGrad)" />
+            <rect x="66" y="96" width="28" height="5" rx="2" fill="#080a16" />
+          </svg>
+        `
+      },
+
+      // 0-3. 우주 과학 & 로켓 탐사 (Rocket, Mars, Rover, Orbit, Space)
+      'space': {
+        tag: '🚀 우주 탐사 & 화성 탐사선 (Space & Rover)',
+        color: '#ff007f',
+        svg: `
+          <svg viewBox="0 0 160 140" class="clue-svg">
+            <defs>
+              <linearGradient id="rocketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff007f" />
+                <stop offset="100%" stop-color="#7928ca" />
+              </linearGradient>
+            </defs>
+            <circle cx="80" cy="70" r="58" fill="rgba(255, 0, 127, 0.1)" stroke="rgba(255, 0, 127, 0.3)" stroke-width="1.5" />
+            <!-- 로켓 본체 -->
+            <path d="M80 22 C94 40 96 74 96 88 L64 88 C64 74 66 40 80 22 Z" fill="url(#rocketGrad)" />
+            <!-- 로켓 창문 -->
+            <circle cx="80" cy="52" r="9" fill="#080a16" stroke="#00f0ff" stroke-width="2.5" />
+            <!-- 날개 -->
+            <path d="M64 72 L48 88 L64 88 Z" fill="#ff7700" />
+            <path d="M96 72 L112 88 L96 88 Z" fill="#ff7700" />
+            <!-- 부스터 불꽃 -->
+            <path d="M72 88 Q80 114 80 120 Q80 114 88 88 Z" fill="#ffc800" />
+            <path d="M75 88 Q80 106 80 110 Q80 106 85 88 Z" fill="#ff007f" />
+          </svg>
+        `
+      },
+
+      // 0-4. 양자 컴퓨팅 & 수학 (Quantum, Equation, Math, Supercomputer)
+      'quantum_math': {
+        tag: '⚛️ 양자컴퓨팅 & 수학 방정식 (Quantum Math)',
+        color: '#b800ff',
+        svg: `
+          <svg viewBox="0 0 160 140" class="clue-svg">
+            <circle cx="80" cy="70" r="58" fill="rgba(184, 0, 255, 0.1)" stroke="rgba(184, 0, 255, 0.3)" stroke-width="1.5" />
+            <!-- 원자 궤도 타원들 -->
+            <ellipse cx="80" cy="70" rx="46" ry="18" fill="none" stroke="#00f0ff" stroke-width="2" transform="rotate(30 80 70)" />
+            <ellipse cx="80" cy="70" rx="46" ry="18" fill="none" stroke="#ff007f" stroke-width="2" transform="rotate(-30 80 70)" />
+            <ellipse cx="80" cy="70" rx="46" ry="18" fill="none" stroke="#ffc800" stroke-width="2" transform="rotate(90 80 70)" />
+            <!-- 원자핵 / 큐비트 코어 -->
+            <circle cx="80" cy="70" r="10" fill="#00ffcc" stroke="#080a16" stroke-width="2" />
+            <!-- 전자 큐비트들 -->
+            <circle cx="44" cy="50" r="4.5" fill="#ff007f" />
+            <circle cx="116" cy="90" r="4.5" fill="#00f0ff" />
+          </svg>
+        `
+      },
       // 1. 두 친구 / 복수 주어 (Tom and Jerry, They are, We are 등)
       'friends': {
         tag: '👥 2명 (복수 주어 ➔ are)',
@@ -598,6 +701,23 @@ class VisualClueManager {
     const trans = (question.translation || '').toLowerCase();
     const cat = (question.category || '').toLowerCase();
     const text = `${sentence} ${full} ${trans} ${cat}`;
+
+    // 0-1. 인공지능 & 로봇공학
+    if (text.includes('ai') || text.includes('robot') || text.includes('humanoid') || text.includes('인공지능') || text.includes('로봇')) {
+      return 'ai_robot';
+    }
+    // 0-2. 컴퓨터 코딩 & 알고리즘 & 소프트웨어
+    if (text.includes('code') || text.includes('coding') || text.includes('python') || text.includes('algorithm') || text.includes('software') || text.includes('알고리즘') || text.includes('프로그래밍') || text.includes('코딩')) {
+      return 'coding';
+    }
+    // 0-3. 우주 탐사 & 화성 & 로켓 & 위성
+    if (text.includes('rocket') || text.includes('mars') || text.includes('rover') || text.includes('space') || text.includes('satellite') || text.includes('galaxy') || text.includes('우주') || text.includes('화성') || text.includes('탐사선')) {
+      return 'space';
+    }
+    // 0-4. 양자 컴퓨팅 & 수학 & 슈퍼컴퓨터 & 데이터
+    if (text.includes('quantum') || text.includes('equation') || text.includes('math') || text.includes('supercomputer') || text.includes('양자') || text.includes('방정식') || text.includes('수학') || text.includes('데이터')) {
+      return 'quantum_math';
+    }
 
     // 1. 친구 / 복수 주어
     if (text.includes('tom and jerry') || text.includes('friends') || text.includes('singers') || text.includes('they are') || text.includes('we are') || text.includes('친구')) {
