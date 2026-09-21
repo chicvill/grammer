@@ -197,6 +197,21 @@ class VoiceCommander {
       if (/^(다음|다음문제|넘어가|next)$/.test(clean) || clean.includes('다음')) return { type: 'next' };
       if (/^(시작|스타트|게임시작|start)$/.test(clean) || clean.includes('시작')) return { type: 'start' };
       if (/^(다시|다시시작|재시작|restart)$/.test(clean) || clean.includes('다시')) return { type: 'restart' };
+
+      // 문법 개념 / 공식 / 설명 보기 명령
+      if (/^(설명|문법|개념|힌트|공식|치트시트|가이드|help|grammar|concept|rule)$/.test(clean) || clean.includes('설명') || clean.includes('문법') || clean.includes('개념')) {
+        return { type: 'concept' };
+      }
+
+      // 내 목소리 다시 듣기 (섀도잉 녹음 재생)
+      if (/^(내목소리|내발음|내소리|들어보기|내목소리듣기)$/.test(clean) || clean.includes('내목소리') || clean.includes('내발음')) {
+        return { type: 'replayUserVoice' };
+      }
+
+      // 원어민 발음 비교
+      if (/^(원어민|원어민발음|원어민소리|비교|발음비교)$/.test(clean) || clean.includes('원어민') || clean.includes('비교')) {
+        return { type: 'playNativeCompare' };
+      }
     }
 
     return null;
@@ -205,7 +220,7 @@ class VoiceCommander {
   // 제어 명령 단어인지 판별
   isControlWord(word) {
     const clean = word.replace(/\s+/g, '');
-    return /^(다음|시작|다시|선택|정답|확인|위|아래|왼쪽|오른쪽|1번|2번|3번|4번)$/.test(clean);
+    return /^(다음|시작|다시|선택|정답|확인|위|아래|왼쪽|오른쪽|1번|2번|3번|4번|설명|문법|개념|힌트|공식|내목소리|내발음|원어민|비교)$/.test(clean);
   }
 
   highlightRecognized() {

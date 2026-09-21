@@ -86,7 +86,30 @@ class GrammarQuestGame {
     this.shadowScoreStars = document.getElementById('shadowScoreStars');
     this.shadowScoreNumber = document.getElementById('shadowScoreNumber');
     this.shadowHeardText = document.getElementById('shadowHeardText');
+    this.playUserVoiceBtn = document.getElementById('playUserVoiceBtn');
+    this.playNativeCompareBtn = document.getElementById('playNativeCompareBtn');
+    this.playUserVoiceText = document.getElementById('playUserVoiceText');
+    this.userAudioWave = document.getElementById('userAudioWave');
     this.isShadowRecording = false;
+    this.currentUserAudioUrl = null;
+    this.currentUserAudio = null;
+    this.mediaRecorder = null;
+    this.audioChunks = [];
+
+    // 4. 문법 개념 치트시트 모달 DOM 및 상태
+    this.conceptGuideBtn = document.getElementById('conceptGuideBtn');
+    this.conceptModalOverlay = document.getElementById('conceptModalOverlay');
+    this.conceptCloseBtn = document.getElementById('conceptCloseBtn');
+    this.conceptOkBtn = document.getElementById('conceptOkBtn');
+    this.conceptGradeBadge = document.getElementById('conceptGradeBadge');
+    this.conceptTitle = document.getElementById('conceptTitle');
+    this.conceptFormula = document.getElementById('conceptFormula');
+    this.conceptUsage = document.getElementById('conceptUsage');
+    this.conceptRulesList = document.getElementById('conceptRulesList');
+    this.conceptTrapWrong = document.getElementById('conceptTrapWrong');
+    this.conceptTrapCorrect = document.getElementById('conceptTrapCorrect');
+    this.conceptExamplesList = document.getElementById('conceptExamplesList');
+    this.isConceptModalOpen = false;
 
     this.explanationBox = document.getElementById('explanationBox');
     this.expResultBadge = document.getElementById('expResultBadge');
@@ -184,6 +207,26 @@ class GrammarQuestGame {
         e.preventDefault();
       }
 
+      // 샤오미 리모컨의 메뉴(Menu / ☰) 버튼으로 언제든 개념 카드 열기 / 닫기
+      if (key === 'ContextMenu' || key === 'Menu' || e.keyCode === 82 || key === 'F1') {
+        e.preventDefault();
+        if (this.isConceptModalOpen) {
+          this.closeConceptModal();
+        } else {
+          this.openConceptModal();
+        }
+        return;
+      }
+
+      // 문법 개념 모달이 열려있을 때 리모컨 뒤로가기(Back) / ESC / OK / Space로 닫기
+      if (this.isConceptModalOpen) {
+        if (['Escape', 'Enter', ' ', 'Backspace', 'GoBack', 'BrowserBack'].includes(key) || e.keyCode === 4) {
+          e.preventDefault();
+          this.closeConceptModal();
+          return;
+        }
+      }
+
       if (this.gameState === 'ready' || this.gameState === 'finished') {
         if (key === 'Enter' || key === ' ') {
           this.startNewGame();
@@ -192,6 +235,12 @@ class GrammarQuestGame {
       }
 
       if (this.gameState === 'quiz') {
+        // 단축키 H 또는 C 로 문법 개념 카드 열기
+        if (['h', 'H', 'c', 'C'].includes(key)) {
+          this.openConceptModal();
+          return;
+        }
+
         const q = this.currentQuestion;
 
         // 선택형 문제인 경우
@@ -251,7 +300,41 @@ class GrammarQuestGame {
           }
         }
       } else if (this.gameState === 'review') {
-        if (['Enter', 'ArrowRight', 'ArrowDown', ' '].includes(key)) {
+        const active = document.activeElement;
+        if (active === this.playUserVoiceBtn && (key === 'Enter' || key === ' ')) {
+          this.playUserRecordedVoice();
+          return;
+        }
+        if (active === this.playNativeCompareBtn && (key === 'Enter' || key === ' ')) {
+          this.playNativeComparisonVoice();
+          return;
+        }
+        if (active === this.shadowRecordBtn && (key === 'Enter' || key === ' ')) {
+          this.startShadowRecording();
+          return;
+        }
+        if (active === this.shadowListenBtn && (key === 'Enter' || key === ' ')) {
+          this.playListeningAudio();
+          return;
+        }
+
+        // 방향키로 섀도잉 컨트롤 간 이동 지원
+        if (key === 'ArrowLeft') {
+          if (active === this.playNativeCompareBtn) this.playUserVoiceBtn.focus();
+          else if (active === this.shadowRecordBtn) this.shadowListenBtn.focus();
+          return;
+        }
+        if (key === 'ArrowRight') {
+          if (active === this.playUserVoiceBtn) this.playNativeCompareBtn.focus();
+          else if (active === this.shadowListenBtn) this.shadowRecordBtn.focus();
+          else {
+            this.triggerDpadVisual(this.btnOk);
+            this.nextQuestion();
+          }
+          return;
+        }
+
+        if (['Enter', 'ArrowDown', ' '].includes(key)) {
           this.triggerDpadVisual(this.btnOk);
           this.nextQuestion();
         }
@@ -287,6 +370,28 @@ class GrammarQuestGame {
     }
     if (this.shadowRecordBtn) {
       this.shadowRecordBtn.addEventListener('click', () => this.startShadowRecording());
+    }
+    if (this.playUserVoiceBtn) {
+      this.playUserVoiceBtn.addEventListener('click', () => this.playUserRecordedVoice());
+    }
+    if (this.playNativeCompareBtn) {
+      this.playNativeCompareBtn.addEventListener('click', () => this.playNativeComparisonVoice());
+    }
+
+    // 4. 핵심 문법 개념 치트시트 모달 버튼 이벤트
+    if (this.conceptGuideBtn) {
+      this.conceptGuideBtn.addEventListener('click', () => this.openConceptModal());
+    }
+    if (this.conceptCloseBtn) {
+      this.conceptCloseBtn.addEventListener('click', () => this.closeConceptModal());
+    }
+    if (this.conceptOkBtn) {
+      this.conceptOkBtn.addEventListener('click', () => this.closeConceptModal());
+    }
+    if (this.conceptModalOverlay) {
+      this.conceptModalOverlay.addEventListener('click', (e) => {
+        if (e.target === this.conceptModalOverlay) this.closeConceptModal();
+      });
     }
 
     this.audioListenBtn.addEventListener('click', () => {
@@ -347,6 +452,30 @@ class GrammarQuestGame {
       return;
     }
 
+    // 문법 개념 / 설명 보기 음성 명령 ("설명", "문법", "개념", "공식", "힌트")
+    if (action.type === 'concept') {
+      this.openConceptModal();
+      return;
+    }
+
+    // 모달이 열려있을 때 닫기 음성 명령 ("확인", "다음", "선택")
+    if (this.isConceptModalOpen) {
+      if (action.type === 'confirm' || action.type === 'next') {
+        this.closeConceptModal();
+        return;
+      }
+    }
+
+    // 내 목소리 다시 듣기 & 원어민 발음 비교 음성 명령
+    if (action.type === 'replayUserVoice') {
+      this.playUserRecordedVoice();
+      return;
+    }
+    if (action.type === 'playNativeCompare') {
+      this.playNativeComparisonVoice();
+      return;
+    }
+
     if (this.gameState === 'ready' || this.gameState === 'finished') {
       if (action.type === 'start' || action.type === 'restart' || action.type === 'confirm') {
         this.startNewGame();
@@ -401,8 +530,17 @@ class GrammarQuestGame {
     if (dir === 'up') {
       if (this.focusedOption === 2) nextIdx = 0;
       else if (this.focusedOption === 3) nextIdx = 1;
+      else if (this.focusedOption === 0 || this.focusedOption === 1) nextIdx = -1; // 1번/2번에서 위(▲)로 누르면 상단 [📖 핵심 문법 개념] 버튼으로 이동!
     } else if (dir === 'down') {
-      if (this.focusedOption === 0) nextIdx = 2;
+      if (this.focusedOption === -1) {
+        if (this.currentQuestion && this.currentQuestion.type === 'scramble') {
+          this.setOptionFocus(null);
+          if (window.scrambleManager) window.scrambleManager.focusCurrentBlock();
+          return;
+        }
+        nextIdx = 0; // 선택형일 때 1번 보기로 복귀!
+      }
+      else if (this.focusedOption === 0) nextIdx = 2;
       else if (this.focusedOption === 1) nextIdx = 3;
     } else if (dir === 'left') {
       if (this.focusedOption === 1) nextIdx = 0;
@@ -426,10 +564,29 @@ class GrammarQuestGame {
     this.shortcutChips.forEach((chip, i) => {
       chip.classList.toggle('active', i === idx);
     });
+
+    // 상단 [📖 핵심 문법 개념] 버튼 포커스 스타일 동기화
+    if (this.conceptGuideBtn) {
+      this.conceptGuideBtn.classList.toggle('focused', idx === -1);
+      if (idx === -1) {
+        this.conceptGuideBtn.focus();
+      }
+    }
   }
 
   confirmSelection() {
+    if (this.isConceptModalOpen) {
+      this.closeConceptModal();
+      return;
+    }
+
     if (this.gameState === 'quiz' && !this.isAnswered) {
+      // 상단 [📖 핵심 문법 개념] 버튼에 포커스된 상태에서 리모컨 OK 누르면 모달 열기!
+      if (this.focusedOption === -1) {
+        this.openConceptModal();
+        return;
+      }
+
       if (this.currentQuestion.type === 'choice') {
         this.selectOption(this.focusedOption);
       } else if (this.currentQuestion.type === 'scramble') {
@@ -513,6 +670,22 @@ class GrammarQuestGame {
 
     this.explanationBox.classList.remove('active');
     if (this.shadowResultBox) this.shadowResultBox.style.display = 'none';
+
+    // 이전 녹음 오디오 객체 및 메모리 해제
+    if (this.currentUserAudio) {
+      try { this.currentUserAudio.pause(); } catch (e) {}
+      this.currentUserAudio = null;
+    }
+    if (this.currentUserAudioUrl) {
+      URL.revokeObjectURL(this.currentUserAudioUrl);
+      this.currentUserAudioUrl = null;
+    }
+    if (this.playUserVoiceBtn) {
+      this.playUserVoiceBtn.classList.remove('playing');
+    }
+    if (this.playUserVoiceText) {
+      this.playUserVoiceText.textContent = '내 목소리 다시 듣기';
+    }
 
     // === 유형별 화면 세팅 ===
     if (q.type === 'choice') {
@@ -690,6 +863,9 @@ class GrammarQuestGame {
     this.streakText.textContent = `${this.streak} 🔥`;
     this.expContent.textContent = q.explanation;
     this.explanationBox.classList.add('active');
+
+    // 정답 확인 시 완성 문장 전체를 원어민 음성으로 자동 읽어줌!
+    this.speakCorrectSentence(400);
   }
 
   // 선택형 문제에서 보기 번호/클릭 선택
@@ -765,6 +941,9 @@ class GrammarQuestGame {
     this.streakText.textContent = `${this.streak} 🔥`;
     this.expContent.textContent = q.explanation;
     this.explanationBox.classList.add('active');
+
+    // 정답 확인 시 완성 문장 전체를 원어민 음성으로 자동 읽어줌!
+    this.speakCorrectSentence(400);
   }
 
   // 1. 단어 어순 배열 (Sentence Scramble) 완성 결과 처리
@@ -807,11 +986,6 @@ class GrammarQuestGame {
       const playerText = this.isBattleMode ? `[${this.currentTurnPlayer}P] ` : '';
       this.expResultBadge.textContent = `${playerText}어순 완성 대성공! 🧩 (+${earned}점)`;
 
-      // 정답 완성 문장 원어민 TTS 자동 발음
-      setTimeout(() => {
-        this.playListeningAudio();
-      }, 300);
-
     } else {
       this.streak = 0;
       if (!this.wrongQuestions.some(wq => wq.sentence === q.sentence)) {
@@ -830,6 +1004,9 @@ class GrammarQuestGame {
     this.streakText.textContent = `${this.streak} 🔥`;
     this.expContent.textContent = q.explanation;
     this.explanationBox.classList.add('active');
+
+    // 정답 확인 시 완성 문장 전체를 원어민 음성으로 자동 읽어줌!
+    this.speakCorrectSentence(400);
   }
 
   // 2. 점수 가산 & 2인 배틀 모드 스코어 관리
@@ -863,8 +1040,8 @@ class GrammarQuestGame {
     this.startNewGame();
   }
 
-  // 3. 문장 전체 섀도잉 & 발음 점수 평가 엔진
-  startShadowRecording() {
+  // 3. 문장 전체 섀도잉 & 발음 점수 평가 엔진 + 학생 실제 음성 녹음 (MediaRecorder)
+  async startShadowRecording() {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       alert('현재 브라우저에서는 음성 인식을 지원하지 않습니다. Chrome 또는 Edge 브라우저를 사용해 주세요.');
       return;
@@ -873,6 +1050,48 @@ class GrammarQuestGame {
     const q = this.currentQuestion;
     const targetFull = (q.audioText || q.full || q.sentence.replace('_____', q.answerWord)).replace(/[.?!]/g, '').trim().toLowerCase();
 
+    // 1. 마이크 스트림 획득 & MediaRecorder 세팅
+    let stream = null;
+    this.audioChunks = [];
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus') ? 'audio/ogg;codecs=opus' : '');
+        
+        this.mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+        
+        this.mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            this.audioChunks.push(e.data);
+          }
+        };
+
+        this.mediaRecorder.onstop = () => {
+          try {
+            stream.getTracks().forEach(track => track.stop());
+          } catch (e) {}
+
+          if (this.audioChunks.length > 0) {
+            if (this.currentUserAudioUrl) {
+              URL.revokeObjectURL(this.currentUserAudioUrl);
+            }
+            const blob = new Blob(this.audioChunks, { type: this.mediaRecorder.mimeType || 'audio/webm' });
+            this.currentUserAudioUrl = URL.createObjectURL(blob);
+            if (this.playUserVoiceBtn) {
+              this.playUserVoiceBtn.style.display = 'inline-flex';
+            }
+          }
+        };
+
+        this.mediaRecorder.start(100);
+      }
+    } catch (err) {
+      console.warn('MediaRecorder 오디오 녹음 스트림 접근 불가 (SpeechRecognition만 진행):', err);
+    }
+
+    // 2. 음성 인식기 (SpeechRecognition) 시작
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognizer = new SpeechRecognition();
     recognizer.lang = 'en-US';
@@ -882,9 +1101,21 @@ class GrammarQuestGame {
     this.shadowRecordBtn.classList.add('recording');
     this.shadowRecordBtn.innerHTML = '<span>🎙️ 귀 기울여 듣는 중... 말씀하세요!</span>';
 
+    const stopAllRecording = () => {
+      this.shadowRecordBtn.classList.remove('recording');
+      this.shadowRecordBtn.innerHTML = '<span>🎙️ 다시 따라 말하기</span>';
+      if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+        try {
+          this.mediaRecorder.stop();
+        } catch (e) {}
+      }
+    };
+
     recognizer.onresult = (e) => {
       const heard = e.results[0][0].transcript.toLowerCase().trim();
       const score = this.calculateSimilarity(heard, targetFull);
+
+      stopAllRecording();
 
       this.shadowResultBox.style.display = 'flex';
       this.shadowScoreNumber.textContent = `발음 정확도: ${score}점`;
@@ -900,19 +1131,89 @@ class GrammarQuestGame {
         this.shadowScoreStars.textContent = '⭐ (조금 더 또박또박!)';
         window.soundFx.playWrong();
       }
+
+      // 발음 채점 완료 후 '내 목소리 다시 듣기' 버튼으로 포커스 유도
+      setTimeout(() => {
+        if (this.playUserVoiceBtn) {
+          this.playUserVoiceBtn.focus();
+        }
+      }, 350);
     };
 
     recognizer.onerror = () => {
-      this.shadowRecordBtn.classList.remove('recording');
-      this.shadowRecordBtn.innerHTML = '<span>🎙️ 다시 따라 말하기</span>';
+      stopAllRecording();
     };
 
     recognizer.onend = () => {
-      this.shadowRecordBtn.classList.remove('recording');
-      this.shadowRecordBtn.innerHTML = '<span>🎙️ 다시 따라 말하기</span>';
+      stopAllRecording();
     };
 
-    recognizer.start();
+    try {
+      recognizer.start();
+    } catch (e) {
+      stopAllRecording();
+    }
+  }
+
+  // 방금 녹음된 사용자 실제 목소리 재생
+  playUserRecordedVoice() {
+    if (!this.currentUserAudioUrl) {
+      alert('녹음된 목소리가 없습니다. 먼저 "따라 말하기 시작" 버튼을 눌러 문장을 읽어보세요!');
+      return;
+    }
+
+    if (this.currentUserAudio) {
+      this.currentUserAudio.pause();
+      this.currentUserAudio.currentTime = 0;
+    }
+
+    this.currentUserAudio = new Audio(this.currentUserAudioUrl);
+
+    if (this.playUserVoiceBtn) {
+      this.playUserVoiceBtn.classList.add('playing');
+    }
+    if (this.playUserVoiceText) {
+      this.playUserVoiceText.textContent = '내 목소리 재생 중...';
+    }
+
+    const resetBtnState = () => {
+      if (this.playUserVoiceBtn) this.playUserVoiceBtn.classList.remove('playing');
+      if (this.playUserVoiceText) this.playUserVoiceText.textContent = '내 목소리 다시 듣기';
+    };
+
+    this.currentUserAudio.onended = resetBtnState;
+    this.currentUserAudio.onerror = resetBtnState;
+
+    this.currentUserAudio.play().catch(e => {
+      console.warn('사용자 녹음 오디오 재생 실패:', e);
+      resetBtnState();
+    });
+  }
+
+  // 원어민 발음 비교 재생
+  playNativeComparisonVoice() {
+    if (this.currentUserAudio) {
+      this.currentUserAudio.pause();
+      if (this.playUserVoiceBtn) this.playUserVoiceBtn.classList.remove('playing');
+      if (this.playUserVoiceText) this.playUserVoiceText.textContent = '내 목소리 다시 듣기';
+    }
+
+    const q = this.currentQuestion;
+    if (!q) return;
+
+    let fullText = q.audioText || q.full;
+    if (!fullText) {
+      const ans = q.answerWord || (q.options ? q.options[q.answer] : '');
+      fullText = q.sentence.replace('_____', ans);
+    }
+    fullText = fullText.trim();
+    if (!fullText.endsWith('.') && !fullText.endsWith('?') && !fullText.endsWith('!')) {
+      fullText += '.';
+    }
+
+    if (window.soundFx) {
+      window.soundFx.speakEnglish(fullText);
+    }
   }
 
   calculateSimilarity(s1, s2) {
@@ -958,6 +1259,144 @@ class GrammarQuestGame {
     this.expResultBadge.textContent = '시간 초과! ⏰ (다음 판에 다시 복습합니다)';
     this.expContent.textContent = q.explanation;
     this.explanationBox.classList.add('active');
+
+    // 시간 초과 시에도 정답 문장을 원어민 음성으로 읽어주어 귀로 기억하게 함!
+    this.speakCorrectSentence(400);
+  }
+
+  // ========================================================
+  // 핵심 문법 개념 카드 (Grammar Cheat Sheet) 모달 제어
+  // ========================================================
+  openConceptModal(question) {
+    const q = question || this.currentQuestion;
+    if (!q) return;
+
+    if (!window.grammarConceptData || !window.grammarConceptData.getConceptForQuestion) {
+      console.warn('grammarConceptData가 아직 로드되지 않았습니다.');
+      return;
+    }
+
+    const data = window.grammarConceptData.getConceptForQuestion(q);
+    if (!data) return;
+
+    if (this.conceptGradeBadge) {
+      this.conceptGradeBadge.textContent = data.gradeBadge || '문법 핵심';
+    }
+    if (this.conceptTitle) {
+      this.conceptTitle.textContent = data.title;
+    }
+    if (this.conceptFormula) {
+      this.conceptFormula.textContent = data.formula;
+    }
+    if (this.conceptUsage) {
+      this.conceptUsage.textContent = data.usage;
+    }
+
+    // 핵심 규칙 리스트
+    if (this.conceptRulesList) {
+      this.conceptRulesList.innerHTML = '';
+      if (Array.isArray(data.rules)) {
+        data.rules.forEach(rule => {
+          const li = document.createElement('li');
+          li.textContent = rule;
+          this.conceptRulesList.appendChild(li);
+        });
+      }
+    }
+
+    // 단골 시험 함정
+    if (data.trap) {
+      if (this.conceptTrapWrong) this.conceptTrapWrong.textContent = data.trap.wrong || '';
+      if (this.conceptTrapCorrect) this.conceptTrapCorrect.textContent = data.trap.correct || '';
+    }
+
+    // 대표 예문
+    if (this.conceptExamplesList) {
+      this.conceptExamplesList.innerHTML = '';
+      if (Array.isArray(data.examples)) {
+        data.examples.forEach(ex => {
+          const li = document.createElement('li');
+          li.textContent = ex;
+          this.conceptExamplesList.appendChild(li);
+        });
+      }
+    }
+
+    if (this.conceptModalOverlay) {
+      this.conceptModalOverlay.style.display = 'flex';
+    }
+    this.isConceptModalOpen = true;
+
+    if (window.soundFx) {
+      window.soundFx.playCardFocus();
+    }
+
+    // 모달 확인 버튼으로 포커스 이동 (리모컨 OK로 바로 닫을 수 있도록)
+    setTimeout(() => {
+      if (this.conceptOkBtn) {
+        this.conceptOkBtn.focus();
+      }
+    }, 60);
+  }
+
+  closeConceptModal() {
+    if (!this.conceptModalOverlay) return;
+    this.conceptModalOverlay.style.display = 'none';
+    this.isConceptModalOpen = false;
+
+    if (window.soundFx) {
+      window.soundFx.playButtonPress();
+    }
+
+    // 문제 화면으로 포커스 복귀
+    if (this.gameState === 'quiz' && this.currentQuestion) {
+      if (this.currentQuestion.type === 'choice') {
+        const idx = this.selectedOptionIndex >= 0 ? this.selectedOptionIndex : (this.focusedOption >= 0 ? this.focusedOption : 0);
+        this.setOptionFocus(idx);
+      } else if (this.currentQuestion.type === 'scramble') {
+        if (window.scrambleManager) window.scrambleManager.focusCurrentBlock();
+      }
+    }
+  }
+
+  // ========================================================
+  // 정답 확인 시 완성된 영어 문장 전체를 또렷하게 읽어주는 메소드
+  // ========================================================
+  speakCorrectSentence(delay = 400) {
+    const q = this.currentQuestion;
+    if (!q) return;
+
+    // 문장의 정답 완성형 텍스트 도출
+    let fullText = q.audioText || q.full;
+    if (!fullText) {
+      const ans = q.answerWord || (q.options ? q.options[q.answer] : '');
+      fullText = q.sentence.replace('_____', ans);
+    }
+
+    // 마침표나 물음표 등 구두점 정돈
+    fullText = fullText.trim();
+    if (!fullText.endsWith('.') && !fullText.endsWith('?') && !fullText.endsWith('!')) {
+      fullText += '.';
+    }
+
+    // 효과음(딩동댕/버저)과 겹치지 않게 약간의 지연 후 낭독!
+    setTimeout(() => {
+      if (window.soundFx) {
+        window.soundFx.speakEnglish(
+          fullText,
+          () => {
+            // 낭독 시작 시 문장에 부드러운 네온 하이라이트 점등
+            const targetEl = document.getElementById('targetSentence');
+            if (targetEl) targetEl.classList.add('tts-reading');
+          },
+          () => {
+            // 낭독 종료 시 하이라이트 해제
+            const targetEl = document.getElementById('targetSentence');
+            if (targetEl) targetEl.classList.remove('tts-reading');
+          }
+        );
+      }
+    }, delay);
   }
 
   nextQuestion() {

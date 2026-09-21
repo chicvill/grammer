@@ -108,10 +108,16 @@
       <!-- 문법 퀘스트 문제 스테이지 -->
       <section class="grammar-stage-section">
         
-        <!-- 문법 카테고리 태그 -->
+        <!-- 문법 카테고리 태그 & 개념 보기 버튼 -->
         <div class="category-pill-wrap">
-          <span class="category-pill" id="categoryTag">Be동사 현재형</span>
-          <span class="rule-hint-pill">D-Pad로 선택 후 OK (또는 음성으로 "1번")</span>
+          <div class="category-left-group">
+            <span class="category-pill" id="categoryTag">Be동사 현재형</span>
+            <button class="concept-guide-btn focusable" id="conceptGuideBtn" tabindex="0" title="이 문제의 핵심 문법 개념 보기 (음성으로 '설명' 또는 클릭)">
+              <span class="icon">📖</span>
+              <span class="text">핵심 문법 개념</span>
+            </button>
+          </div>
+          <span class="rule-hint-pill">D-Pad로 선택 후 OK (또는 음성으로 "설명", "1번")</span>
         </div>
 
         <!-- 영문법 Hero 문제 쇼케이스 보드 (비주얼 일러스트 + 문장 집중 2-컬럼 구조) -->
@@ -246,11 +252,28 @@
                 <span>🎙️ 따라 말하기 시작</span>
               </button>
             </div>
-            <!-- 발음 채점 결과 카드 -->
+            <!-- 발음 채점 결과 카드 및 내 목소리 다시 듣기 오디오 바 -->
             <div class="shadow-result-box" id="shadowResultBox" style="display: none;">
-              <div class="score-stars" id="shadowScoreStars">⭐⭐⭐</div>
-              <div class="score-number-pill" id="shadowScoreNumber">발음 점수: 95점</div>
-              <div class="shadow-heard-text" id="shadowHeardText">"Tom and Jerry are good friends"</div>
+              <div class="shadow-result-header">
+                <div class="score-stars" id="shadowScoreStars">⭐⭐⭐</div>
+                <div class="score-number-pill" id="shadowScoreNumber">발음 점수: 95점</div>
+                <div class="shadow-heard-text" id="shadowHeardText">"Tom and Jerry are good friends"</div>
+              </div>
+
+              <!-- 내 목소리 재생 & 원어민 발음 비교 버튼 바 -->
+              <div class="shadow-audio-actions">
+                <button class="shadow-audio-btn play-user-voice focusable" id="playUserVoiceBtn" tabindex="0" title="방금 내가 녹음한 목소리 다시 듣기">
+                  <span class="icon">🎧</span>
+                  <span class="text" id="playUserVoiceText">내 목소리 다시 듣기</span>
+                  <span class="audio-wave-anim" id="userAudioWave">
+                    <i></i><i></i><i></i><i></i>
+                  </span>
+                </button>
+                <button class="shadow-audio-btn play-native-voice focusable" id="playNativeCompareBtn" tabindex="0" title="원어민 발음과 나란히 비교해서 듣기">
+                  <span class="icon">🔊</span>
+                  <span class="text">원어민 발음 비교</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -277,6 +300,60 @@
             <button class="tv-btn voice-toggle-btn focusable" id="micToggleBtn" tabindex="0">
               <span class="btn-text" id="micToggleBtnText">🎙️ 마이크 음성 제어 켜기</span>
             </button>
+          </div>
+        </div>
+
+        <!-- 핵심 문법 개념 카드 팝업 모달 (Concept Modal) -->
+        <div class="concept-modal-overlay" id="conceptModalOverlay" style="display: none;">
+          <div class="concept-card" id="conceptCard">
+            <div class="concept-header">
+              <div class="concept-title-group">
+                <span class="concept-grade-badge" id="conceptGradeBadge">초등 5~6 필수</span>
+                <h3 class="concept-main-title" id="conceptMainTitle">현재진행형 (Present Continuous)</h3>
+              </div>
+              <button class="concept-close-btn focusable" id="conceptCloseBtn" tabindex="0" title="닫기 (ESC / OK)">✕</button>
+            </div>
+
+            <div class="concept-body">
+              <!-- 1. 핵심 공식 박스 -->
+              <div class="concept-section formula-section">
+                <h4 class="section-label">⚡ 핵심 공식 (Formula)</h4>
+                <div class="formula-box" id="conceptFormula">주어 + be동사(am / are / is) + 동사-ing</div>
+              </div>
+
+              <!-- 2. 의미와 쓰임 -->
+              <div class="concept-section">
+                <h4 class="section-label">💡 의미와 쓰임 (Usage)</h4>
+                <p class="usage-text" id="conceptUsage">지금 말하고 있는 이 순간에 일어나는 동작을 나타냅니다.</p>
+              </div>
+
+              <!-- 3. 규칙 요약 -->
+              <div class="concept-section">
+                <h4 class="section-label">📝 형태 변화 규칙 (Rules)</h4>
+                <ul class="rules-list" id="conceptRules"></ul>
+              </div>
+
+              <!-- 4. 🚨 시험 단골 함정 -->
+              <div class="concept-section trap-section">
+                <h4 class="section-label trap-label">🚨 시험 단골 함정 (Common Trap)</h4>
+                <div class="trap-box">
+                  <div class="trap-item wrong" id="conceptTrapWrong">He listening to music now. (be동사 누락 ❌)</div>
+                  <div class="trap-item correct" id="conceptTrapCorrect">He is listening to music now. (be동사 + -ing ✅)</div>
+                </div>
+              </div>
+
+              <!-- 5. 대표 예문 -->
+              <div class="concept-section">
+                <h4 class="section-label">🌟 대표 예문 (Examples)</h4>
+                <ul class="examples-list" id="conceptExamples"></ul>
+              </div>
+            </div>
+
+            <div class="concept-footer">
+              <button class="concept-ok-btn focusable" id="conceptOkBtn" tabindex="0">
+                <span>확인 후 퀘스트 풀기 (OK / ESC)</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -324,6 +401,7 @@
         <div class="command-cheatsheet">
           <h4>🗣️ 지원 음성 명령어</h4>
           <ul>
+            <li><strong>문법 개념 보기:</strong> "설명", "문법", "개념", "힌트"</li>
             <li><strong>영어 직접 발음:</strong> "went", "is", "speak" 등</li>
             <li><strong>보기 선택:</strong> "1번", "2번", "3번", "4번"</li>
             <li><strong>리스닝 명령:</strong> "다시 들려줘", "소리"</li>
@@ -337,25 +415,86 @@
     <!-- 하단 TV 풋터 바 -->
     <footer class="footer-bar">
       <div class="key-indicator">
+        <span class="key-tag">▲ 위로 이동 후 OK / ☰ 메뉴</span> 📖 핵심 문법 개념
+      </div>
+      <div class="key-indicator">
         <span class="key-tag">▲▼◀▶</span> 보기 이동
       </div>
       <div class="key-indicator">
-        <span class="key-tag">OK / ENTER</span> 정답 선택 및 다음 문제
+        <span class="key-tag">OK / ENTER</span> 정답 선택
       </div>
       <div class="key-indicator">
-        <span class="key-tag">1~4 숫자키</span> 보기 바로 선택
-      </div>
-      <div class="key-indicator">
-        <span class="key-tag">🎙️ 음성</span> "1번", "2번", "다음" 한국어 지원
+        <span class="key-tag">🎙️ 음성</span> "설명", "1번", "다음"
       </div>
     </footer>
 
   </div>
 
-  <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 -> 어순 배열 -> 효과음 -> 음성 인식 -> 게임 코어 -->
+  <!-- 문법 개념 치트시트 모달 (Grammar Concept Modal) -->
+  <div class="concept-modal-overlay" id="conceptModalOverlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="conceptTitle">
+    <div class="concept-modal-card">
+      <div class="concept-modal-header">
+        <div class="concept-header-left">
+          <span class="concept-grade-badge" id="conceptGradeBadge">초등 5~6 필수</span>
+          <h2 class="concept-title" id="conceptTitle">현재진행형 (Present Continuous)</h2>
+        </div>
+        <button class="concept-close-btn focusable" id="conceptCloseBtn" aria-label="모달 닫기">✕</button>
+      </div>
+
+      <div class="concept-modal-body">
+        <!-- 핵심 공식 (Formula Box) -->
+        <div class="concept-section formula-section">
+          <div class="concept-section-title">📐 핵심 공식</div>
+          <div class="formula-box" id="conceptFormula">주어 + be동사(am / are / is) + 동사-ing</div>
+          <p class="usage-text" id="conceptUsage">지금 말하고 있는 이 순간에 일어나는 동작을 나타냅니다.</p>
+        </div>
+
+        <!-- 3대 규칙 & 포인트 (Rules List) -->
+        <div class="concept-section rules-section">
+          <div class="concept-section-title">💡 꼭 알아야 할 핵심 규칙</div>
+          <ul class="concept-rules-list" id="conceptRulesList">
+            <!-- 동적 삽입 -->
+          </ul>
+        </div>
+
+        <!-- 🚨 시험 단골 함정 (Trap Alert Box) -->
+        <div class="concept-section trap-section">
+          <div class="concept-section-title">🚨 시험 단골 함정 주의!</div>
+          <div class="trap-box">
+            <div class="trap-item trap-wrong">
+              <span class="trap-badge wrong-badge">오답 ❌</span>
+              <span class="trap-text" id="conceptTrapWrong">He listening to music now.</span>
+            </div>
+            <div class="trap-item trap-correct">
+              <span class="trap-badge correct-badge">정답 ✅</span>
+              <span class="trap-text" id="conceptTrapCorrect">He is listening to music now.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 대표 예문 (Examples List) -->
+        <div class="concept-section examples-section">
+          <div class="concept-section-title">🌟 대표 예문으로 익히기</div>
+          <ul class="concept-examples-list" id="conceptExamplesList">
+            <!-- 동적 삽입 -->
+          </ul>
+        </div>
+      </div>
+
+      <div class="concept-modal-footer">
+        <button class="concept-ok-btn focusable" id="conceptOkBtn">
+          <span>확인 완료! 문제 풀러 가기</span>
+          <span class="key-hint">(OK / ESC / 음성 "다음")</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 -> 어순 배열 -> 문법 개념 카드 -> 효과음 -> 음성 인식 -> 게임 코어 -->
   <script src="grammarGenerator.js"></script>
   <script src="visualClueManager.js"></script>
   <script src="scrambleManager.js"></script>
+  <script src="grammarConceptData.js"></script>
   <script src="audio.js"></script>
   <script src="voice.js"></script>
   <script src="game.js"></script>

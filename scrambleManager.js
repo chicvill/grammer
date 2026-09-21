@@ -230,6 +230,12 @@ class ScrambleManager {
       // 아래로 누르면 [완성 확인] 버튼으로 포커스 이동
       const submitBtn = document.getElementById('scrambleSubmitBtn');
       if (submitBtn) submitBtn.focus();
+    } else if (dir === 'up') {
+      // 위(▲)로 누르면 상단 [📖 핵심 문법 개념] 버튼으로 포커스 이동
+      if (window.gameApp) {
+        window.gameApp.setOptionFocus(-1);
+        if (window.soundFx) window.soundFx.playMove();
+      }
     }
   }
 
