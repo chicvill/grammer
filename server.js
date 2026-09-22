@@ -13,7 +13,9 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  let reqPath = req.url === '/' ? '/index.html' : req.url;
+  // 쿼리스트링 분리 (예: /style.css?v=123 -> /style.css)
+  const urlPath = req.url.split('?')[0];
+  let reqPath = urlPath === '/' ? '/index.html' : urlPath;
   const filePath = path.join(__dirname, reqPath);
   const ext = path.extname(filePath).toLowerCase();
 
@@ -23,7 +25,12 @@ const server = http.createServer((req, res) => {
       res.end('404 Not Found');
       return;
     }
-    res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' });
+    res.writeHead(200, {
+      'Content-Type': MIME_TYPES[ext] || 'application/octet-stream',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     res.end(content);
   });
 });
