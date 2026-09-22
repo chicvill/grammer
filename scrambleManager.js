@@ -15,7 +15,7 @@ class ScrambleManager {
     this.isLocked = false;       // 문제 완료 후 조작 잠금
   }
 
-  // 문장을 어순 배열용 토큰 덩어리로 분할 (3~6 덩어리)
+  // 문장을 어순 배열용 토큰 덩어리로 분할 (화면 가림 방지 및 학습 효과를 위해 항상 3~5개 덩어리로 최적화)
   tokenizeSentence(sentence) {
     // 마침표, 물음표 등 구두점 분리 보존
     let clean = sentence.trim();
@@ -24,22 +24,42 @@ class ScrambleManager {
     }
     const rawWords = clean.split(/\s+/);
 
-    // 단어가 너무 많으면(7개 이상) 의미 단위로 2단어씩 묶어서 4~5개 블록으로 최적화
-    if (rawWords.length <= 5) {
+    // 4단어 이하인 경우 단어별로 분할
+    if (rawWords.length <= 4) {
       return rawWords;
     }
 
+    // 5단어인 경우: 관사+명사(a young scientist 등) 또는 고유명사구 묶기
+    if (rawWords.length === 5) {
+      // 3번째나 4번째에 관사가 있는 경우 (예: You are a young scientist -> You / are / a young / scientist)
+      if (rawWords[2] === 'a' || rawWords[2] === 'an' || rawWords[2] === 'the') {
+        return [rawWords[0], rawWords[1], `${rawWords[2]} ${rawWords[3]}`, rawWords[4]];
+      }
+      return rawWords;
+    }
+
+    // 6단어 이상인 경우: TV 와이드 화면에 맞추어 항상 최대 4~5개 청크로 지능적 결합
     const tokens = [];
     let i = 0;
     while (i < rawWords.length) {
-      // 주어구나 동사구 등 자연스러운 덩어리 형성
-      if (i === 0 && (rawWords[0] === 'Tom' && rawWords[1] === 'and' && rawWords[2] === 'Jerry')) {
+      const remainingWords = rawWords.length - i;
+      const remainingSlots = 5 - tokens.length;
+
+      // 마지막 슬롯이면 남은 단어들을 하나로 합침
+      if (remainingSlots <= 1) {
+        tokens.push(rawWords.slice(i).join(' '));
+        break;
+      }
+
+      // 주어구 특수 결합
+      if (i === 0 && rawWords[0] === 'Tom' && rawWords[1] === 'and' && rawWords[2] === 'Jerry') {
         tokens.push('Tom and Jerry');
         i += 3;
-      } else if (i === 0 && (rawWords[0] === 'My' && (rawWords[1] === 'brother' || rawWords[1] === 'sister'))) {
-        tokens.push(`${rawWords[0]} ${rawWords[1]}`);
-        i += 2;
-      } else if (rawWords.length - i >= 2 && Math.random() < 0.35 && tokens.length < 4) {
+        continue;
+      }
+
+      // 2단어를 하나로 결합
+      if (remainingWords > remainingSlots) {
         tokens.push(`${rawWords[i]} ${rawWords[i + 1]}`);
         i += 2;
       } else {
