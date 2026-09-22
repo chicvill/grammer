@@ -76,8 +76,23 @@ class GrammarQuestGame {
     this.p2Tag = document.getElementById('p2Tag');
     this.isBattleMode = false;
     this.p1Score = 0;
-    this.p2Score = 0;
     this.currentTurnPlayer = 1;
+
+    // 화면 배율 조절 컨트롤러 (100% -> 92% -> 85% -> 80% -> 108%)
+    this.uiScaleBtn = document.getElementById('uiScaleBtn');
+    this.uiScaleText = document.getElementById('uiScaleText');
+    this.scaleLevels = [
+      { label: '화면 100%', zoom: '1.0' },
+      { label: '화면 92%', zoom: '0.92' },
+      { label: '화면 85%', zoom: '0.85' },
+      { label: '화면 80%', zoom: '0.80' },
+      { label: '화면 108%', zoom: '1.08' }
+    ];
+    this.currentScaleIdx = parseInt(localStorage.getItem('TV_UI_SCALE_IDX') || '0', 10);
+    if (isNaN(this.currentScaleIdx) || this.currentScaleIdx < 0 || this.currentScaleIdx >= this.scaleLevels.length) {
+      this.currentScaleIdx = 0;
+    }
+    this.applyUiScale();
 
     // 3. 문장 전체 섀도잉 DOM 및 상태
     this.shadowingPanel = document.getElementById('shadowingPanel');
@@ -245,6 +260,10 @@ class GrammarQuestGame {
         } else {
           this.openConceptModal();
         }
+      // 리모컨 숫자 0 또는 's'/'S' 누르면 화면 배율 즉시 조절 (100% -> 92% -> 85% -> 80% -> 108%)
+      if (key === '0' || key === 's' || key === 'S') {
+        e.preventDefault();
+        this.cycleUiScale();
         return;
       }
 
@@ -449,6 +468,26 @@ class GrammarQuestGame {
       this.voiceCommander.toggle();
       window.soundFx.init();
     });
+
+    if (this.uiScaleBtn) {
+      this.uiScaleBtn.addEventListener('click', () => this.cycleUiScale());
+    }
+  }
+
+  cycleUiScale() {
+    this.currentScaleIdx = (this.currentScaleIdx + 1) % this.scaleLevels.length;
+    this.applyUiScale();
+    if (window.soundFx) window.soundFx.playMove();
+  }
+
+  applyUiScale() {
+    if (!this.scaleLevels) return;
+    const item = this.scaleLevels[this.currentScaleIdx];
+    document.body.style.zoom = item.zoom;
+    if (this.uiScaleText) {
+      this.uiScaleText.textContent = item.label;
+    }
+    localStorage.setItem('TV_UI_SCALE_IDX', this.currentScaleIdx.toString());
   }
 
   handleDpadClick(dir) {

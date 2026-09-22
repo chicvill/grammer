@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Pretendard:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260922_08">
+  <link rel="stylesheet" href="style.css?v=20260922_09">
 </head>
 <body>
   <!-- TV 오버스캔 방지 세이프 에어리어 -->
@@ -33,6 +33,12 @@
             <div class="player-score-tag p2" id="p2Tag"><span class="p-dot"></span>2P: <span id="p2Score">0</span></div>
           </div>
         </div>
+
+        <!-- TV 화면 배율 맞춤 컨트롤러 (100% -> 92% -> 85% -> 80% -> 105%) -->
+        <button class="ui-scale-btn focusable" id="uiScaleBtn" title="TV 화면 크기 맞춤 (클릭 시 100% -> 92% -> 85% -> 80% 변경)">
+          <span class="scale-icon">🖥️</span>
+          <span class="scale-text" id="uiScaleText">화면 100%</span>
+        </button>
       </div>
 
       <div class="hud-stats">
@@ -446,12 +452,12 @@
   </div>
 
   <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 -> 어순 배열 -> 문법 개념 카드 -> 효과음 -> 음성 인식 -> 게임 코어 -->
-  <script src="grammarGenerator.js?v=20260922_08"></script>
-  <script src="visualClueManager.js?v=20260922_08"></script>
-  <script src="scrambleManager.js?v=20260922_08"></script>
-  <script src="grammarConceptData.js?v=20260922_08"></script>
-  <script src="audio.js?v=20260922_08"></script>
-  <script src="voice.js?v=20260922_08"></script>
-  <script src="game.js?v=20260922_08"></script>
+  <script src="grammarGenerator.js?v=20260922_09"></script>
+  <script src="visualClueManager.js?v=20260922_09"></script>
+  <script src="scrambleManager.js?v=20260922_09"></script>
+  <script src="grammarConceptData.js?v=20260922_09"></script>
+  <script src="audio.js?v=20260922_09"></script>
+  <script src="voice.js?v=20260922_09"></script>
+  <script src="game.js?v=20260922_09"></script>
 </body>
 </html>

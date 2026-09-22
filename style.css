@@ -269,6 +269,38 @@ body {
   line-height: 1.2;
 }
 
+/* TV 화면 배율 맞춤 버튼 */
+.ui-scale-btn {
+  background: rgba(18, 26, 56, 0.85);
+  border: 1.5px solid rgba(0, 240, 255, 0.4);
+  color: var(--accent-cyan);
+  padding: 4px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 800;
+  outline: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ui-scale-btn:hover,
+.ui-scale-btn:focus {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: #fff;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--accent-cyan);
+}
+
+.ui-scale-btn .scale-icon {
+  font-size: 13px;
+}
+
 /* === 6단계 학년 선택 탭 바 === */
 .grade-selector-bar {
   display: flex;
