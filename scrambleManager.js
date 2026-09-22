@@ -57,6 +57,11 @@ class ScrambleManager {
     this.liftedIndex = null;
     this.focusedIndex = 0;
 
+    const transGuide = document.getElementById('scrambleTranslationGuide');
+    if (transGuide && question.translation) {
+      transGuide.textContent = `"${question.translation}"`;
+    }
+
     const fullText = question.audioText || question.full || question.sentence.replace('_____', question.answerWord);
     this.correctSentence = fullText.replace(/[.?!]/g, '').trim().toLowerCase();
     

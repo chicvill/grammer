@@ -36,6 +36,7 @@ class GrammarQuestGame {
     this.targetSentence = document.getElementById('targetSentence');
     this.sentenceTranslation = document.getElementById('sentenceTranslation');
     this.visualClueStage = document.getElementById('visualClueStage');
+    this.heroQuestionShowcase = document.getElementById('heroQuestionShowcase');
     
     // 선택형 2x2 그리드
     this.optionsGrid = document.getElementById('optionsGrid');
@@ -690,6 +691,7 @@ class GrammarQuestGame {
     // === 유형별 화면 세팅 ===
     if (q.type === 'choice') {
       // 1. 4지선다 선택형
+      if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
       this.optionsGrid.style.display = 'grid';
       this.speechStageWrap.style.display = 'none';
       if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
@@ -702,6 +704,8 @@ class GrammarQuestGame {
 
     } else if (q.type === 'scramble') {
       // 2. 단어 어순 배열 (Sentence Scramble) 블록 스왑형
+      // 상단 정답 노출 방지 및 단어 블록/버튼의 온전한 화면 확보를 위해 쇼케이스 숨김
+      if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'none';
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'none';
       if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'flex';
@@ -714,6 +718,7 @@ class GrammarQuestGame {
 
     } else if (q.type === 'speaking') {
       // 3. 보기가 없는 주관식 말하기형
+      if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'flex';
       if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
@@ -725,6 +730,7 @@ class GrammarQuestGame {
 
     } else if (q.type === 'listening') {
       // 4. 듣고 답하는 리스닝 평가형
+      if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'flex';
       if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';

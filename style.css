@@ -1118,53 +1118,61 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 12px 0;
+  margin: 0;
+  min-height: 0;
 }
 
 .scramble-prompt-card {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   background: rgba(14, 20, 44, 0.85);
-  border: 2px solid rgba(0, 240, 255, 0.3);
-  border-radius: 20px;
-  padding: 20px 24px;
+  border: 2px solid rgba(0, 240, 255, 0.35);
+  border-radius: 18px;
+  padding: 18px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-evenly;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.05);
 }
 
 .scramble-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 2px;
 }
 
 .scramble-badge {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
   color: var(--accent-gold);
   background: rgba(255, 200, 0, 0.15);
   border: 1px solid rgba(255, 200, 0, 0.4);
-  padding: 4px 14px;
-  border-radius: 20px;
+  padding: 3px 12px;
+  border-radius: 16px;
+  white-space: nowrap;
 }
 
-.scramble-hint-tag {
-  font-size: 14px;
-  color: var(--text-dim);
-  font-weight: 600;
+.scramble-translation-guide {
+  font-size: clamp(20px, 2.2vw, 28px);
+  font-weight: 800;
+  color: #ffe680;
+  text-shadow: 0 0 12px rgba(255, 200, 0, 0.5);
+  letter-spacing: 0.3px;
 }
 
 .scramble-sentence-preview {
-  font-size: clamp(24px, 2.8vw, 34px);
+  font-size: clamp(22px, 2.4vw, 32px);
   font-weight: 800;
-  color: #fff;
-  margin: 8px 0 16px 0;
-  text-align: center;
-  min-height: 44px;
   color: var(--accent-cyan);
-  text-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  margin: 4px 0 14px 0;
+  text-align: center;
+  min-height: 38px;
+  text-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
 }
 
 /* 단어 블록 트랙 */
