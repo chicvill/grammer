@@ -15,21 +15,23 @@
     
     <!-- 상단 헤더 & HUD -->
     <header class="hud-header">
-      <div class="logo-area">
-        <span class="game-badge">XIAOMI TV EDU EDITION</span>
-        <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag">중1 영문법</span></h1>
-      </div>
+      <div class="header-left-group">
+        <div class="logo-area">
+          <span class="game-badge">TV EDU QUEST</span>
+          <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag">중1 영문법</span></h1>
+        </div>
 
-      <!-- 2인 가족 대전 모드 토글 & 듀얼 스코어 HUD -->
-      <div class="battle-toggle-wrap">
-        <button class="mode-toggle-btn focusable" id="modeToggleBtn" title="1인 솔로 / 2인 가족 대전 전환">
-          <span class="mode-icon">👥</span>
-          <span class="mode-text" id="modeToggleText">1인 솔로</span>
-        </button>
-        <div class="battle-scoreboard" id="battleScoreboard" style="display: none;">
-          <div class="player-score-tag p1" id="p1Tag"><span class="p-dot"></span>1P: <span id="p1Score">0</span></div>
-          <div class="vs-tag">VS</div>
-          <div class="player-score-tag p2" id="p2Tag"><span class="p-dot"></span>2P: <span id="p2Score">0</span></div>
+        <!-- 2인 가족 대전 모드 토글 & 듀얼 스코어 HUD -->
+        <div class="battle-toggle-wrap">
+          <button class="mode-toggle-btn focusable" id="modeToggleBtn" title="1인 솔로 / 2인 가족 대전 전환">
+            <span class="mode-icon">👥</span>
+            <span class="mode-text" id="modeToggleText">1인 솔로</span>
+          </button>
+          <div class="battle-scoreboard" id="battleScoreboard" style="display: none;">
+            <div class="player-score-tag p1" id="p1Tag"><span class="p-dot"></span>1P: <span id="p1Score">0</span></div>
+            <div class="vs-tag">VS</div>
+            <div class="player-score-tag p2" id="p2Tag"><span class="p-dot"></span>2P: <span id="p2Score">0</span></div>
+          </div>
         </div>
       </div>
 
@@ -40,7 +42,7 @@
         </div>
         <div class="stat-card">
           <span class="stat-label">SOLVED</span>
-          <span class="stat-value master-val" id="masteredProgressText">0 pts</span>
+          <span class="stat-value master-val" id="masteredProgressText">0개 완료</span>
         </div>
         <div class="stat-card">
           <span class="stat-label">SCORE</span>
@@ -69,7 +71,7 @@
         </div>
         <div class="voice-text-info">
           <span class="voice-status-title" id="voiceStatusText">음성 대기중</span>
-          <span class="voice-recognized-word" id="voiceHeardText">"초3", "중2", "고등" 말해보세요</span>
+          <span class="voice-recognized-word" id="voiceHeardText">"초3", "중2", "고등"</span>
         </div>
       </div>
     </header>
@@ -359,72 +361,25 @@
 
       </section>
 
-      <!-- 우측 사이드바: 샤오미 TV 리모컨 인터페이스 패널 -->
-      <aside class="controller-panel">
-        <h3 class="controller-title">샤오미 TV 리모컨</h3>
-        <p class="controller-hint">화면을 직접 누르거나 리모컨으로 조작하세요</p>
-
-        <!-- 원형 D-Pad -->
-        <div class="dpad-wrapper">
-          <button class="dpad-btn dpad-up" id="btnUp" title="위로 이동 / 1, 2번 라인">
-            <span class="arrow">▲</span>
-            <span class="label">위</span>
-          </button>
-          <div class="dpad-middle-row">
-            <button class="dpad-btn dpad-left" id="btnLeft" title="왼쪽 보기 (1번, 3번)">
-              <span class="arrow">◀</span>
-              <span class="label">왼쪽</span>
-            </button>
-            <button class="dpad-btn dpad-center" id="btnOk" title="정답 확정 / 다음 (OK)">
-              <span class="label">OK</span>
-            </button>
-            <button class="dpad-btn dpad-right" id="btnRight" title="오른쪽 보기 (2번, 4번)">
-              <span class="arrow">▶</span>
-              <span class="label">오른쪽</span>
-            </button>
-          </div>
-          <button class="dpad-btn dpad-down" id="btnDown" title="아래로 이동 / 3, 4번 라인">
-            <span class="arrow">▼</span>
-            <span class="label">아래</span>
-          </button>
-        </div>
-
-        <!-- 보기 단축 가이드 -->
-        <div class="dpad-shortcuts">
-          <div class="shortcut-chip" id="chip-1">1번: ▲ ◀</div>
-          <div class="shortcut-chip" id="chip-2">2번: ▲ ▶</div>
-          <div class="shortcut-chip" id="chip-3">3번: ▼ ◀</div>
-          <div class="shortcut-chip" id="chip-4">4번: ▼ ▶</div>
-        </div>
-
-        <!-- 음성 치트시트 -->
-        <div class="command-cheatsheet">
-          <h4>🗣️ 지원 음성 명령어</h4>
-          <ul>
-            <li><strong>문법 개념 보기:</strong> "설명", "문법", "개념", "힌트"</li>
-            <li><strong>영어 직접 발음:</strong> "went", "is", "speak" 등</li>
-            <li><strong>보기 선택:</strong> "1번", "2번", "3번", "4번"</li>
-            <li><strong>리스닝 명령:</strong> "다시 들려줘", "소리"</li>
-            <li><strong>진행:</strong> "다음", "선택", "시작"</li>
-          </ul>
-        </div>
-      </aside>
-
     </main>
 
-    <!-- 하단 TV 풋터 바 -->
+    <!-- 하단 TV 컨트롤 가이드 바 -->
     <footer class="footer-bar">
       <div class="key-indicator">
-        <span class="key-tag">▲ 위로 이동 후 OK / ☰ 메뉴</span> 📖 핵심 문법 개념
+        <span class="key-tag">▲▼◀▶</span>
+        <span class="key-label">보기 이동</span>
       </div>
       <div class="key-indicator">
-        <span class="key-tag">▲▼◀▶</span> 보기 이동
+        <span class="key-tag">OK / ENTER</span>
+        <span class="key-label">정답 선택</span>
       </div>
       <div class="key-indicator">
-        <span class="key-tag">OK / ENTER</span> 정답 선택
+        <span class="key-tag">📖 메뉴</span>
+        <span class="key-label">문법 개념</span>
       </div>
       <div class="key-indicator">
-        <span class="key-tag">🎙️ 음성</span> "설명", "1번", "다음"
+        <span class="key-tag">🎙️ 음성</span>
+        <span class="key-label">"1번", "정답", "다음"</span>
       </div>
     </footer>
 

@@ -341,11 +341,11 @@ class GrammarQuestGame {
       }
     });
 
-    this.btnUp.addEventListener('click', () => this.handleDpadClick('up'));
-    this.btnDown.addEventListener('click', () => this.handleDpadClick('down'));
-    this.btnLeft.addEventListener('click', () => this.handleDpadClick('left'));
-    this.btnRight.addEventListener('click', () => this.handleDpadClick('right'));
-    this.btnOk.addEventListener('click', () => this.confirmSelection());
+    if (this.btnUp) this.btnUp.addEventListener('click', () => this.handleDpadClick('up'));
+    if (this.btnDown) this.btnDown.addEventListener('click', () => this.handleDpadClick('down'));
+    if (this.btnLeft) this.btnLeft.addEventListener('click', () => this.handleDpadClick('left'));
+    if (this.btnRight) this.btnRight.addEventListener('click', () => this.handleDpadClick('right'));
+    if (this.btnOk) this.btnOk.addEventListener('click', () => this.confirmSelection());
 
     // 2인 가족 대전 토글
     if (this.modeToggleBtn) {
@@ -562,7 +562,7 @@ class GrammarQuestGame {
       card.classList.toggle('focused', i === idx);
     });
     this.shortcutChips.forEach((chip, i) => {
-      chip.classList.toggle('active', i === idx);
+      if (chip) chip.classList.toggle('active', i === idx);
     });
 
     // 상단 [📖 핵심 문법 개념] 버튼 포커스 스타일 동기화

@@ -43,14 +43,17 @@ body {
   align-items: center;
 }
 
-/* === TV 오버스캔 방지 세이프 에어리어 (5% Safe Margin) === */
+/* === TV 오버스캔 방지 세이프 에어리어 (컴팩트 & 100vh 뷰포트 고정) === */
 .tv-safe-area {
   width: 100%;
-  height: 100%;
-  padding: 2.5vh 3.5vw;
+  height: 100vh;
+  max-height: 100vh;
+  padding: 1.8vh 2.4vw;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 /* === 상단 헤더 & HUD === */
@@ -60,9 +63,18 @@ body {
   justify-content: space-between;
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
-  border-radius: 16px;
-  padding: 12px 28px;
+  border-radius: 14px;
+  padding: 8px 18px;
   backdrop-filter: blur(12px);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.header-left-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
 }
 
 .logo-area {
@@ -72,80 +84,92 @@ body {
 
 .game-badge {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 2px;
   color: var(--accent-cyan);
   font-weight: 700;
+  line-height: 1.1;
 }
 
 .game-title {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 19px;
   font-weight: 900;
   letter-spacing: 1px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  line-height: 1.2;
 }
 
 .grade-tag {
   font-family: var(--font-main);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   background: rgba(255, 200, 0, 0.2);
   color: var(--accent-gold);
   border: 1px solid rgba(255, 200, 0, 0.4);
-  padding: 2px 10px;
+  padding: 2px 8px;
   border-radius: 20px;
   letter-spacing: 0;
+  white-space: nowrap;
 }
 
 /* HUD 스탯 카드 */
 .hud-stats {
   display: flex;
-  gap: 16px;
+  gap: 8px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .stat-card {
   background: rgba(10, 14, 30, 0.85);
   border: 1px solid var(--panel-border);
-  padding: 6px 16px;
-  border-radius: 12px;
+  padding: 4px 12px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 95px;
+  min-width: 80px;
+  white-space: nowrap;
 }
 
 .stat-label {
   font-family: var(--font-display);
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-dim);
   letter-spacing: 1px;
+  line-height: 1.2;
 }
 
 .stat-value {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 17px;
   font-weight: 800;
   color: #fff;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .master-val {
   color: var(--accent-cyan);
-  font-size: 19px;
-  text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+  font-size: 14px;
+  font-family: var(--font-main);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+  white-space: nowrap;
 }
 
 .streak-val {
   color: #ff9900;
-  text-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+  text-shadow: 0 0 8px rgba(255, 153, 0, 0.5);
+  white-space: nowrap;
 }
 
 /* 타이머 카드 */
 .timer-card {
-  min-width: 130px;
+  min-width: 105px;
 }
 
 .timer-bar-wrap {
@@ -175,22 +199,24 @@ body {
 .voice-status-card {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   background: rgba(10, 15, 30, 0.85);
   border: 1px solid var(--panel-border);
-  padding: 8px 16px;
-  border-radius: 14px;
+  padding: 4px 12px;
+  border-radius: 10px;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .voice-status-card.listening {
   border-color: var(--accent-magenta);
-  box-shadow: 0 0 16px rgba(255, 0, 127, 0.4);
+  box-shadow: 0 0 14px rgba(255, 0, 127, 0.4);
 }
 
 .mic-icon-wrap {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
   display: flex;
@@ -200,8 +226,8 @@ body {
 }
 
 .mic-svg {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   fill: var(--text-dim);
   transition: fill 0.3s;
 }
@@ -227,39 +253,42 @@ body {
 }
 
 .voice-status-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--accent-cyan);
+  line-height: 1.1;
 }
 
 .voice-recognized-word {
-  font-size: 13px;
+  font-size: 12px;
   color: #fff;
-  max-width: 160px;
+  max-width: 140px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 /* === 6단계 학년 선택 탭 바 === */
 .grade-selector-bar {
   display: flex;
-  gap: 12px;
-  margin-top: 14px;
-  overflow-x: auto;
+  gap: 10px;
+  margin: 10px 0 12px 0;
+  flex-shrink: 0;
 }
 
 .grade-tab {
   flex: 1;
   background: rgba(18, 24, 52, 0.75);
   border: 1.5px solid var(--panel-border);
-  border-radius: 14px;
-  padding: 10px 14px;
+  border-radius: 12px;
+  padding: 6px 10px;
+  height: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
   cursor: pointer;
   outline: none;
   transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -267,13 +296,13 @@ body {
 
 .grade-tab .tab-badge {
   font-family: var(--font-main);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
   color: var(--text-dim);
 }
 
 .grade-tab .tab-sub {
-  font-size: 11px;
+  font-size: 10.5px;
   color: #6b7c96;
 }
 
@@ -299,29 +328,31 @@ body {
   font-weight: 700;
 }
 
-/* === 메인 영역: 문제 스테이지 + 컨트롤러 사이드바 === */
+/* === 메인 영역: 문제 풀이 풀스크린 와이드 스테이지 === */
 .main-content {
   display: flex;
   flex: 1;
-  gap: 24px;
-  margin: 16px 0;
+  width: 100%;
+  margin: 0;
   align-items: stretch;
   min-height: 0;
 }
 
-/* 문법 문제 풀이 스테이지 */
+/* 문법 문제 풀이 스테이지 (화면 100% 와이드) */
 .grammar-stage-section {
   position: relative;
   flex: 1;
+  width: 100%;
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
-  border-radius: 20px;
-  padding: 24px 32px;
+  border-radius: 18px;
+  padding: 16px 26px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   backdrop-filter: blur(12px);
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* 카테고리 태그 영역 */
@@ -329,7 +360,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
 }
 
 .category-left-group {
@@ -388,15 +420,17 @@ body {
 /* === 영문법 Hero 문제 쇼케이스 보드 (비주얼 일러스트 + 문장 집중) === */
 .hero-question-showcase {
   display: flex;
-  gap: 20px;
+  gap: 18px;
   align-items: stretch;
-  margin-bottom: 12px;
-  min-height: 180px;
+  margin-bottom: 10px;
+  min-height: 145px;
+  max-height: 175px;
+  flex-shrink: 0;
 }
 
 /* 좌측: 비주얼 일러스트 힌트 스테이지 */
 .visual-clue-stage {
-  flex: 0 0 clamp(190px, 18vw, 240px);
+  flex: 0 0 clamp(180px, 18vw, 230px);
   display: flex;
   flex-direction: column;
 }
@@ -440,7 +474,7 @@ body {
 
 .clue-artwork-wrap {
   width: 100%;
-  height: 116px;
+  height: 95px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -450,7 +484,7 @@ body {
 .clue-svg {
   width: 100%;
   height: 100%;
-  max-height: 116px;
+  max-height: 95px;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
 }
 
@@ -487,8 +521,8 @@ body {
   flex: 1;
   background: linear-gradient(140deg, rgba(18, 26, 58, 0.95) 0%, rgba(10, 15, 34, 0.95) 100%);
   border: 2px solid rgba(120, 160, 255, 0.35);
-  border-radius: 20px;
-  padding: 18px 28px;
+  border-radius: 16px;
+  padding: 14px 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -504,32 +538,32 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .q-focus-badge {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 1.5px;
   color: var(--accent-cyan);
   background: rgba(0, 240, 255, 0.15);
   border: 1px solid rgba(0, 240, 255, 0.3);
-  padding: 3px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
 .q-clue-guide {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--text-dim);
 }
 
 .target-sentence {
-  font-size: clamp(30px, 3.6vw, 44px);
+  font-size: clamp(24px, 2.6vw, 36px);
   font-weight: 900;
   color: #ffffff;
-  line-height: 1.35;
+  line-height: 1.3;
   letter-spacing: 0.5px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
@@ -544,12 +578,12 @@ body {
 /* 빈칸 슬롯: 펄스 애니메이션이 적용된 3D 네온 골드 박스 */
 .blank-box {
   display: inline-block;
-  min-width: 130px;
+  min-width: 110px;
   background: linear-gradient(180deg, rgba(255, 200, 0, 0.28) 0%, rgba(255, 120, 0, 0.15) 100%);
   border: 2.5px dashed var(--accent-gold);
   color: var(--accent-gold);
-  padding: 3px 22px;
-  border-radius: 14px;
+  padding: 2px 18px;
+  border-radius: 12px;
   margin: 0 8px;
   font-weight: 900;
   text-align: center;
@@ -578,27 +612,28 @@ body {
 }
 
 .sentence-translation {
-  margin-top: 10px;
-  font-size: clamp(18px, 2.2vw, 24px);
+  margin-top: 6px;
+  font-size: clamp(16px, 1.7vw, 21px);
   color: #b0c2de;
   font-weight: 600;
 }
 
-/* 2x2 보기 선택지 그리드 */
+/* 2x2 보기 선택지 그리드 (와이드 & 고시인성) */
 .options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 18px;
-  margin: 18px 0;
+  gap: 14px;
+  margin: 0;
   flex: 1;
+  min-height: 0;
 }
 
 .option-card {
-  background: var(--card-bg);
-  border: 2.5px solid var(--card-border);
-  border-radius: 18px;
-  padding: 20px 28px;
+  background: rgba(18, 24, 56, 0.85);
+  border: 2.5px solid rgba(70, 95, 175, 0.45);
+  border-radius: 16px;
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -606,21 +641,24 @@ body {
   outline: none;
   transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
   position: relative;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .option-card .opt-key-badge {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 800;
-  color: var(--text-dim);
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 6px 14px;
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.12);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 8px;
+  padding: 4px 12px;
   transition: all 0.18s ease;
+  white-space: nowrap;
 }
 
 .option-card .opt-text {
-  font-size: clamp(30px, 3.8vw, 44px);
+  font-size: clamp(24px, 2.5vw, 34px);
   font-weight: 900;
   color: #fff;
   flex: 1;
@@ -628,13 +666,13 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* 리모컨 탐색 시 포커스 상태 */
+/* 리모컨 탐색 시 포커스 상태 (아케이드 네온 글로우) */
 .option-card.focused,
 .option-card:focus {
-  background: rgba(36, 50, 96, 0.95);
-  border-color: var(--accent-cyan);
-  transform: scale(1.03);
-  box-shadow: var(--focus-glow);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(20, 36, 88, 0.95)) !important;
+  border-color: #00f0ff !important;
+  transform: scale(1.025);
+  box-shadow: 0 0 28px rgba(0, 240, 255, 0.7), inset 0 0 14px rgba(0, 240, 255, 0.35) !important;
   z-index: 2;
 }
 
@@ -642,6 +680,7 @@ body {
 .option-card:focus .opt-key-badge {
   background: var(--accent-cyan);
   color: #000;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
 }
 
 /* 정답/오답 강조 상태 */
@@ -943,199 +982,45 @@ body {
   box-shadow: var(--focus-glow);
 }
 
-/* === 우측 컨트롤러 패널 (샤오미 리모컨 D-Pad) === */
-.controller-panel {
-  width: 320px;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: 20px;
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  backdrop-filter: blur(12px);
-}
-
-.controller-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--accent-cyan);
-  margin-bottom: 4px;
-}
-
-.controller-hint {
-  font-size: 12px;
-  color: var(--text-dim);
-  margin-bottom: 18px;
-  text-align: center;
-}
-
-/* 원형 D-Pad */
-.dpad-wrapper {
-  width: 200px;
-  height: 200px;
-  background: #14182e;
-  border-radius: 50%;
-  border: 3px solid rgba(80, 100, 170, 0.4);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  position: relative;
-  margin-bottom: 16px;
-}
-
-.dpad-btn {
-  background: #1f2648;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-main);
-  border-radius: 12px;
-  cursor: pointer;
-  outline: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.dpad-btn .arrow {
-  font-size: 15px;
-  color: var(--accent-cyan);
-}
-
-.dpad-btn .label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-dim);
-}
-
-.dpad-up, .dpad-down {
-  width: 65px;
-  height: 44px;
-}
-
-.dpad-middle-row {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.dpad-left, .dpad-right {
-  width: 44px;
-  height: 65px;
-}
-
-.dpad-center {
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #253058, #161c36);
-  border: 2px solid var(--accent-cyan);
-  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
-}
-
-.dpad-center .label {
-  font-family: var(--font-display);
-  font-size: 15px;
-  color: #fff;
-  font-weight: 900;
-}
-
-.dpad-btn.active-press {
-  background: var(--accent-cyan) !important;
-  transform: scale(0.92);
-  box-shadow: 0 0 16px var(--accent-cyan);
-}
-
-.dpad-btn.active-press .arrow,
-.dpad-btn.active-press .label {
-  color: #000 !important;
-}
-
-/* 단축키 칩 */
-.dpad-shortcuts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  width: 100%;
-  margin-bottom: 16px;
-}
-
-.shortcut-chip {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  padding: 6px 8px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-dim);
-  transition: all 0.2s ease;
-}
-
-.shortcut-chip.active {
-  background: rgba(0, 240, 255, 0.2);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-}
-
-/* 음성 치트시트 */
-.command-cheatsheet {
-  background: rgba(10, 14, 28, 0.7);
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  padding: 12px 16px;
-  width: 100%;
-  font-size: 12px;
-}
-
-.command-cheatsheet h4 {
-  color: var(--accent-gold);
-  margin-bottom: 6px;
-  font-size: 13px;
-}
-
-.command-cheatsheet ul {
-  list-style: none;
-  line-height: 1.55;
-}
-
-.command-cheatsheet strong {
-  color: #fff;
-}
-
-/* === 하단 TV 풋터 바 === */
+/* === 하단 TV 컨트롤 가이드 바 (콘솔 스타일 키 칩) === */
 .footer-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 28px;
+  gap: 22px;
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   border-radius: 12px;
-  padding: 8px 24px;
-  font-size: 13px;
-  color: var(--text-dim);
+  padding: 6px 20px;
+  margin-top: 8px;
+  flex-shrink: 0;
+  backdrop-filter: blur(12px);
 }
 
 .key-indicator {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
 
 .key-tag {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  padding: 2px 8px;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  color: #00f0ff;
+  padding: 3px 10px;
   border-radius: 6px;
   font-family: var(--font-display);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.key-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #b0c4de;
+  white-space: nowrap;
 }
 
 /* ========================================================
