@@ -810,16 +810,17 @@ body {
   font-weight: 600;
 }
 
-/* 문제 해설 박스 */
+/* 문제 해설 박스 (컴팩트 & 겹침 방지) */
 .explanation-box {
-  background: rgba(10, 16, 36, 0.95);
+  background: rgba(12, 18, 42, 0.98);
   border: 2px solid var(--accent-cyan);
   border-radius: 16px;
-  padding: 18px 26px;
+  padding: 12px 22px;
   display: none;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   animation: slideUp 0.25s ease-out;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
 }
 
 .explanation-box.active {
@@ -827,21 +828,22 @@ body {
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .exp-header {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .exp-badge {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 800;
-  padding: 4px 12px;
-  border-radius: 8px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
 .exp-badge.correct {
@@ -856,16 +858,17 @@ body {
 
 .exp-title {
   font-weight: 800;
-  font-size: 18px;
+  font-size: 15px;
   color: var(--accent-gold);
 }
 
 .next-guide-tag {
   margin-left: auto;
-  font-size: 15px;
+  font-size: 13px;
   color: var(--accent-cyan);
   font-weight: 700;
   animation: blinkText 1.5s infinite;
+  white-space: nowrap;
 }
 
 @keyframes blinkText {
@@ -874,9 +877,9 @@ body {
 }
 
 .exp-content {
-  font-size: 20px;
-  color: var(--text-main);
-  line-height: 1.5;
+  font-size: clamp(15px, 1.6vw, 18px);
+  color: #e2e8f0;
+  line-height: 1.4;
   font-weight: 600;
 }
 
@@ -1354,49 +1357,52 @@ body {
    3. 문장 전체 섀도잉 & 발음 점수 평가 (Shadowing Panel)
    ======================================================== */
 .shadowing-panel {
-  margin-top: 14px;
-  padding-top: 14px;
+  margin-top: 6px;
+  padding-top: 6px;
   border-top: 1px dashed rgba(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .shadowing-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .shadowing-badge {
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
   color: #ff007f;
   background: rgba(255, 0, 127, 0.15);
   border: 1px solid rgba(255, 0, 127, 0.4);
-  padding: 3px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
 
 .shadowing-guide {
-  font-size: 13px;
+  font-size: 11.5px;
   color: var(--text-dim);
+  white-space: nowrap;
 }
 
 .shadowing-controls {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .shadow-btn {
-  padding: 8px 18px;
-  border-radius: 10px;
-  font-size: 14px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .shadow-btn.shadow-listen {

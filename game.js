@@ -204,8 +204,25 @@ class GrammarQuestGame {
     window.addEventListener('keydown', (e) => {
       const key = e.key;
 
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(key)) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Tab'].includes(key)) {
         e.preventDefault();
+      }
+
+      // Tab 키 누를 때 브라우저 기본 포커스 충돌 방지 및 게임 내 이동 연결
+      if (key === 'Tab') {
+        if (this.gameState === 'quiz') {
+          const q = this.currentQuestion;
+          if (q.type === 'choice') {
+            if (e.shiftKey) this.navigateOptions('left');
+            else this.navigateOptions('right');
+          } else if (q.type === 'scramble') {
+            if (window.scrambleManager) {
+              if (e.shiftKey) window.scrambleManager.navigate('left');
+              else window.scrambleManager.navigate('right');
+            }
+          }
+        }
+        return;
       }
 
       // 샤오미 리모컨의 메뉴(Menu / ☰) 버튼으로 언제든 개념 카드 열기 / 닫기
@@ -946,7 +963,7 @@ class GrammarQuestGame {
     this.scoreText.textContent = this.score;
     this.streakText.textContent = `${this.streak} 🔥`;
     this.expContent.textContent = q.explanation;
-    this.explanationBox.classList.add('active');
+    this.enterReviewMode();
 
     // 정답 확인 시 완성 문장 전체를 원어민 음성으로 자동 읽어줌!
     this.speakCorrectSentence(400);
@@ -1009,10 +1026,29 @@ class GrammarQuestGame {
     this.scoreText.textContent = this.score;
     this.streakText.textContent = `${this.streak} 🔥`;
     this.expContent.textContent = q.explanation;
-    this.explanationBox.classList.add('active');
+    this.enterReviewMode();
 
     // 정답 확인 시 완성 문장 전체를 원어민 음성으로 자동 읽어줌!
     this.speakCorrectSentence(400);
+  }
+
+  // 정답/오답/시간초과 시 해설 모드 진입 (요소 겹침 방지)
+  enterReviewMode() {
+    this.gameState = 'review';
+    if (this.timer) clearInterval(this.timer);
+
+    const q = this.currentQuestion;
+    // 어순 배열 문제의 경우, 해설이 뜰 때 복잡한 단어 트랙을 숨기고
+    // 상단 문장 보드에 완성된 정답 문장을 깔끔하게 보여주어 해설 상자와 절대 겹치지 않게 함!
+    if (q && q.type === 'scramble') {
+      if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
+      if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
+      const full = q.audioText || q.full || q.sentence.replace('_____', q.answerWord || '');
+      this.targetSentence.innerHTML = `<span style="color: var(--accent-green); text-shadow: 0 0 16px rgba(0,255,136,0.5);">${full}</span>`;
+      if (q.translation) this.sentenceTranslation.textContent = `"${q.translation}"`;
+    }
+
+    this.explanationBox.classList.add('active');
   }
 
   // 2. 점수 가산 & 2인 배틀 모드 스코어 관리
@@ -1308,7 +1344,7 @@ class GrammarQuestGame {
     this.expResultBadge.className = 'exp-badge wrong';
     this.expResultBadge.textContent = '시간 초과! ⏰ (다음 판에 다시 복습합니다)';
     this.expContent.textContent = q.explanation;
-    this.explanationBox.classList.add('active');
+    this.enterReviewMode();
 
     // 시간 초과 시에도 정답 문장을 원어민 음성으로 읽어주어 귀로 기억하게 함!
     this.speakCorrectSentence(400);
