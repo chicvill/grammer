@@ -41,3 +41,16 @@ node server.js
 1. 샤오미 TV 스틱에서 **`TV Bro`** 브라우저 설치 및 실행
 2. 주소창에 PC의 로컬 네트워크 IP 입력 (예: `http://192.168.x.x:3000`)
 3. 전체화면 모드(F11)로 플레이
+
+### 🐳 Docker로 실행
+```bash
+docker compose up -d
+```
+브라우저에서 `http://localhost:3000` 접속
+
+### ☁️ 구글 클라우드(Google Cloud Run) 배포
+자세한 배포 가이드는 [DEPLOY_GCP.md](DEPLOY_GCP.md)를 참고하세요.
+```bash
+# Windows 환경에서 원클릭 배포
+deploy-cloudrun.bat
+```
