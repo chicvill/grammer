@@ -225,6 +225,18 @@ class GrammarQuestGame {
         return;
       }
 
+      // 샤오미 리모컨의 마이크(Google Assistant/Search/Mic) 버튼 누르면 마이크 토글!
+      if (['VoiceSearch', 'Search', 'Mic', 'MediaRecord'].includes(key) || e.keyCode === 84 || e.keyCode === 130 || key === 'v' || key === 'V') {
+        e.preventDefault();
+        if (this.voiceCommander && this.voiceCommander.isSupported) {
+          this.voiceCommander.toggle();
+          if (this.voiceCommander.isListening) {
+            window.soundFx.playCombo();
+          }
+        }
+        return;
+      }
+
       // 샤오미 리모컨의 메뉴(Menu / ☰) 버튼으로 언제든 개념 카드 열기 / 닫기
       if (key === 'ContextMenu' || key === 'Menu' || e.keyCode === 82 || key === 'F1') {
         e.preventDefault();
@@ -646,9 +658,10 @@ class GrammarQuestGame {
     this.gameOverlay.classList.remove('active');
     window.soundFx.playCorrect();
 
-    if (this.voiceCommander.isSupported && !this.voiceCommander.isListening) {
-      this.voiceCommander.start();
-    }
+    // 마이크 자동 시작 제거: 권한 팝업 방지 및 대기 모드 유지 (리모컨 마이크 버튼 또는 V키로 직접 켤 때만 작동)
+    // if (this.voiceCommander.isSupported && !this.voiceCommander.isListening) {
+    //   this.voiceCommander.start();
+    // }
 
     this.updateProgressHUD();
     this.loadQuestion();

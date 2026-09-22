@@ -90,6 +90,12 @@ class VoiceCommander {
         }
       };
 
+      if (this.statusCard) {
+        this.statusCard.style.cursor = 'pointer';
+        this.statusCard.title = '클릭 또는 리모컨 마이크 버튼(🎙️)으로 켜기/끄기';
+        this.statusCard.addEventListener('click', () => this.toggle());
+      }
+      this.updateUI();
     } catch (err) {
       console.error('음성 인식 초기화 오류:', err);
       this.isSupported = false;
@@ -264,10 +270,12 @@ class VoiceCommander {
     if (this.isListening) {
       this.statusCard.classList.add('listening');
       this.statusText.textContent = '음성 인식 중... 🎙️';
+      if (this.heardText) this.heardText.textContent = '단어를 말씀하세요';
       if (this.toggleBtnText) this.toggleBtnText.textContent = '🔴 마이크 끄기';
     } else {
       this.statusCard.classList.remove('listening');
-      this.statusText.textContent = '음성 대기';
+      this.statusText.textContent = '마이크 꺼짐 (리모컨 🎙️)';
+      if (this.heardText) this.heardText.textContent = '마이크 버튼 또는 V키로 켜기';
       if (this.toggleBtnText) this.toggleBtnText.textContent = '🎙️ 마이크 켜기 (영어 단어 직접 발음)';
     }
   }
