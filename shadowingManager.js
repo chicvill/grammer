@@ -330,6 +330,7 @@ class ShadowingManager {
       URL.revokeObjectURL(this.currentUserAudioUrl);
       this.currentUserAudioUrl = null;
     }
+    this.audioChunks = [];
   }
 }
 
