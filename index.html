@@ -39,6 +39,12 @@
           <span class="scale-icon">🖥️</span>
           <span class="scale-text" id="uiScaleText">화면 100%</span>
         </button>
+
+        <!-- 조작 및 사용법 도움말 팝업 버튼 -->
+        <button class="help-btn focusable" id="helpBtn" title="게임 조작 및 사용법 도움말 (클릭 / H키 / 음성 '도움말')">
+          <span class="help-icon">❓</span>
+          <span class="help-text">도움말</span>
+        </button>
       </div>
 
       <div class="hud-stats">
@@ -125,7 +131,6 @@
               <span class="text">핵심 문법 개념</span>
             </button>
           </div>
-          <span class="rule-hint-pill">D-Pad로 선택 후 OK (또는 음성으로 "설명", "1번")</span>
         </div>
 
         <!-- 영문법 Hero 문제 쇼케이스 보드 (비주얼 일러스트 + 문장 집중 2-컬럼 구조) -->
@@ -139,7 +144,6 @@
           <div class="sentence-board">
             <div class="question-pill-header">
               <span class="q-focus-badge">TARGET SENTENCE</span>
-              <span class="q-clue-guide">💡 그림 단서를 보고 빈칸에 들어갈 알맞은 말을 찾아보세요!</span>
             </div>
             <p class="target-sentence" id="targetSentence">
               Tom and Jerry <span class="blank-box">[ ? ]</span> good friends.
@@ -154,22 +158,22 @@
         <div class="options-grid" id="optionsGrid" role="radiogroup">
           <!-- 1번: 좌상 -->
           <div class="option-card focusable" id="opt-0" tabindex="0" data-idx="0">
-            <div class="opt-key-badge">1 (▲ ◀)</div>
+            <div class="opt-key-badge">1</div>
             <div class="opt-text" id="optText-0">is</div>
           </div>
           <!-- 2번: 우상 -->
           <div class="option-card focusable" id="opt-1" tabindex="0" data-idx="1">
-            <div class="opt-key-badge">2 (▲ ▶)</div>
+            <div class="opt-key-badge">2</div>
             <div class="opt-text" id="optText-1">are</div>
           </div>
           <!-- 3번: 좌하 -->
           <div class="option-card focusable" id="opt-2" tabindex="0" data-idx="2">
-            <div class="opt-key-badge">3 (▼ ◀)</div>
+            <div class="opt-key-badge">3</div>
             <div class="opt-text" id="optText-2">am</div>
           </div>
           <!-- 4번: 우하 -->
           <div class="option-card focusable" id="opt-3" tabindex="0" data-idx="3">
-            <div class="opt-key-badge">4 (▼ ▶)</div>
+            <div class="opt-key-badge">4</div>
             <div class="opt-text" id="optText-3">be</div>
           </div>
         </div>
@@ -315,26 +319,6 @@
 
     </main>
 
-    <!-- 하단 TV 컨트롤 가이드 바 -->
-    <footer class="footer-bar">
-      <div class="key-indicator">
-        <span class="key-tag">▲▼◀▶</span>
-        <span class="key-label">보기 이동</span>
-      </div>
-      <div class="key-indicator">
-        <span class="key-tag">OK / ENTER</span>
-        <span class="key-label">정답 선택</span>
-      </div>
-      <div class="key-indicator">
-        <span class="key-tag">📖 메뉴</span>
-        <span class="key-label">문법 개념</span>
-      </div>
-      <div class="key-indicator">
-        <span class="key-tag">🎙️ 음성</span>
-        <span class="key-label">"1번", "정답", "다음"</span>
-      </div>
-    </footer>
-
   </div>
 
   <!-- 문법 개념 치트시트 모달 (Grammar Concept Modal) -->
@@ -397,15 +381,85 @@
     </div>
   </div>
 
-  <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 -> 어순 배열 -> 문법 개념 데이터 -> 개념 모달 -> 섀도잉 엔진 -> 효과음 -> 음성 인식 -> 게임 코어 -->
-  <script src="grammarGenerator.js?v=20260922_10"></script>
-  <script src="visualClueManager.js?v=20260922_10"></script>
-  <script src="scrambleManager.js?v=20260922_10"></script>
-  <script src="grammarConceptData.js?v=20260922_10"></script>
-  <script src="conceptModalManager.js?v=20260922_10"></script>
-  <script src="shadowingManager.js?v=20260922_10"></script>
-  <script src="audio.js?v=20260922_10"></script>
-  <script src="voice.js?v=20260922_10"></script>
-  <script src="game.js?v=20260922_10"></script>
+  <!-- 조작 및 사용법 도움말 모달 (Help Modal) -->
+  <div class="help-modal-overlay" id="helpModalOverlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="help-modal-card">
+      <div class="help-modal-header">
+        <div class="help-header-left">
+          <span class="help-badge">GUIDE & HELP</span>
+          <h2 class="help-title" id="helpTitle">🎮 스마트 TV 조작 및 학습 가이드</h2>
+        </div>
+        <button class="help-close-btn focusable" id="helpCloseBtn" aria-label="도움말 닫기">✕</button>
+      </div>
+
+      <div class="help-modal-body">
+        <div class="help-grid">
+          <!-- 1. 리모컨 조작법 -->
+          <div class="help-card">
+            <div class="help-card-title">🕹️ TV 리모컨 조작</div>
+            <ul class="help-item-list">
+              <li><span class="key-pill">▲▼◀▶</span> 보기 이동 및 어순 단어 블록 이동</li>
+              <li><span class="key-pill">OK / Enter</span> 정답 선택, 퀘스트 시작, 다음 문제</li>
+              <li><span class="key-pill">메뉴 (📖)</span> [핵심 문법 개념] 치트시트 열기</li>
+              <li><span class="key-pill">뒤로가기 / ESC</span> 팝업 모달 닫기</li>
+              <li><span class="key-pill">숫자 0</span> TV 화면 크기(100%~80%) 원클릭 조절</li>
+            </ul>
+          </div>
+
+          <!-- 2. 마이크 음성 제어 -->
+          <div class="help-card">
+            <div class="help-card-title">🎙️ 마이크 음성 제어</div>
+            <ul class="help-item-list">
+              <li><span class="cmd-pill">"1번" ~ "4번"</span> 해당 번호 보기 즉시 선택</li>
+              <li><span class="cmd-pill">영어 단어 발음</span> 주관식 말하기/듣기 단어 직접 입력</li>
+              <li><span class="cmd-pill">"시작" / "다음"</span> 게임 시작 및 다음 퀘스트 진행</li>
+              <li><span class="cmd-pill">"설명" / "개념"</span> 핵심 문법 공식 치트시트 팝업</li>
+              <li><span class="cmd-pill">"내 목소리" / "비교"</span> 섀도잉 발음 재생 및 원어민 비교</li>
+            </ul>
+          </div>
+
+          <!-- 3. 핵심 퀘스트 유형 안내 -->
+          <div class="help-card">
+            <div class="help-card-title">🧩 학습 퀘스트 유형</div>
+            <ul class="help-item-list">
+              <li><strong>4지선다형:</strong> 그림 단서를 보고 문맥에 맞는 문법 어휘 선택</li>
+              <li><strong>단어 어순배열:</strong> 단어 블록을 선택(OK) 후 좌우로 이동하여 문장 완성</li>
+              <li><strong>스피킹 / 리스닝:</strong> 원어민 소리를 듣고 빈칸 단어를 마이크로 발음</li>
+              <li><strong>문장 전체 섀도잉:</strong> 문장 전체를 원어민과 따라 읽고 AI 발음 점수 획득</li>
+            </ul>
+          </div>
+
+          <!-- 4. 2인 가족 대전 & 화면 팁 -->
+          <div class="help-card">
+            <div class="help-card-title">💡 유용한 팁 & 대전 모드</div>
+            <ul class="help-item-list">
+              <li><strong>2인 대전 모드:</strong> [👥 1인 솔로] 클릭 시 1P와 2P 턴제 배틀</li>
+              <li><strong>화면 배율 맞춤:</strong> [🖥️ 화면 100%] 클릭 시 TV에 딱 맞게 스케일링</li>
+              <li><strong>마이크 켜기:</strong> 리모컨 음성 검색 버튼을 누르면 마이크가 켜집니다.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="help-modal-footer">
+        <button class="help-ok-btn focusable" id="helpOkBtn">
+          <span>확인 완료! 퀘스트로 돌아가기</span>
+          <span class="key-hint">(OK / ESC / 음성 "닫기")</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 -> 어순 배열 -> 문법 개념 데이터 -> 개념 모달 -> 도움말 모달 -> 섀도잉 엔진 -> 효과음 -> 음성 인식 -> 게임 코어 -->
+  <script src="grammarGenerator.js?v=20260922_11"></script>
+  <script src="visualClueManager.js?v=20260922_11"></script>
+  <script src="scrambleManager.js?v=20260922_11"></script>
+  <script src="grammarConceptData.js?v=20260922_11"></script>
+  <script src="conceptModalManager.js?v=20260922_11"></script>
+  <script src="helpModalManager.js?v=20260922_11"></script>
+  <script src="shadowingManager.js?v=20260922_11"></script>
+  <script src="audio.js?v=20260922_11"></script>
+  <script src="voice.js?v=20260922_11"></script>
+  <script src="game.js?v=20260922_11"></script>
 </body>
 </html>

@@ -101,6 +101,9 @@ class GrammarQuestGame {
     this.conceptGuideBtn = document.getElementById('conceptGuideBtn');
     this.conceptModalManager = new ConceptModalManager();
 
+    // 5. 조작 및 사용법 도움말 모달 전용 매니저 모듈
+    this.helpModalManager = new HelpModalManager();
+
     this.explanationBox = document.getElementById('explanationBox');
     this.expResultBadge = document.getElementById('expResultBadge');
     this.expContent = document.getElementById('expContent');
@@ -231,6 +234,15 @@ class GrammarQuestGame {
         return;
       }
 
+      // 도움말 모달이 열려있을 때 리모컨 뒤로가기(Back) / ESC / OK / Space로 닫기
+      if (this.helpModalManager && this.helpModalManager.isOpen) {
+        if (['Escape', 'Enter', ' ', 'Backspace', 'GoBack', 'BrowserBack'].includes(key) || e.keyCode === 4) {
+          e.preventDefault();
+          this.helpModalManager.close();
+          return;
+        }
+      }
+
       // 문법 개념 모달이 열려있을 때 리모컨 뒤로가기(Back) / ESC / OK / Space로 닫기
       if (this.conceptModalManager && this.conceptModalManager.isOpen) {
         if (['Escape', 'Enter', ' ', 'Backspace', 'GoBack', 'BrowserBack'].includes(key) || e.keyCode === 4) {
@@ -248,8 +260,14 @@ class GrammarQuestGame {
       }
 
       if (this.gameState === 'quiz') {
-        // 단축키 H 또는 C 로 문법 개념 카드 열기
-        if (['h', 'H', 'c', 'C'].includes(key)) {
+        // 단축키 H: 조작 및 사용법 도움말 모달 열기
+        if (['h', 'H'].includes(key)) {
+          if (this.helpModalManager) this.helpModalManager.open();
+          return;
+        }
+
+        // 단축키 C 또는 M: 문법 개념 카드 열기
+        if (['c', 'C', 'm', 'M'].includes(key)) {
           if (this.conceptModalManager) this.conceptModalManager.open(this.currentQuestion);
           return;
         }
@@ -422,15 +440,27 @@ class GrammarQuestGame {
       return;
     }
 
+    // 조작 및 사용법 도움말 음성 명령 ("도움말", "사용법", "조작법", "help")
+    if (action.type === 'help') {
+      if (this.helpModalManager) this.helpModalManager.open();
+      return;
+    }
+
     // 문법 개념 / 설명 보기 음성 명령 ("설명", "문법", "개념", "공식", "힌트")
     if (action.type === 'concept') {
       this.openConceptModal();
       return;
     }
 
-    // 모달이 열려있을 때 닫기 음성 명령 ("확인", "다음", "선택")
+    // 모달이 열려있을 때 닫기 음성 명령 ("확인", "다음", "선택", "닫기")
+    if (this.helpModalManager && this.helpModalManager.isOpen) {
+      if (action.type === 'confirm' || action.type === 'next' || action.type === 'closeModal') {
+        this.helpModalManager.close();
+        return;
+      }
+    }
     if (this.conceptModalManager && this.conceptModalManager.isOpen) {
-      if (action.type === 'confirm' || action.type === 'next') {
+      if (action.type === 'confirm' || action.type === 'next' || action.type === 'closeModal') {
         this.closeConceptModal();
         return;
       }

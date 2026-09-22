@@ -204,9 +204,19 @@ class VoiceCommander {
       if (/^(시작|스타트|게임시작|start)$/.test(clean) || clean.includes('시작')) return { type: 'start' };
       if (/^(다시|다시시작|재시작|restart)$/.test(clean) || clean.includes('다시')) return { type: 'restart' };
 
-      // 문법 개념 / 공식 / 설명 보기 명령
-      if (/^(설명|문법|개념|힌트|공식|치트시트|가이드|help|grammar|concept|rule)$/.test(clean) || clean.includes('설명') || clean.includes('문법') || clean.includes('개념')) {
+      // 조작 및 사용법 도움말 보기 명령
+      if (/^(도움말|사용법|조작법|방법|가이드|help|guide)$/.test(clean) || clean.includes('도움말') || clean.includes('사용법')) {
+        return { type: 'help' };
+      }
+
+      // 문법 개념 / 공식 / 치트시트 보기 명령
+      if (/^(설명|문법|개념|힌트|공식|치트시트|grammar|concept|rule)$/.test(clean) || clean.includes('설명') || clean.includes('문법') || clean.includes('개념')) {
         return { type: 'concept' };
+      }
+
+      // 모달 닫기
+      if (/^(닫기|닫아줘|나가기|취소|close|cancel)$/.test(clean)) {
+        return { type: 'closeModal' };
       }
 
       // 내 목소리 다시 듣기 (섀도잉 녹음 재생)
@@ -226,7 +236,7 @@ class VoiceCommander {
   // 제어 명령 단어인지 판별
   isControlWord(word) {
     const clean = word.replace(/\s+/g, '');
-    return /^(다음|시작|다시|선택|정답|확인|위|아래|왼쪽|오른쪽|1번|2번|3번|4번|설명|문법|개념|힌트|공식|내목소리|내발음|원어민|비교)$/.test(clean);
+    return /^(다음|시작|다시|선택|정답|확인|위|아래|왼쪽|오른쪽|1번|2번|3번|4번|설명|문법|개념|힌트|공식|도움말|사용법|조작법|닫기|내목소리|내발음|원어민|비교)$/.test(clean);
   }
 
   highlightRecognized() {

@@ -301,6 +301,38 @@ body {
   font-size: 13px;
 }
 
+/* 조작 및 사용법 도움말 버튼 */
+.help-btn {
+  background: rgba(18, 26, 56, 0.85);
+  border: 1.5px solid rgba(255, 200, 0, 0.45);
+  color: var(--accent-gold);
+  padding: 4px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 800;
+  outline: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.help-btn:hover,
+.help-btn:focus {
+  background: rgba(255, 200, 0, 0.25);
+  border-color: #fff;
+  color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--accent-gold);
+}
+
+.help-btn .help-icon {
+  font-size: 13px;
+}
+
 /* === 6단계 학년 선택 탭 바 === */
 .grade-selector-bar {
   display: flex;
@@ -678,15 +710,19 @@ body {
 
 .option-card .opt-key-badge {
   font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 900;
   color: var(--accent-cyan);
-  background: rgba(0, 240, 255, 0.12);
-  border: 1px solid rgba(0, 240, 255, 0.3);
-  border-radius: 8px;
-  padding: 4px 12px;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1.5px solid rgba(0, 240, 255, 0.4);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.18s ease;
-  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .option-card .opt-text {
@@ -1017,46 +1053,7 @@ body {
   box-shadow: var(--focus-glow);
 }
 
-/* === 하단 TV 컨트롤 가이드 바 (콘솔 스타일 키 칩) === */
-.footer-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: 12px;
-  padding: 6px 20px;
-  margin-top: 8px;
-  flex-shrink: 0;
-  backdrop-filter: blur(12px);
-}
-
-.key-indicator {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.key-tag {
-  background: rgba(0, 240, 255, 0.15);
-  border: 1px solid rgba(0, 240, 255, 0.35);
-  color: #00f0ff;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-.key-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #b0c4de;
-  white-space: nowrap;
-}
+/* === 메인 영역 여백 확보 (하단 푸터 바 제거) === */
 
 /* ========================================================
    1. 2인 가족 대전 모드 (Family Battle HUD)
@@ -1908,5 +1905,224 @@ body {
 @keyframes scaleUpModal {
   from { opacity: 0; transform: scale(0.92); }
   to { opacity: 1; transform: scale(1); }
+}
+
+/* ========================================================
+   조작 및 사용법 도움말 모달 (Help Modal) 전용 디자인
+   ======================================================== */
+.help-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 7, 18, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.help-modal-card {
+  width: 90%;
+  max-width: 860px;
+  max-height: 88vh;
+  background: linear-gradient(145deg, rgba(20, 28, 60, 0.96), rgba(12, 16, 36, 0.98));
+  border: 2px solid rgba(255, 200, 0, 0.45);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(255, 200, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scaleUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.help-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 26px;
+  border-bottom: 1px solid rgba(90, 120, 200, 0.25);
+  background: rgba(10, 15, 35, 0.6);
+}
+
+.help-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.help-badge {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--accent-gold);
+  background: rgba(255, 200, 0, 0.15);
+  border: 1px solid rgba(255, 200, 0, 0.4);
+  border-radius: 8px;
+  padding: 3px 10px;
+  letter-spacing: 1px;
+}
+
+.help-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.help-close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  outline: none;
+}
+
+.help-close-btn:hover,
+.help-close-btn:focus {
+  background: rgba(255, 51, 102, 0.8);
+  border-color: #ff3366;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(255, 51, 102, 0.5);
+}
+
+.help-modal-body {
+  padding: 20px 26px;
+  overflow-y: auto;
+}
+
+.help-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.help-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 200, 0, 0.3);
+  border-radius: 4px;
+}
+
+.help-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.help-card {
+  background: rgba(18, 24, 52, 0.55);
+  border: 1px solid rgba(90, 120, 200, 0.25);
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.help-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent-gold);
+  border-bottom: 1px solid rgba(255, 200, 0, 0.25);
+  padding-bottom: 6px;
+}
+
+.help-item-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.help-item-list li {
+  font-size: 13.5px;
+  color: #dce6ff;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.help-item-list li strong {
+  color: var(--accent-cyan);
+}
+
+.key-pill {
+  display: inline-block;
+  background: rgba(0, 240, 255, 0.15);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  color: var(--accent-cyan);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cmd-pill {
+  display: inline-block;
+  background: rgba(0, 255, 136, 0.15);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  color: var(--accent-green);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.help-modal-footer {
+  padding: 14px 26px;
+  border-top: 1px solid rgba(90, 120, 200, 0.25);
+  background: rgba(10, 15, 35, 0.6);
+  display: flex;
+  justify-content: center;
+}
+
+.help-ok-btn {
+  width: 100%;
+  max-width: 440px;
+  padding: 12px 26px;
+  background: linear-gradient(135deg, #ffc800, #ff9900);
+  border: none;
+  border-radius: 14px;
+  color: #080a16;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 0 20px rgba(255, 200, 0, 0.4);
+}
+
+.help-ok-btn .key-hint {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.help-ok-btn:hover,
+.help-ok-btn:focus {
+  transform: scale(1.03);
+  box-shadow: 0 0 32px rgba(255, 200, 0, 0.85);
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  outline: none;
 }
 
