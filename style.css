@@ -1129,17 +1129,18 @@ body {
 .scramble-prompt-card {
   width: 100%;
   height: auto;
+  min-height: 270px;
   max-height: 100%;
   box-sizing: border-box;
   background: rgba(14, 20, 44, 0.85);
   border: 2px solid rgba(0, 240, 255, 0.35);
   border-radius: 18px;
-  padding: clamp(10px, 1.6vh, 18px) clamp(16px, 2vw, 28px);
+  padding: clamp(10px, 1.5vh, 16px) clamp(16px, 2vw, 28px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: clamp(8px, 1.3vh, 16px);
+  justify-content: space-between;
+  gap: clamp(6px, 1.2vh, 12px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 240, 255, 0.05);
 }
 
@@ -1149,6 +1150,7 @@ body {
   justify-content: center;
   gap: 12px;
   margin: 0;
+  flex-shrink: 0;
 }
 
 .scramble-badge {
@@ -1164,7 +1166,7 @@ body {
 }
 
 .scramble-translation-guide {
-  font-size: clamp(18px, 2vw, 25px);
+  font-size: clamp(17px, 1.9vw, 24px);
   font-weight: 800;
   color: #ffe680;
   text-shadow: 0 0 12px rgba(255, 200, 0, 0.5);
@@ -1172,34 +1174,53 @@ body {
 }
 
 .scramble-sentence-preview {
-  font-size: clamp(18px, 2vw, 26px);
+  font-size: clamp(17px, 1.9vw, 25px);
   font-weight: 800;
   color: var(--accent-cyan);
   margin: 0;
   text-align: center;
-  min-height: 28px;
+  min-height: 26px;
   text-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
+  flex-shrink: 0;
 }
 
-/* 단어 블록 트랙: 와이드 1줄 배치 및 유연한 축소 */
+/* 단어 블록 트랙: 1줄 및 고등과정 2줄(wrap) 유연 배치 지원 */
 .scramble-track {
   display: flex;
-  flex-wrap: nowrap;
-  gap: clamp(8px, 1.2vw, 14px);
+  flex-wrap: wrap;
+  gap: clamp(8px, 1.1vw, 12px);
   justify-content: center;
   align-items: center;
+  align-content: center;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  padding: 8px 14px;
-  min-height: 64px;
+  padding: 8px 12px;
+  min-height: 62px;
+  max-height: 155px;
   background: rgba(8, 12, 28, 0.6);
   border: 1.5px dashed rgba(100, 150, 255, 0.3);
   border-radius: 16px;
   margin: 0;
   transition: all 0.3s ease;
-  overflow-x: auto;
+  overflow-y: auto;
   scrollbar-width: none;
+}
+
+/* 고등 과정 등 긴 문장/많은 블록 전용 콤팩트 스케일링 */
+.scramble-track.dense-layout {
+  gap: 6px 10px;
+  padding: 6px 10px;
+}
+
+.scramble-track.dense-layout .scramble-block {
+  padding: 6px clamp(8px, 1vw, 12px);
+  gap: 6px;
+  border-radius: 10px;
+}
+
+.scramble-track.dense-layout .block-word-text {
+  font-size: clamp(14px, 1.6vw, 20px);
 }
 
 .scramble-track.shake-anim {
@@ -1314,8 +1335,10 @@ body {
   gap: 14px;
   justify-content: center;
   align-items: center;
-  margin-top: 4px;
+  margin-top: auto;
+  padding-top: 6px;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .scramble-btn {

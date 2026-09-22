@@ -38,12 +38,14 @@ class ScrambleManager {
       return rawWords;
     }
 
-    // 6단어 이상인 경우: TV 와이드 화면에 맞추어 항상 최대 4~5개 청크로 지능적 결합
+    // 6단어 이상 (고등학교 10~18단어 문장 포함):
+    // 고등/수능 서술형 평가 원칙에 따라 핵심 구문 단위로 최대 5~6개 청크로 지능적 결합
+    const targetSlots = (rawWords.length >= 10) ? 6 : 5;
     const tokens = [];
     let i = 0;
     while (i < rawWords.length) {
       const remainingWords = rawWords.length - i;
-      const remainingSlots = 5 - tokens.length;
+      const remainingSlots = targetSlots - tokens.length;
 
       // 마지막 슬롯이면 남은 단어들을 하나로 합침
       if (remainingSlots <= 1) {
@@ -58,10 +60,11 @@ class ScrambleManager {
         continue;
       }
 
-      // 2단어를 하나로 결합
-      if (remainingWords > remainingSlots) {
-        tokens.push(`${rawWords[i]} ${rawWords[i + 1]}`);
-        i += 2;
+      // 목표 슬롯 수에 맞춰 단어들을 2~3단어씩 균등하게 청킹
+      const wordsPerChunk = Math.ceil(remainingWords / remainingSlots);
+      if (wordsPerChunk >= 2) {
+        tokens.push(rawWords.slice(i, i + wordsPerChunk).join(' '));
+        i += wordsPerChunk;
       } else {
         tokens.push(rawWords[i]);
         i++;
@@ -112,6 +115,10 @@ class ScrambleManager {
     if (!track) return;
 
     track.innerHTML = '';
+
+    // 블록이 6개 이상이거나 긴 덩어리가 포함된 고등 과정의 경우 dense-layout 활성화
+    const isDense = this.currentTokens.length >= 6 || this.currentTokens.some(t => t.length > 14);
+    track.classList.toggle('dense-layout', isDense);
 
     this.currentTokens.forEach((word, idx) => {
       const block = document.createElement('div');
