@@ -86,6 +86,11 @@ class ShadowingManager {
     if (this.playUserVoiceText) {
       this.playUserVoiceText.textContent = '내 목소리 다시 듣기';
     }
+    const clinicPanel = document.getElementById('pronunciationClinicPanel');
+    if (clinicPanel) {
+      clinicPanel.style.display = 'none';
+      clinicPanel.innerHTML = '';
+    }
   }
 
   // 섀도잉 녹음 시작 (마이크 스트림 & 음성인식 병행)
@@ -234,6 +239,17 @@ class ShadowingManager {
       if (this.scoreNumber) this.scoreNumber.textContent = '내 목소리 확인';
       if (this.heardText) this.heardText.textContent = '녹음이 저장되었습니다. 옆의 [내 목소리 다시 듣기]를 눌러보세요!';
       if (window.soundFx) window.soundFx.playCorrect();
+    }
+
+    // 5. AI 원어민 발음 정밀 클리닉 & 음소 교정 코칭 렌더링
+    const clinicPanel = document.getElementById('pronunciationClinicPanel');
+    if (clinicPanel && window.pronunciationCoach) {
+      let targetSentence = '';
+      if (window.gameApp && window.gameApp.currentQuestion) {
+        const q = window.gameApp.currentQuestion;
+        targetSentence = q.audioText || q.full || q.sentence.replace('_____', q.answerWord || '');
+      }
+      window.pronunciationCoach.renderClinic(clinicPanel, targetSentence, heard, score || 80);
     }
 
     // 5. [내 목소리 다시 듣기] 버튼으로 자동 포커스

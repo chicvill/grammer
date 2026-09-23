@@ -53,7 +53,17 @@ class ScrambleManager {
         break;
       }
 
-      // 주어구 특수 결합
+      // 주어구 특수 결합 (STEM & AI 핵심 구문)
+      if (i === 0 && rawWords[0] === 'Artificial' && rawWords[1] === 'intelligence') {
+        tokens.push('Artificial intelligence');
+        i += 2;
+        continue;
+      }
+      if (i === 0 && rawWords[0] === 'Numbers' && rawWords[1] === 'and' && rawWords[2] === 'data') {
+        tokens.push('Numbers and data');
+        i += 3;
+        continue;
+      }
       if (i === 0 && rawWords[0] === 'Tom' && rawWords[1] === 'and' && rawWords[2] === 'Jerry') {
         tokens.push('Tom and Jerry');
         i += 3;

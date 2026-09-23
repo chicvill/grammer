@@ -25,6 +25,7 @@
   padding: 0;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -35,25 +36,28 @@ body {
     linear-gradient(180deg, #070913 0%, #0d1226 100%);
   color: var(--text-main);
   font-family: var(--font-main);
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
-/* === TV 오버스캔 방지 세이프 에어리어 (컴팩트 & 100vh 뷰포트 고정) === */
+/* === 메인 앱 컨테이너 (PC 와이드 & 모바일 세로 반응형 지원) === */
+.app-container,
 .tv-safe-area {
   width: 100%;
-  height: 100vh;
-  max-height: 100vh;
-  padding: 1.8vh 2.4vw;
+  max-width: 1360px;
+  min-height: 100vh;
+  padding: 16px 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
+  justify-content: flex-start;
+  gap: 12px;
+  overflow: visible;
 }
 
 /* === 상단 헤더 & HUD === */
@@ -413,9 +417,10 @@ body {
   padding: 16px 26px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 12px;
   backdrop-filter: blur(12px);
-  overflow: hidden;
+  overflow: visible;
   box-sizing: border-box;
 }
 
@@ -2125,4 +2130,567 @@ body {
   background: linear-gradient(135deg, #ffd700, #ffa500);
   outline: none;
 }
+
+/* ========================================================
+   AI 원어민 발음 정밀 클리닉 & 음소 교정 코칭 (V-B, P-F, R-L, 강세)
+   ======================================================== */
+.pronunciation-clinic-panel {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1.5px dashed rgba(0, 240, 255, 0.3);
+  animation: fadeIn 0.3s ease;
+}
+
+.clinic-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.clinic-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.clinic-main-badge {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(121, 40, 202, 0.35));
+  border: 1.5px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-size: 13px;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+}
+
+.clinic-subtitle {
+  font-size: 13px;
+  color: #a8bfe8;
+  font-weight: 600;
+}
+
+.clinic-words-track {
+  background: rgba(8, 12, 28, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clinic-track-label {
+  font-size: 12px;
+  color: #798bb0;
+  font-weight: 700;
+}
+
+.clinic-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.word-tag {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: var(--font-body);
+}
+
+.word-tag.matched {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.4);
+}
+
+.word-tag.missed {
+  background: rgba(255, 0, 127, 0.15);
+  color: #ff5599;
+  border: 1px solid rgba(255, 0, 127, 0.4);
+}
+
+.clinic-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.clinic-card {
+  background: rgba(15, 22, 48, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--accent-cyan);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clinic-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.clinic-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.clinic-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.clinic-word-chips {
+  font-size: 12px;
+  color: #ccd9ff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip-item {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-family: monospace;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.chip-item.r {
+  color: #ff5599;
+  border-color: rgba(255, 0, 127, 0.4);
+  background: rgba(255, 0, 127, 0.1);
+}
+
+.chip-item.l {
+  color: #00f0ff;
+  border-color: rgba(0, 240, 255, 0.4);
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.clinic-card-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #d1dcfa;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.clinic-rule {
+  color: #e2e8f0;
+}
+
+.clinic-habit {
+  color: #ffa07a;
+}
+
+.clinic-action {
+  color: var(--accent-green);
+}
+
+.stress-card {
+  border-left-color: #ffc800 !important;
+}
+
+.stress-badge {
+  background: rgba(255, 200, 0, 0.18) !important;
+  color: #ffc800 !important;
+  border: 1px solid rgba(255, 200, 0, 0.4) !important;
+}
+
+.stress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stress-item-pill {
+  background: rgba(255, 200, 0, 0.08);
+  border: 1px solid rgba(255, 200, 0, 0.25);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stress-orig {
+  font-weight: 700;
+  color: #a8bfe8;
+}
+
+.stress-syll {
+  font-weight: 900;
+  color: #ffc800;
+  letter-spacing: 0.8px;
+  font-family: monospace;
+}
+
+.stress-tip {
+  font-size: 12px;
+  color: #ccd9ff;
+}
+
+/* ========================================================
+   PC & 스마트폰(모바일 웹) 반응형 미디어 쿼리 및 터치 최적화
+   ======================================================== */
+
+/* 모바일 터치 반응 속도 최적화 (300ms 딜레이 제거 및 하이라이트 투명화) */
+button,
+.focusable,
+.option-card,
+.scramble-block,
+.grade-tab,
+.voice-status-card {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 태블릿 및 작은 PC 화면 (가로 960px 이하) */
+@media (max-width: 960px) {
+  .hud-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .grade-selector-bar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 6px;
+  }
+
+  .grade-tab {
+    flex: 0 0 135px;
+  }
+
+  .hero-question-showcase {
+    flex-direction: column;
+    max-height: none;
+    min-height: auto;
+    gap: 12px;
+  }
+
+  .visual-clue-stage {
+    flex: none;
+    width: 100%;
+    max-height: 130px;
+  }
+
+  .clue-artwork-wrap {
+    height: 70px;
+  }
+
+  .options-grid {
+    gap: 10px;
+    min-height: 180px;
+  }
+}
+
+/* 스마트폰 세로 모드 (가로 640px 이하) */
+@media (max-width: 640px) {
+  .app-container,
+  .tv-safe-area {
+    padding: 8px 10px 36px;
+    gap: 8px;
+    min-height: 100vh;
+  }
+
+  /* 헤더 모바일 최적화 */
+  .hud-header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .header-left-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .logo-area .game-title {
+    font-size: 16px;
+  }
+
+  .grade-tag {
+    font-size: 11px;
+    padding: 1px 7px;
+  }
+
+  .battle-toggle-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(10, 16, 38, 0.6);
+    padding: 4px 8px;
+    border-radius: 10px;
+  }
+
+  .hud-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    width: 100%;
+  }
+
+  .hud-stats .stat-card {
+    padding: 4px 6px;
+    min-width: 0;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hud-stats .stat-label {
+    font-size: 9px;
+  }
+
+  .hud-stats .stat-value {
+    font-size: 13px;
+  }
+
+  .timer-card {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 10px;
+  }
+
+  .timer-bar-wrap {
+    flex: 1;
+    height: 8px;
+  }
+
+  .timer-number {
+    font-size: 12px;
+    min-width: 28px;
+  }
+
+  .voice-status-card {
+    width: 100%;
+    justify-content: center;
+    padding: 6px 10px;
+  }
+
+  /* 학년 탭 모바일 터치 스크롤 */
+  .grade-selector-bar {
+    margin: 4px 0 8px 0;
+    gap: 6px;
+  }
+
+  .grade-tab {
+    flex: 0 0 112px;
+    height: 44px;
+    padding: 3px 6px;
+  }
+
+  .grade-tab .tab-badge {
+    font-size: 12px;
+  }
+
+  .grade-tab .tab-sub {
+    font-size: 9px;
+  }
+
+  /* 문제 스테이지 모바일 카드 */
+  .grammar-stage-section {
+    padding: 12px;
+    border-radius: 14px;
+    gap: 10px;
+  }
+
+  .category-pill-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .category-pill {
+    font-size: 13px;
+    padding: 4px 12px;
+  }
+
+  .concept-guide-btn {
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+
+  .hero-question-showcase {
+    margin-bottom: 6px;
+    gap: 8px;
+  }
+
+  .visual-clue-card {
+    padding: 8px 10px;
+  }
+
+  .clue-artwork-wrap {
+    height: 60px;
+  }
+
+  .clue-tag-text {
+    font-size: 11px;
+  }
+
+  .sentence-board {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .target-sentence {
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  .blank-box {
+    padding: 2px 8px;
+    font-size: 16px;
+    min-width: 48px;
+  }
+
+  .sentence-translation {
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  /* 모바일 1열 보기 카드 */
+  .options-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    gap: 8px;
+  }
+
+  .option-card {
+    padding: 12px 16px;
+    min-height: 52px;
+    border-radius: 12px;
+  }
+
+  .option-card .opt-key-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .option-card .opt-text {
+    font-size: 20px;
+  }
+
+  /* 어순 배열 모바일 최적화 */
+  .scramble-prompt-card {
+    padding: 12px;
+  }
+
+  .scramble-sentence-preview {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .scramble-track {
+    gap: 6px;
+    padding: 8px 4px;
+  }
+
+  .scramble-block {
+    padding: 8px 12px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  .scramble-action-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .scramble-btn {
+    width: 100%;
+    justify-content: center;
+    height: 46px;
+    font-size: 14px;
+  }
+
+  /* 섀도잉 컨트롤 모바일 2x2 그리드 */
+  .shadowing-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .shadow-btn {
+    width: 100%;
+    padding: 10px 6px;
+    font-size: 12px;
+    justify-content: center;
+  }
+
+  /* 모달 팝업 모바일 최적화 */
+  .concept-modal-card,
+  .help-modal-card {
+    width: 95vw;
+    max-height: 92vh;
+    padding: 14px;
+    margin: 4vh auto;
+  }
+
+  .help-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .overlay-card {
+    width: 94%;
+    max-width: 400px;
+    padding: 22px 16px;
+  }
+
+  .overlay-title {
+    font-size: 22px;
+  }
+
+  .overlay-desc {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .overlay-controls-guide {
+    gap: 6px;
+    margin: 12px 0 16px 0;
+  }
+
+  .guide-item {
+    font-size: 12px;
+  }
+}
+
+
 

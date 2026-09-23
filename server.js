@@ -39,7 +39,7 @@ const os = require('os');
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log('====================================================');
-  console.log(` TV Game Server running on port ${PORT}`);
+  console.log(` Grammar Quest Web Server (PC & Mobile) on port ${PORT}`);
   console.log('====================================================');
   console.log(` - Local:   http://localhost:${PORT}`);
   const nets = os.networkInterfaces();

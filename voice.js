@@ -92,7 +92,7 @@ class VoiceCommander {
 
       if (this.statusCard) {
         this.statusCard.style.cursor = 'pointer';
-        this.statusCard.title = '클릭 또는 리모컨 마이크 버튼(🎙️)으로 켜기/끄기';
+        this.statusCard.title = '클릭/터치 또는 V키로 마이크 켜기/끄기';
         this.statusCard.addEventListener('click', () => this.toggle());
       }
       this.updateUI();
@@ -108,7 +108,46 @@ class VoiceCommander {
 
     // 1. [최우선] 현재 문제의 정답/보기 영어 단어 직접 발음 매칭
     if (currentQ) {
-      // (1) 주관식 말하기 / 듣기 문제인 경우: acceptableAnswers 목록과 대조
+      // (1) 문장 전체 섀도잉 문제인 경우: 문장 전체 일치율 비교
+      if (currentQ.type === 'shadowing') {
+        const fullTarget = (currentQ.audioText || currentQ.full || currentQ.sentence.replace('_____', currentQ.answerWord || '')).toLowerCase().replace(/[^a-zA-Z0-9\s]/g, '').trim();
+        const targetWords = fullTarget.split(/\s+/).filter(Boolean);
+
+        for (const spoken of candidates) {
+          const cleanSpoken = spoken.toLowerCase().replace(/[^a-zA-Z0-9\s]/g, '').trim();
+          const spokenWords = cleanSpoken.split(/\s+/).filter(Boolean);
+          let matches = 0;
+          spokenWords.forEach(sw => {
+            if (targetWords.includes(sw)) matches++;
+          });
+          const matchRatio = matches / Math.max(1, targetWords.length);
+          if (matchRatio >= 0.4 || cleanSpoken.includes(fullTarget) || fullTarget.includes(cleanSpoken)) {
+            return {
+              type: 'spokenShadowingAnswer',
+              spokenSentence: spoken,
+              targetSentence: fullTarget,
+              similarity: Math.min(100, Math.max(65, Math.round(matchRatio * 100))),
+              isCorrect: true
+            };
+          }
+        }
+
+        // 제어 명령어가 아닐 때 오답으로 처리
+        if (candidates.length > 0) {
+          const first = candidates[0];
+          if (!this.isControlWord(first)) {
+            return {
+              type: 'spokenShadowingAnswer',
+              spokenSentence: first,
+              targetSentence: fullTarget,
+              similarity: 40,
+              isCorrect: false
+            };
+          }
+        }
+      }
+
+      // (2) 주관식 말하기 / 듣기 문제인 경우: acceptableAnswers 목록과 대조
       if (currentQ.type === 'speaking' || currentQ.type === 'listening') {
         const acceptable = (currentQ.acceptableAnswers || [currentQ.answerWord || currentQ.missingWord || ''])
           .map(a => a.toLowerCase().replace(/\s+/g, ''));
@@ -143,7 +182,7 @@ class VoiceCommander {
         }
       }
 
-      // (2) 4지선다형 문제인 경우: 4개 보기의 영어 단어 또는 번호 대조
+      // (3) 4지선다형 문제인 경우: 4개 보기의 영어 단어 또는 번호 대조
       if (currentQ.type === 'choice' && currentQ.options) {
         for (let optIdx = 0; optIdx < currentQ.options.length; optIdx++) {
           const optWord = currentQ.options[optIdx].toLowerCase().replace(/\s+/g, '');
@@ -284,7 +323,7 @@ class VoiceCommander {
       if (this.toggleBtnText) this.toggleBtnText.textContent = '🔴 마이크 끄기';
     } else {
       this.statusCard.classList.remove('listening');
-      this.statusText.textContent = '마이크 꺼짐 (리모컨 🎙️)';
+      this.statusText.textContent = '마이크 꺼짐 (클릭 또는 V)';
       if (this.heardText) this.heardText.textContent = '마이크 버튼 또는 V키로 켜기';
       if (this.toggleBtnText) this.toggleBtnText.textContent = '🎙️ 마이크 켜기 (영어 단어 직접 발음)';
     }

@@ -2,28 +2,28 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>중1 기초 영문법 TV 퀘스트 - 리모컨 & 음성 학습 게임</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>Grammar Quest - 초3~고3 영문법 퀘스트 (PC & 모바일 웹)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Pretendard:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260922_10">
+  <link rel="stylesheet" href="style.css?v=20260923_01">
 </head>
 <body>
-  <!-- TV 오버스캔 방지 세이프 에어리어 -->
-  <div class="tv-safe-area">
+  <!-- 메인 앱 컨테이너 (반응형 PC & 모바일 지원) -->
+  <div class="app-container tv-safe-area">
     
     <!-- 상단 헤더 & HUD -->
     <header class="hud-header">
       <div class="header-left-group">
         <div class="logo-area">
-          <span class="game-badge">TV EDU QUEST</span>
-          <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag">중1 영문법</span></h1>
+          <span class="game-badge">AI STEM QUEST</span>
+          <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag">초3~고3 영문법</span></h1>
         </div>
 
-        <!-- 2인 가족 대전 모드 토글 & 듀얼 스코어 HUD -->
+        <!-- 2인 대전 모드 토글 & 듀얼 스코어 HUD -->
         <div class="battle-toggle-wrap">
-          <button class="mode-toggle-btn focusable" id="modeToggleBtn" title="1인 솔로 / 2인 가족 대전 전환">
+          <button class="mode-toggle-btn focusable" id="modeToggleBtn" title="1인 솔로 / 2인 대전 전환">
             <span class="mode-icon">👥</span>
             <span class="mode-text" id="modeToggleText">1인 솔로</span>
           </button>
@@ -34,10 +34,10 @@
           </div>
         </div>
 
-        <!-- TV 화면 배율 맞춤 컨트롤러 (100% -> 92% -> 85% -> 80% -> 105%) -->
-        <button class="ui-scale-btn focusable" id="uiScaleBtn" title="TV 화면 크기 맞춤 (클릭 시 100% -> 92% -> 85% -> 80% 변경)">
-          <span class="scale-icon">🖥️</span>
-          <span class="scale-text" id="uiScaleText">화면 100%</span>
+        <!-- 전체화면 토글 버튼 (PC / 모바일) -->
+        <button class="ui-scale-btn focusable" id="uiScaleBtn" title="전체화면 토글 (클릭 또는 F키)">
+          <span class="scale-icon">⛶</span>
+          <span class="scale-text" id="uiScaleText">전체화면</span>
         </button>
 
         <!-- 조작 및 사용법 도움말 팝업 버튼 -->
@@ -82,7 +82,7 @@
           </svg>
         </div>
         <div class="voice-text-info">
-          <span class="voice-status-title" id="voiceStatusText">마이크 꺼짐 (리모컨 🎙️)</span>
+          <span class="voice-status-title" id="voiceStatusText">마이크 꺼짐 (클릭 또는 V)</span>
           <span class="voice-recognized-word" id="voiceHeardText">마이크 버튼 또는 V로 켜기</span>
         </div>
       </div>
@@ -116,7 +116,7 @@
       </button>
     </nav>
 
-    <!-- 메인 레이아웃: 영문법 문제 스테이지 + 리모컨 컨트롤러 -->
+    <!-- 메인 레이아웃: 영문법 문제 스테이지 -->
     <main class="main-content">
       
       <!-- 문법 퀘스트 문제 스테이지 -->
@@ -126,7 +126,7 @@
         <div class="category-pill-wrap">
           <div class="category-left-group">
             <span class="category-pill" id="categoryTag">Be동사 현재형</span>
-            <button class="concept-guide-btn focusable" id="conceptGuideBtn" tabindex="0" title="이 문제의 핵심 문법 개념 보기 (음성으로 '설명' 또는 클릭)">
+            <button class="concept-guide-btn focusable" id="conceptGuideBtn" tabindex="0" title="이 문제의 핵심 문법 개념 보기 (음성으로 '설명' 또는 C키)">
               <span class="icon">📖</span>
               <span class="text">핵심 문법 개념</span>
             </button>
@@ -146,10 +146,10 @@
               <span class="q-focus-badge">TARGET SENTENCE</span>
             </div>
             <p class="target-sentence" id="targetSentence">
-              Tom and Jerry <span class="blank-box">[ ? ]</span> good friends.
+              Artificial intelligence and robotics <span class="blank-box">[ ? ]</span> transforming modern science.
             </p>
             <p class="sentence-translation" id="sentenceTranslation">
-              "톰과 제리는 좋은 친구들이다."
+              "인공지능과 로봇공학은 현대 과학을 변화시키고 있다."
             </p>
           </div>
         </div>
@@ -184,7 +184,7 @@
             <!-- 리스닝 오디오 다시 듣기 버튼 -->
             <button class="audio-listen-btn focusable" id="audioListenBtn" tabindex="0">
               <span class="sound-icon">🔊</span>
-              <span class="btn-caption" id="audioBtnCaption">원어민 발음 다시 듣기 (OK / "다시 들려줘")</span>
+              <span class="btn-caption" id="audioBtnCaption">원어민 발음 다시 듣기 (클릭 / "다시 들려줘")</span>
             </button>
             
             <div class="speaking-hint-box" id="speakingHintBox">
@@ -214,15 +214,15 @@
           <div class="scramble-prompt-card">
             <div class="scramble-header">
               <span class="scramble-badge">🧩 단어 어순 배열 퀘스트</span>
-              <span class="scramble-translation-guide" id="scrambleTranslationGuide">"올바른 순서로 단어를 배열하세요"</span>
+              <span class="scramble-translation-guide" id="scrambleTranslationGuide">"올바른 순서로 단어를 배열하세요 (블록 탭 또는 드래그)"</span>
             </div>
 
             <!-- 실시간 문장 조립 미리보기 -->
             <div class="scramble-sentence-preview" id="scrambleSentencePreview">
-              "Tom and Jerry are good friends."
+              "Artificial intelligence and robotics are transforming modern science."
             </div>
 
-            <!-- 단어 블록 트랙 (마우스 드래그 & 리모컨 스왑 영역) -->
+            <!-- 단어 블록 트랙 (터치 탭 스왑 & 마우스 드래그 영역) -->
             <div class="scramble-track" id="scrambleTrack" role="group" aria-label="단어 어순 배열 블록">
               <!-- scrambleManager에 의해 동적 렌더링 -->
             </div>
@@ -233,7 +233,7 @@
                 <span>🔄 다시 섞기</span>
               </button>
               <button class="scramble-btn primary focusable" id="scrambleSubmitBtn" tabindex="0">
-                <span>✅ 완성 확인 (OK / "완성")</span>
+                <span>✅ 완성 확인 (Enter / 터치)</span>
               </button>
             </div>
           </div>
@@ -244,10 +244,10 @@
           <div class="exp-header">
             <span class="exp-badge correct" id="expResultBadge">정답! 🎉</span>
             <span class="exp-title">핵심 문법 공식</span>
-            <span class="next-guide-tag">리모컨 [OK] 또는 "다음"을 말하세요</span>
+            <span class="next-guide-tag">[Enter], [스페이스] 클릭 또는 "다음"</span>
           </div>
           <p class="exp-content" id="expContent">
-            주어가 'Tom and Jerry'로 2명(복수)이므로 복수형 be동사 'are'를 씁니다.
+            주어가 'Artificial intelligence and robotics'로 2개의 첨단 기술 분야(복수)이므로 복수형 be동사 'are'를 씁니다.
           </p>
 
           <!-- 3. 문장 전체 섀도잉 & 발음 점수 평가 패널 -->
@@ -281,11 +281,14 @@
               <div class="shadow-result-header">
                 <div class="score-stars" id="shadowScoreStars">⭐⭐⭐</div>
                 <div class="score-number-pill" id="shadowScoreNumber">발음 점수: 95점</div>
-                <div class="shadow-heard-text" id="shadowHeardText">"Tom and Jerry are good friends"</div>
+                <div class="shadow-heard-text" id="shadowHeardText">"Artificial intelligence and robotics are transforming modern science"</div>
               </div>
               <div class="shadow-result-tip">
                 💡 <strong>[🎧 내 목소리 다시 듣기]</strong>와 <strong>[🔊 원어민 발음 비교]</strong>를 눌러 억양과 발음 차이를 직접 비교해 보세요!
               </div>
+
+              <!-- AI 원어민 발음 정밀 클리닉 & 교정 코칭 패널 (V vs B, P vs F, R vs L, TH, 강세) -->
+              <div class="pronunciation-clinic-panel" id="pronunciationClinicPanel" style="display: none;"></div>
             </div>
           </div>
         </div>
@@ -294,20 +297,20 @@
         <div class="game-overlay active" id="gameOverlay">
           <div class="overlay-card">
             <div class="overlay-icon-badge" id="overlayIcon">📚</div>
-            <h2 class="overlay-title" id="overlayTitle">중1 기초 영문법 퀘스트</h2>
+            <h2 class="overlay-title" id="overlayTitle">초3~고3 영문법 퀘스트</h2>
             <p class="overlay-desc" id="overlayDesc">
-              샤오미 TV 리모컨의 방향키와 OK 버튼 또는<br>
-              음성("1번", "2번", "시작")으로 10개의 영문법 퀘스트를 풀어보세요!
+              PC(키보드/마우스), 스마트폰(터치/음성) 어디서나 접속하여<br>
+              10개의 첨단 STEM & AI 영문법 퀘스트를 풀어보세요!
             </p>
 
             <div class="overlay-controls-guide">
-              <div class="guide-item"><span class="key-pill">▲▼◀▶</span> 방향키로 4개 보기 탐색</div>
-              <div class="guide-item"><span class="key-pill">OK / Enter</span> 보기 확정 / 다음 문제</div>
-              <div class="guide-item"><span class="key-pill">음성 제어</span> "1번", "2번", "시작", "다음"</div>
+              <div class="guide-item"><span class="key-pill">1~4 / 터치</span> 키보드 번호키 또는 화면 보기 직접 터치</div>
+              <div class="guide-item"><span class="key-pill">Enter / Space</span> 정답 확정 및 다음 문제 진행</div>
+              <div class="guide-item"><span class="key-pill">🎙️ 음성 인식</span> 단어 직접 발음 / "다음" / "시작" 음성 제어</div>
             </div>
 
             <button class="tv-btn focusable" id="startBtn" tabindex="0">
-              <span class="btn-text" id="startBtnText">퀘스트 시작 (OK / "시작")</span>
+              <span class="btn-text" id="startBtnText">퀘스트 시작 (Enter / 터치 / "시작")</span>
             </button>
             <button class="tv-btn voice-toggle-btn focusable" id="micToggleBtn" tabindex="0">
               <span class="btn-text" id="micToggleBtnText">🎙️ 마이크 음성 제어 켜기</span>
@@ -375,7 +378,7 @@
       <div class="concept-modal-footer">
         <button class="concept-ok-btn focusable" id="conceptOkBtn">
           <span>확인 완료! 문제 풀러 가기</span>
-          <span class="key-hint">(OK / ESC / 음성 "다음")</span>
+          <span class="key-hint">(Enter / 터치 / ESC)</span>
         </button>
       </div>
     </div>
@@ -387,55 +390,56 @@
       <div class="help-modal-header">
         <div class="help-header-left">
           <span class="help-badge">GUIDE & HELP</span>
-          <h2 class="help-title" id="helpTitle">🎮 스마트 TV 조작 및 학습 가이드</h2>
+          <h2 class="help-title" id="helpTitle">💻📱 PC & 스마트폰 학습 및 조작 가이드</h2>
         </div>
         <button class="help-close-btn focusable" id="helpCloseBtn" aria-label="도움말 닫기">✕</button>
       </div>
 
       <div class="help-modal-body">
         <div class="help-grid">
-          <!-- 1. 리모컨 조작법 -->
+          <!-- 1. PC 키보드 & 마우스 조작법 -->
           <div class="help-card">
-            <div class="help-card-title">🕹️ TV 리모컨 조작</div>
+            <div class="help-card-title">💻 PC 키보드 & 마우스</div>
             <ul class="help-item-list">
-              <li><span class="key-pill">▲▼◀▶</span> 보기 이동 및 어순 단어 블록 이동</li>
-              <li><span class="key-pill">OK / Enter</span> 정답 선택, 퀘스트 시작, 다음 문제</li>
-              <li><span class="key-pill">메뉴 (📖)</span> [핵심 문법 개념] 치트시트 열기</li>
-              <li><span class="key-pill">뒤로가기 / ESC</span> 팝업 모달 닫기</li>
-              <li><span class="key-pill">숫자 0</span> TV 화면 크기(100%~80%) 원클릭 조절</li>
+              <li><span class="key-pill">1 ~ 4</span> 보기 번호키 즉시 선택 (마우스 클릭도 지원)</li>
+              <li><span class="key-pill">Enter / Space</span> 정답 확인, 퀘스트 시작, 다음 문제</li>
+              <li><span class="key-pill">V 키</span> 마이크 켜기 / 끄기 음성 제어 토글</li>
+              <li><span class="key-pill">C / M / F1</span> [핵심 문법 개념] 치트시트 열기</li>
+              <li><span class="key-pill">F 키</span> 전체화면 토글 / <span class="key-pill">ESC</span> 모달 닫기</li>
             </ul>
           </div>
 
-          <!-- 2. 마이크 음성 제어 -->
+          <!-- 2. 스마트폰 & 모바일 터치 조작법 -->
           <div class="help-card">
-            <div class="help-card-title">🎙️ 마이크 음성 제어</div>
+            <div class="help-card-title">📱 스마트폰 터치 제스처</div>
             <ul class="help-item-list">
+              <li><span class="cmd-pill">보기 카드 탭</span> 화면의 보기를 터치하여 바로 답안 선택</li>
+              <li><span class="cmd-pill">단어 원터치 스왑</span> 어순 배열 시 단어를 탭하여 순서 맞바꿈</li>
+              <li><span class="cmd-pill">마이크 터치</span> 상단 마이크 아이콘으로 음성 인식 시작</li>
+              <li><span class="cmd-pill">반응형 스크롤</span> 모바일 세로 화면에서도 완벽한 자동 정렬</li>
+              <li><span class="cmd-pill">섀도잉 원터치</span> [🔊 원문] 듣고 [🎙️ 따라 말하기]로 발음 진단</li>
+            </ul>
+          </div>
+
+          <!-- 3. 마이크 음성 제어 & 섀도잉 -->
+          <div class="help-card">
+            <div class="help-card-title">🎙️ 음성 인식 & AI 발음 클리닉</div>
+            <ul class="help-item-list">
+              <li><span class="cmd-pill">영어 단어 직접 발음</span> 주관식 말하기/듣기 단어 음성 입력</li>
               <li><span class="cmd-pill">"1번" ~ "4번"</span> 해당 번호 보기 즉시 선택</li>
-              <li><span class="cmd-pill">영어 단어 발음</span> 주관식 말하기/듣기 단어 직접 입력</li>
-              <li><span class="cmd-pill">"시작" / "다음"</span> 게임 시작 및 다음 퀘스트 진행</li>
+              <li><span class="cmd-pill">"시작" / "다음"</span> 문제 진행 및 다음 퀘스트 넘기기</li>
               <li><span class="cmd-pill">"설명" / "개념"</span> 핵심 문법 공식 치트시트 팝업</li>
-              <li><span class="cmd-pill">"내 목소리" / "비교"</span> 섀도잉 발음 재생 및 원어민 비교</li>
+              <li><span class="cmd-pill">AI 발음 진단</span> V-B, P-F, R-L, 강세 차이점 실시간 피드백</li>
             </ul>
           </div>
 
-          <!-- 3. 핵심 퀘스트 유형 안내 -->
+          <!-- 4. 2인 대전 모드 & 유용한 팁 -->
           <div class="help-card">
-            <div class="help-card-title">🧩 학습 퀘스트 유형</div>
+            <div class="help-card-title">💡 2인 대전 & 학습 모드</div>
             <ul class="help-item-list">
-              <li><strong>4지선다형:</strong> 그림 단서를 보고 문맥에 맞는 문법 어휘 선택</li>
-              <li><strong>단어 어순배열:</strong> 단어 블록을 선택(OK) 후 좌우로 이동하여 문장 완성</li>
-              <li><strong>스피킹 / 리스닝:</strong> 원어민 소리를 듣고 빈칸 단어를 마이크로 발음</li>
-              <li><strong>문장 전체 섀도잉:</strong> 문장 전체를 원어민과 따라 읽고 AI 발음 점수 획득</li>
-            </ul>
-          </div>
-
-          <!-- 4. 2인 가족 대전 & 화면 팁 -->
-          <div class="help-card">
-            <div class="help-card-title">💡 유용한 팁 & 대전 모드</div>
-            <ul class="help-item-list">
-              <li><strong>2인 대전 모드:</strong> [👥 1인 솔로] 클릭 시 1P와 2P 턴제 배틀</li>
-              <li><strong>화면 배율 맞춤:</strong> [🖥️ 화면 100%] 클릭 시 TV에 딱 맞게 스케일링</li>
-              <li><strong>마이크 켜기:</strong> 리모컨 음성 검색 버튼을 누르면 마이크가 켜집니다.</li>
+              <li><strong>2인 턴제 대전:</strong> [👥 1인 솔로] 클릭 시 1P와 2P 점수 배틀</li>
+              <li><strong>학년별 맞춤:</strong> 상단 탭에서 초3부터 고등/수능까지 자유 변경</li>
+              <li><strong>무한 자동 생성:</strong> 매번 새로운 STEM & AI 문장이 생성됩니다</li>
             </ul>
           </div>
         </div>
@@ -444,7 +448,7 @@
       <div class="help-modal-footer">
         <button class="help-ok-btn focusable" id="helpOkBtn">
           <span>확인 완료! 퀘스트로 돌아가기</span>
-          <span class="key-hint">(OK / ESC / 음성 "닫기")</span>
+          <span class="key-hint">(Enter / 터치 / ESC)</span>
         </button>
       </div>
     </div>
@@ -457,6 +461,7 @@
   <script src="grammarConceptData.js?v=20260922_11"></script>
   <script src="conceptModalManager.js?v=20260922_11"></script>
   <script src="helpModalManager.js?v=20260922_11"></script>
+  <script src="pronunciationCoach.js?v=20260922_12"></script>
   <script src="shadowingManager.js?v=20260922_11"></script>
   <script src="audio.js?v=20260922_11"></script>
   <script src="voice.js?v=20260922_11"></script>
