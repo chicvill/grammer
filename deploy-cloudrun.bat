@@ -8,6 +8,14 @@ echo   Deploying Grammar Quest TV to Google Cloud Run
 echo ===================================================================
 echo.
 
+set "SDK_BIN=C:\Users\USER\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin"
+if exist "%SDK_BIN%\gcloud.cmd" (
+    set "PATH=%SDK_BIN%;%PATH%"
+)
+if "%CLOUDSDK_PYTHON%"=="" (
+    if exist "C:\Python314\python.exe" set "CLOUDSDK_PYTHON=C:\Python314\python.exe"
+)
+
 where gcloud >nul 2>&1
 if errorlevel 1 goto :no_gcloud
 

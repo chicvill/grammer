@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Pretendard:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260923_01">
+  <link rel="stylesheet" href="style.css?v=20260923_02">
 </head>
 <body>
   <!-- 메인 앱 컨테이너 (반응형 PC & 모바일 지원) -->
@@ -16,35 +16,24 @@
     <!-- 상단 헤더 & HUD -->
     <header class="hud-header">
       <div class="header-left-group">
+        <!-- 햄버거 사이드 메뉴 토글 버튼 -->
+        <button class="hamburger-btn focusable" id="hamburgerBtn" aria-label="메뉴 및 설정 열기" title="설정 & 메뉴 열기 (M키)">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+
         <div class="logo-area">
           <span class="game-badge">AI STEM QUEST</span>
-          <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag">초3~고3 영문법</span></h1>
+          <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag" id="currentGradeBadge">중학 1학년</span></h1>
         </div>
 
-        <!-- 2인 대전 모드 토글 & 듀얼 스코어 HUD -->
-        <div class="battle-toggle-wrap">
-          <button class="mode-toggle-btn focusable" id="modeToggleBtn" title="1인 솔로 / 2인 대전 전환">
-            <span class="mode-icon">👥</span>
-            <span class="mode-text" id="modeToggleText">1인 솔로</span>
-          </button>
-          <div class="battle-scoreboard" id="battleScoreboard" style="display: none;">
-            <div class="player-score-tag p1" id="p1Tag"><span class="p-dot"></span>1P: <span id="p1Score">0</span></div>
-            <div class="vs-tag">VS</div>
-            <div class="player-score-tag p2" id="p2Tag"><span class="p-dot"></span>2P: <span id="p2Score">0</span></div>
-          </div>
+        <!-- 2인 대전 모드 활성화 시 점수 HUD -->
+        <div class="battle-scoreboard" id="battleScoreboard" style="display: none;">
+          <div class="player-score-tag p1" id="p1Tag"><span class="p-dot"></span>1P: <span id="p1Score">0</span></div>
+          <div class="vs-tag">VS</div>
+          <div class="player-score-tag p2" id="p2Tag"><span class="p-dot"></span>2P: <span id="p2Score">0</span></div>
         </div>
-
-        <!-- 전체화면 토글 버튼 (PC / 모바일) -->
-        <button class="ui-scale-btn focusable" id="uiScaleBtn" title="전체화면 토글 (클릭 또는 F키)">
-          <span class="scale-icon">⛶</span>
-          <span class="scale-text" id="uiScaleText">전체화면</span>
-        </button>
-
-        <!-- 조작 및 사용법 도움말 팝업 버튼 -->
-        <button class="help-btn focusable" id="helpBtn" title="게임 조작 및 사용법 도움말 (클릭 / H키 / 음성 '도움말')">
-          <span class="help-icon">❓</span>
-          <span class="help-text">도움말</span>
-        </button>
       </div>
 
       <div class="hud-stats">
@@ -73,54 +62,29 @@
         </div>
       </div>
 
-      <!-- 음성 인식 상태 뱃지 -->
-      <div class="voice-status-card" id="voiceStatusCard">
-        <div class="mic-icon-wrap" id="micIconWrap">
-          <svg class="mic-svg" viewBox="0 0 24 24">
-            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
-            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
-          </svg>
-        </div>
-        <div class="voice-text-info">
-          <span class="voice-status-title" id="voiceStatusText">마이크 꺼짐 (클릭 또는 V)</span>
-          <span class="voice-recognized-word" id="voiceHeardText">마이크 버튼 또는 V로 켜기</span>
-        </div>
+      <!-- 상단 미니 마이크 상태 인디케이터 -->
+      <div class="header-mic-pill focusable" id="voiceStatusCard" title="마이크 켜기/끄기 (V키 또는 클릭)">
+        <span class="mic-dot" id="headerMicDot"></span>
+        <span class="mic-label" id="voiceStatusText">마이크 OFF (V)</span>
       </div>
     </header>
 
-    <!-- 6단계 학년별 선택 탭 바 -->
-    <nav class="grade-selector-bar" id="gradeSelectorBar" aria-label="학년 선택">
-      <button class="grade-tab focusable" data-grade="elem-low" tabindex="0">
-        <span class="tab-badge">초등 3~4</span>
-        <span class="tab-sub">파닉스·Be동사</span>
+    <!-- 모바일 전용 뷰포트 전환 탭 (스마트폰 세로 화면에서 노출) -->
+    <div class="mobile-viewport-tabs" id="mobileViewportTabs">
+      <button class="m-tab-btn active focusable" id="mTabSolve" data-target="solve">
+        <span>📝 1. 문제 풀기</span>
       </button>
-      <button class="grade-tab focusable" data-grade="elem-high" tabindex="0">
-        <span class="tab-badge">초등 5~6</span>
-        <span class="tab-sub">진행형·조동사</span>
+      <button class="m-tab-btn focusable" id="mTabExplain" data-target="explain">
+        <span>💡 2. 해설 & 섀도잉</span>
+        <span class="feedback-badge" id="mExplainBadge" style="display: none;">NEW</span>
       </button>
-      <button class="grade-tab focusable active" data-grade="mid-1" tabindex="0">
-        <span class="tab-badge">중학 1학년</span>
-        <span class="tab-sub">3인칭단수·과거</span>
-      </button>
-      <button class="grade-tab focusable" data-grade="mid-2" tabindex="0">
-        <span class="tab-badge">중학 2학년</span>
-        <span class="tab-sub">to부정사·수동태</span>
-      </button>
-      <button class="grade-tab focusable" data-grade="mid-3" tabindex="0">
-        <span class="tab-badge">중학 3학년</span>
-        <span class="tab-sub">현재완료·관계사</span>
-      </button>
-      <button class="grade-tab focusable" data-grade="high" tabindex="0">
-        <span class="tab-badge">고등 / 수능</span>
-        <span class="tab-sub">수일치·어법실전</span>
-      </button>
-    </nav>
+    </div>
 
-    <!-- 메인 레이아웃: 영문법 문제 스테이지 -->
-    <main class="main-content">
+    <!-- 메인 듀얼 뷰포트 (PC: 좌우 2분할 50:50 / 스마트폰: 좌우 스크롤 스냅 페이징) -->
+    <main class="quest-dual-viewport" id="questDualViewport">
       
-      <!-- 문법 퀘스트 문제 스테이지 -->
-      <section class="grammar-stage-section">
+      <!-- ◀ 좌측 패널: 문제 풀이 영역 -->
+      <section class="quest-panel panel-solve" id="panelSolve">
         
         <!-- 문법 카테고리 태그 & 개념 보기 버튼 -->
         <div class="category-pill-wrap">
@@ -133,17 +97,11 @@
           </div>
         </div>
 
-        <!-- 영문법 Hero 문제 쇼케이스 보드 (비주얼 일러스트 + 문장 집중 2-컬럼 구조) -->
+        <!-- 영문법 Hero 문제 쇼케이스 보드 (100% 와이드 텍스트 집중형 보드) -->
         <div class="hero-question-showcase" id="heroQuestionShowcase">
-          <!-- 좌측: 답 유추를 돕는 비주얼 일러스트 & 상황 힌트 태그 -->
-          <div class="visual-clue-stage" id="visualClueStage">
-            <!-- visualClueManager에 의해 동적으로 고해상도 SVG 일러스트가 주입됩니다 -->
-          </div>
-
-          <!-- 우측: 메인 타겟 문장 & 번역 포커스 보드 -->
-          <div class="sentence-board">
+          <div class="sentence-board" id="sentenceBoard">
             <div class="question-pill-header">
-              <span class="q-focus-badge">TARGET SENTENCE</span>
+              <span class="q-focus-badge" id="qFocusBadge">TARGET SENTENCE</span>
             </div>
             <p class="target-sentence" id="targetSentence">
               Artificial intelligence and robotics <span class="blank-box">[ ? ]</span> transforming modern science.
@@ -239,18 +197,36 @@
           </div>
         </div>
 
-        <!-- 문제 해설 및 피드백 바 (정답 확인 시 하단에 등장) -->
+      </section>
+
+      <!-- ▶ 우측 패널: 해설 & 섀도잉 & 발음 클리닉 영역 -->
+      <section class="quest-panel panel-explain" id="panelExplain">
+        
+        <!-- 문제 풀기 전 대기 안내 플레이스홀더 (미풀이 상태) -->
+        <div class="explain-placeholder-card" id="explainPlaceholder">
+          <div class="ph-glow-icon">💡</div>
+          <h3 class="ph-title">문법 해설 & 섀도잉 랩</h3>
+          <p class="ph-desc">
+            좌측에서 문제의 정답을 선택하시면<br>
+            <strong>핵심 문법 공식, 상세 해설, 문장 전체 섀도잉 연습 및 AI 발음 클리닉</strong>이 이곳에 실시간으로 표시됩니다.
+          </p>
+          <div class="ph-tip-box">
+            <span>TIP</span> 키보드 <strong>[1]~[4]</strong>번 또는 보기를 터치하여 답안을 제출해 보세요!
+          </div>
+        </div>
+
+        <!-- 문제 해설 및 피드백 바 (정답 확인 시 활성화) -->
         <div class="explanation-box" id="explanationBox">
           <div class="exp-header">
             <span class="exp-badge correct" id="expResultBadge">정답! 🎉</span>
             <span class="exp-title">핵심 문법 공식</span>
-            <span class="next-guide-tag">[Enter], [스페이스] 클릭 또는 "다음"</span>
+            <span class="next-guide-tag">[Enter] 또는 [다음 문제 ▶]</span>
           </div>
           <p class="exp-content" id="expContent">
             주어가 'Artificial intelligence and robotics'로 2개의 첨단 기술 분야(복수)이므로 복수형 be동사 'are'를 씁니다.
           </p>
 
-          <!-- 3. 문장 전체 섀도잉 & 발음 점수 평가 패널 -->
+          <!-- 문장 전체 섀도잉 & 발음 점수 평가 패널 -->
           <div class="shadowing-panel" id="shadowingPanel">
             <div class="shadowing-header">
               <span class="shadowing-badge">🎙️ 문장 전체 섀도잉 도전</span>
@@ -293,34 +269,142 @@
           </div>
         </div>
 
-        <!-- 오버레이 화면 (시작 / 결과 리포트) -->
-        <div class="game-overlay active" id="gameOverlay">
-          <div class="overlay-card">
-            <div class="overlay-icon-badge" id="overlayIcon">📚</div>
-            <h2 class="overlay-title" id="overlayTitle">초3~고3 영문법 퀘스트</h2>
-            <p class="overlay-desc" id="overlayDesc">
-              PC(키보드/마우스), 스마트폰(터치/음성) 어디서나 접속하여<br>
-              10개의 첨단 STEM & AI 영문법 퀘스트를 풀어보세요!
-            </p>
+      </section>
 
-            <div class="overlay-controls-guide">
-              <div class="guide-item"><span class="key-pill">1~4 / 터치</span> 키보드 번호키 또는 화면 보기 직접 터치</div>
-              <div class="guide-item"><span class="key-pill">Enter / Space</span> 정답 확정 및 다음 문제 진행</div>
-              <div class="guide-item"><span class="key-pill">🎙️ 음성 인식</span> 단어 직접 발음 / "다음" / "시작" 음성 제어</div>
-            </div>
+    </main>
 
-            <button class="tv-btn focusable" id="startBtn" tabindex="0">
-              <span class="btn-text" id="startBtnText">퀘스트 시작 (Enter / 터치 / "시작")</span>
+    <!-- 하단 전후 문제 이동 네비게이션 바 -->
+    <nav class="bottom-nav-bar" id="bottomNavBar" aria-label="문제 탐색 네비게이션">
+      <button class="nav-arrow-btn focusable" id="prevQuestionBtn" title="이전 문제로 이동 (Alt+Left)">
+        <span class="arrow-icon">◀</span>
+        <span class="btn-label">이전 문제</span>
+      </button>
+
+      <div class="nav-question-track" id="navQuestionTrack">
+        <!-- 1~10번 문제 닷/상태가 동적으로 렌더링됩니다 -->
+      </div>
+
+      <button class="nav-arrow-btn primary focusable" id="nextQuestionBtn" title="다음 문제로 이동 (Alt+Right / Enter)">
+        <span class="btn-label" id="nextBtnLabel">다음 문제</span>
+        <span class="arrow-icon">▶</span>
+      </button>
+    </nav>
+
+    <!-- 오버레이 화면 (시작 / 결과 리포트) -->
+    <div class="game-overlay active" id="gameOverlay">
+      <div class="overlay-card">
+        <div class="overlay-icon-badge" id="overlayIcon">📚</div>
+        <h2 class="overlay-title" id="overlayTitle">초3~고3 영문법 퀘스트</h2>
+        <p class="overlay-desc" id="overlayDesc">
+          PC(키보드/마우스), 스마트폰(터치/음성) 어디서나 접속하여<br>
+          10개의 첨단 STEM & AI 영문법 퀘스트를 풀어보세요!
+        </p>
+
+        <div class="overlay-controls-guide">
+          <div class="guide-item"><span class="key-pill">1~4 / 터치</span> 키보드 번호키 또는 화면 보기 직접 터치</div>
+          <div class="guide-item"><span class="key-pill">Enter / Space</span> 정답 확정 및 다음 문제 진행</div>
+          <div class="guide-item"><span class="key-pill">🎙️ 음성 인식</span> 단어 직접 발음 / "다음" / "시작" 음성 제어</div>
+        </div>
+
+        <button class="tv-btn focusable" id="startBtn" tabindex="0">
+          <span class="btn-text" id="startBtnText">퀘스트 시작 (Enter / 터치 / "시작")</span>
+        </button>
+        <button class="tv-btn voice-toggle-btn focusable" id="micToggleBtn" tabindex="0">
+          <span class="btn-text" id="micToggleBtnText">🎙️ 마이크 음성 제어 켜기</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 좌상단 햄버거 사이드 드로어 메뉴 (Side Drawer) -->
+  <div class="drawer-overlay" id="drawerOverlay" role="dialog" aria-modal="true" aria-label="학습 설정 및 메뉴">
+    <aside class="drawer-menu" id="drawerMenu">
+      <div class="drawer-header">
+        <div class="drawer-title-wrap">
+          <span class="drawer-icon">⚙️</span>
+          <h2 class="drawer-title">학습 설정 & 메뉴</h2>
+        </div>
+        <button class="drawer-close-btn focusable" id="drawerCloseBtn" aria-label="메뉴 닫기">✕</button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- 1. 학습 레벨 (학년 선택) -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">📚 학습 레벨 (학년 선택)</div>
+          <div class="drawer-grade-grid" id="gradeSelectorBar">
+            <button class="grade-tab focusable" data-grade="elem-low" tabindex="0">
+              <span class="tab-badge">초등 3~4</span>
+              <span class="tab-sub">파닉스·Be동사</span>
             </button>
-            <button class="tv-btn voice-toggle-btn focusable" id="micToggleBtn" tabindex="0">
-              <span class="btn-text" id="micToggleBtnText">🎙️ 마이크 음성 제어 켜기</span>
+            <button class="grade-tab focusable" data-grade="elem-high" tabindex="0">
+              <span class="tab-badge">초등 5~6</span>
+              <span class="tab-sub">진행형·조동사</span>
+            </button>
+            <button class="grade-tab focusable active" data-grade="mid-1" tabindex="0">
+              <span class="tab-badge">중학 1학년</span>
+              <span class="tab-sub">3인칭단수·과거</span>
+            </button>
+            <button class="grade-tab focusable" data-grade="mid-2" tabindex="0">
+              <span class="tab-badge">중학 2학년</span>
+              <span class="tab-sub">to부정사·수동태</span>
+            </button>
+            <button class="grade-tab focusable" data-grade="mid-3" tabindex="0">
+              <span class="tab-badge">중학 3학년</span>
+              <span class="tab-sub">현재완료·관계사</span>
+            </button>
+            <button class="grade-tab focusable" data-grade="high" tabindex="0">
+              <span class="tab-badge">고등 / 수능</span>
+              <span class="tab-sub">수일치·어법실전</span>
             </button>
           </div>
         </div>
 
-      </section>
+        <!-- 2. 음성 인식 제어 -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">🎙️ 음성 인식 (마이크)</div>
+          <div class="drawer-action-card">
+            <div class="drawer-action-info">
+              <span class="drawer-action-label" id="drawerMicStatusText">마이크 꺼짐 (V키)</span>
+              <span class="drawer-action-desc">음성으로 정답 단어 구술 및 섀도잉 발음 진단</span>
+            </div>
+            <button class="drawer-toggle-btn focusable" id="drawerMicToggleBtn">
+              <span class="toggle-text" id="drawerMicBtnText">마이크 켜기</span>
+            </button>
+          </div>
+        </div>
 
-    </main>
+        <!-- 3. 2인 턴제 대전 모드 -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">👥 2인 턴제 대전 모드</div>
+          <div class="drawer-action-card">
+            <div class="drawer-action-info">
+              <span class="drawer-action-label" id="drawerBattleStatusText">1인 솔로 모드</span>
+              <span class="drawer-action-desc">친구 또는 가족과 번갈아가며 점수 경쟁</span>
+            </div>
+            <button class="drawer-toggle-btn focusable" id="modeToggleBtn">
+              <span class="toggle-text" id="modeToggleText">1인 솔로</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. 도움말 & 전체화면 -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">🛠️ 부가 도구</div>
+          <div class="drawer-btn-row">
+            <button class="drawer-tool-btn focusable" id="helpBtn" title="도움말 열기 (H키)">
+              <span class="icon">❓</span>
+              <span class="text">학습 도움말</span>
+            </button>
+            <button class="drawer-tool-btn focusable" id="uiScaleBtn" title="전체화면 전환 (F키)">
+              <span class="icon">⛶</span>
+              <span class="text" id="uiScaleText">전체화면</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
 
   </div>
 
@@ -454,17 +538,16 @@
     </div>
   </div>
 
-  <!-- 스크립트 로드 순서: 문법 생성기 -> 비주얼 단서 -> 어순 배열 -> 문법 개념 데이터 -> 개념 모달 -> 도움말 모달 -> 섀도잉 엔진 -> 효과음 -> 음성 인식 -> 게임 코어 -->
+  <!-- 스크립트 로드 순서: 문법 생성기 -> 어순 배열 -> 문법 개념 데이터 -> 개념 모달 -> 도움말 모달 -> 발음 코치 -> 섀도잉 엔진 -> 효과음 -> 음성 인식 -> 게임 코어 -->
   <script src="grammarGenerator.js?v=20260922_11"></script>
-  <script src="visualClueManager.js?v=20260922_11"></script>
   <script src="scrambleManager.js?v=20260922_11"></script>
   <script src="grammarConceptData.js?v=20260922_11"></script>
   <script src="conceptModalManager.js?v=20260922_11"></script>
   <script src="helpModalManager.js?v=20260922_11"></script>
   <script src="pronunciationCoach.js?v=20260922_12"></script>
-  <script src="shadowingManager.js?v=20260922_11"></script>
+  <script src="shadowingManager.js?v=20260923_01"></script>
   <script src="audio.js?v=20260922_11"></script>
   <script src="voice.js?v=20260922_11"></script>
-  <script src="game.js?v=20260922_11"></script>
+  <script src="game.js?v=20260923_02"></script>
 </body>
 </html>

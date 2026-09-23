@@ -337,92 +337,635 @@ body {
   font-size: 13px;
 }
 
-/* === 6단계 학년 선택 탭 바 === */
-.grade-selector-bar {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0 12px 0;
-  flex-shrink: 0;
-}
-
-.grade-tab {
-  flex: 1;
-  background: rgba(18, 24, 52, 0.75);
-  border: 1.5px solid var(--panel-border);
-  border-radius: 12px;
-  padding: 6px 10px;
-  height: 48px;
+/* === 햄버거 메뉴 버튼 (상단 좌측) === */
+.hamburger-btn {
+  background: rgba(18, 26, 56, 0.85);
+  border: 1.5px solid rgba(0, 240, 255, 0.45);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
+  gap: 4px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.hamburger-btn:hover,
+.hamburger-btn:focus {
+  background: rgba(0, 240, 255, 0.25);
+  border-color: #fff;
+  transform: scale(1.05);
+  box-shadow: 0 0 16px var(--accent-cyan);
+}
+
+.hamburger-bar {
+  display: block;
+  width: 20px;
+  height: 2.5px;
+  background-color: var(--accent-cyan);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.hamburger-btn:hover .hamburger-bar {
+  background-color: #fff;
+}
+
+/* === 좌측 슬라이드 드로어 메뉴 (설정, 학년선택, 음성/도움말 모음) === */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(4, 7, 18, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s;
+}
+
+.drawer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.drawer-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 360px;
+  max-width: 88vw;
+  background: linear-gradient(180deg, #0e1532 0%, #070a18 100%);
+  border-right: 1.5px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 20px 0 50px rgba(0, 0, 0, 0.85);
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.drawer-overlay.active .drawer-menu {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(14, 20, 48, 0.95);
+  flex-shrink: 0;
+}
+
+.drawer-header h2 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-close-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: var(--text-dim);
+  font-size: 15px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.drawer-close-btn:hover {
+  background: rgba(255, 51, 102, 0.25);
+  border-color: var(--accent-red);
+  color: #fff;
+}
+
+.drawer-body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.drawer-section-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.drawer-grade-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+}
+
+.drawer-grade-grid .grade-tab {
+  height: 50px;
+  padding: 5px 8px;
+  border-radius: 10px;
+  background: rgba(18, 24, 52, 0.85);
+  border: 1.5px solid var(--panel-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   cursor: pointer;
   outline: none;
   transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.grade-tab .tab-badge {
+.drawer-grade-grid .grade-tab .tab-badge {
   font-family: var(--font-main);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   color: var(--text-dim);
 }
 
-.grade-tab .tab-sub {
-  font-size: 10.5px;
+.drawer-grade-grid .grade-tab .tab-sub {
+  font-size: 10px;
   color: #6b7c96;
 }
 
-.grade-tab:focus {
-  transform: scale(1.05);
+.drawer-grade-grid .grade-tab:hover,
+.drawer-grade-grid .grade-tab:focus {
+  transform: scale(1.03);
   border-color: var(--accent-cyan);
-  box-shadow: var(--focus-glow);
   background: rgba(30, 42, 85, 0.95);
+  box-shadow: var(--focus-glow);
 }
 
-.grade-tab.active {
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(18, 24, 60, 0.9));
+.drawer-grade-grid .grade-tab.active {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(18, 24, 60, 0.95));
   border-color: var(--accent-cyan);
-  box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
 }
 
-.grade-tab.active .tab-badge {
-  color: #ffffff;
+.drawer-grade-grid .grade-tab.active .tab-badge {
+  color: #fff;
 }
 
-.grade-tab.active .tab-sub {
+.drawer-grade-grid .grade-tab.active .tab-sub {
   color: var(--accent-cyan);
   font-weight: 700;
 }
 
-/* === 메인 영역: 문제 풀이 풀스크린 와이드 스테이지 === */
-.main-content {
+.drawer-item-btn {
   display: flex;
-  flex: 1;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  margin: 0;
+  padding: 11px 14px;
+  background: rgba(18, 24, 52, 0.8);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 12px;
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.drawer-item-btn:hover,
+.drawer-item-btn:focus {
+  background: rgba(30, 42, 85, 0.9);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+  transform: translateX(3px);
+}
+
+.drawer-item-btn .item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drawer-item-btn .item-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-dim);
+}
+
+.drawer-action-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(18, 24, 52, 0.75);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 12px;
+}
+
+.drawer-action-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drawer-action-label {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.drawer-action-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+.drawer-toggle-btn {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(0, 120, 255, 0.4));
+  border: 1.5px solid var(--accent-cyan);
+  color: #fff;
+  border-radius: 10px;
+  padding: 7px 14px;
+  font-family: var(--font-main);
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.drawer-toggle-btn:hover,
+.drawer-toggle-btn:focus {
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 14px var(--accent-cyan);
+  transform: scale(1.04);
+}
+
+.drawer-btn-row {
+  display: flex;
+  gap: 10px;
+}
+
+.drawer-tool-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  background: rgba(18, 24, 52, 0.8);
+  border: 1.5px solid var(--panel-border);
+  border-radius: 10px;
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.drawer-tool-btn:hover,
+.drawer-tool-btn:focus {
+  border-color: var(--accent-cyan);
+  background: rgba(30, 42, 85, 0.95);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+
+.drawer-footer {
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+  background: rgba(10, 14, 30, 0.6);
+  flex-shrink: 0;
+}
+
+/* === 모바일 뷰포트 탭 바 (문제 풀기 vs 해설 & 섀도잉) === */
+.mobile-viewport-tabs {
+  display: none; /* PC에서는 숨김 */
+  gap: 8px;
+  width: 100%;
+  margin: 2px 0 6px 0;
+  flex-shrink: 0;
+}
+
+.m-tab-btn {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(18, 24, 52, 0.85);
+  border: 1.5px solid var(--panel-border);
+  color: var(--text-dim);
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.m-tab-btn.active {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(18, 24, 60, 0.95));
+  border-color: var(--accent-cyan);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+}
+
+.m-tab-btn .tab-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+
+.m-tab-btn.active .tab-badge-dot {
+  background: var(--accent-cyan);
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+/* === 메인 듀얼 뷰포트 (PC: 좌우 2분할 50:50 / 스마트폰: 좌우 스크롤 스냅 페이징) === */
+.quest-dual-viewport {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
   align-items: stretch;
+  width: 100%;
+  flex: 1;
   min-height: 0;
 }
 
-/* 문법 문제 풀이 스테이지 (화면 100% 와이드) */
-.grammar-stage-section {
-  position: relative;
-  flex: 1;
-  width: 100%;
+.quest-panel {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   border-radius: 18px;
-  padding: 16px 26px;
+  padding: 16px 22px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   gap: 12px;
   backdrop-filter: blur(12px);
-  overflow: visible;
+  overflow-y: auto;
   box-sizing: border-box;
+  min-height: 0;
+  position: relative;
 }
+
+/* 좌측 문제 풀이 패널 */
+.panel-solve {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 우측 해설 & 섀도잉 패널 */
+.panel-explain {
+  background: linear-gradient(180deg, rgba(14, 20, 44, 0.88) 0%, rgba(10, 15, 34, 0.92) 100%);
+  border-color: rgba(90, 130, 220, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 해설 대기 플레이스홀더 카드 */
+.explain-placeholder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 36px 24px;
+  border: 2px dashed rgba(90, 120, 200, 0.35);
+  border-radius: 16px;
+  background: rgba(14, 20, 48, 0.4);
+  gap: 14px;
+  margin: auto 0;
+}
+
+.ph-glow-icon {
+  font-size: 38px;
+  animation: pulseIcon 2s infinite ease-in-out;
+}
+
+@keyframes pulseIcon {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(255, 200, 0, 0.4)); }
+  50% { transform: scale(1.1); filter: drop-shadow(0 0 16px rgba(255, 200, 0, 0.8)); }
+}
+
+.ph-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.ph-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  max-width: 380px;
+}
+
+.ph-desc strong {
+  color: var(--accent-cyan);
+}
+
+.ph-tip-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  color: #d0e4ff;
+  margin-top: 6px;
+}
+
+.ph-tip-box span {
+  background: var(--accent-cyan);
+  color: #000;
+  font-weight: 900;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* === 하단 전후 문제 이동 네비게이션 바 === */
+.bottom-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(14, 20, 44, 0.9);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 8px 16px;
+  backdrop-filter: blur(12px);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.nav-arrow-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-family: var(--font-main);
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 1.5px solid transparent;
+  white-space: nowrap;
+}
+
+.nav-arrow-btn.prev-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #d0d8ec;
+}
+
+.nav-arrow-btn.prev-btn:hover:not(:disabled),
+.nav-arrow-btn.prev-btn:focus:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #fff;
+  color: #fff;
+  transform: translateX(-2px);
+}
+
+.nav-arrow-btn.next-btn {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(0, 150, 255, 0.5));
+  border-color: var(--accent-cyan);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.3);
+}
+
+.nav-arrow-btn.next-btn:hover:not(:disabled),
+.nav-arrow-btn.next-btn:focus:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-cyan), #0088ff);
+  color: #000;
+  box-shadow: 0 0 20px var(--accent-cyan);
+  transform: translateX(2px);
+}
+
+.nav-arrow-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 문제 이동 트랙 (1~10 문제 닷) */
+.nav-question-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px 6px;
+}
+
+.nav-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nav-dot:hover {
+  border-color: var(--accent-cyan);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.nav-dot.active {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.3);
+  color: #fff;
+  box-shadow: 0 0 12px var(--accent-cyan);
+  transform: scale(1.15);
+}
+
+.nav-dot.correct {
+  background: rgba(0, 255, 136, 0.25);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+
+.nav-dot.correct.active {
+  background: var(--accent-green);
+  color: #000;
+  box-shadow: 0 0 14px var(--accent-green);
+}
+
+.nav-dot.wrong {
+  background: rgba(255, 51, 102, 0.25);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.nav-dot.wrong.active {
+  background: var(--accent-red);
+  color: #fff;
+  box-shadow: 0 0 14px var(--accent-red);
+}
+
+
 
 /* 카테고리 태그 영역 */
 .category-pill-wrap {
@@ -486,112 +1029,22 @@ body {
   color: var(--text-dim);
 }
 
-/* === 영문법 Hero 문제 쇼케이스 보드 (비주얼 일러스트 + 문장 집중) === */
+/* === 영문법 Hero 문제 쇼케이스 보드 (100% 와이드 텍스트 집중형) === */
 .hero-question-showcase {
-  display: flex;
-  gap: 18px;
-  align-items: stretch;
-  margin-bottom: 10px;
-  min-height: 145px;
-  max-height: 175px;
+  width: 100%;
+  margin-bottom: 12px;
   flex-shrink: 0;
+  display: block;
 }
 
-/* 좌측: 비주얼 일러스트 힌트 스테이지 */
-.visual-clue-stage {
-  flex: 0 0 clamp(180px, 18vw, 230px);
-  display: flex;
-  flex-direction: column;
-}
-
-.visual-clue-card {
-  flex: 1;
-  background: radial-gradient(circle at 50% 30%, rgba(26, 36, 78, 0.95), rgba(10, 14, 32, 0.95));
-  border: 2px solid var(--clue-theme, rgba(0, 240, 255, 0.5));
-  border-radius: 20px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 
-    0 0 24px rgba(0, 0, 0, 0.6),
-    0 0 16px var(--clue-theme, rgba(0, 240, 255, 0.3)),
-    inset 0 0 16px rgba(0, 240, 255, 0.08);
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  animation: clueFloat 4s ease-in-out infinite alternate;
-}
-
-@keyframes clueFloat {
-  0% { transform: translateY(0px); }
-  100% { transform: translateY(-4px); }
-}
-
-/* 정답 시 일러스트 축하 팝 애니메이션 */
-.visual-clue-card.clue-success-pop {
-  animation: clueSuccessPop 0.8s ease-in-out forwards;
-}
-
-@keyframes clueSuccessPop {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.08) rotate(-2deg); box-shadow: 0 0 35px var(--accent-green), 0 0 15px #fff; }
-  60% { transform: scale(1.05) rotate(2deg); }
-  100% { transform: scale(1) rotate(0deg); }
-}
-
-.clue-artwork-wrap {
-  width: 100%;
-  height: 95px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.clue-svg {
-  width: 100%;
-  height: 100%;
-  max-height: 95px;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
-}
-
-.clue-hint-pill {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: rgba(10, 15, 35, 0.85);
-  border: 1.5px solid var(--clue-theme, rgba(0, 240, 255, 0.4));
-  border-radius: 20px;
-  padding: 5px 12px;
-  width: 100%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-.clue-icon-bulb {
-  font-size: 13px;
-  filter: drop-shadow(0 0 5px #ffc800);
-}
-
-.clue-tag-text {
-  font-size: 13px;
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 우측: 메인 영어 문장 & 번역 포커스 보드 */
+/* 메인 영어 문장 & 번역 포커스 보드 */
 .sentence-board {
-  flex: 1;
-  background: linear-gradient(140deg, rgba(18, 26, 58, 0.95) 0%, rgba(10, 15, 34, 0.95) 100%);
+  width: 100%;
+  min-height: 120px;
+  background: linear-gradient(135deg, rgba(16, 24, 56, 0.95) 0%, rgba(10, 15, 36, 0.95) 100%);
   border: 2px solid rgba(120, 160, 255, 0.35);
-  border-radius: 16px;
-  padding: 14px 24px;
+  border-radius: 18px;
+  padding: 20px 32px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -2365,292 +2818,270 @@ button,
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 태블릿 및 작은 PC 화면 (가로 960px 이하) */
+/* 태블릿 및 스마트폰 화면 (가로 960px 이하): 좌우 스크롤 스냅 듀얼 뷰포트 & 탭 활성화 */
 @media (max-width: 960px) {
-  .hud-header {
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 14px;
+  .mobile-viewport-tabs {
+    display: flex;
   }
 
-  .grade-selector-bar {
+  .quest-dual-viewport {
+    display: flex;
     overflow-x: auto;
-    flex-wrap: nowrap;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    padding-bottom: 6px;
+    scrollbar-width: none;
+    gap: 0;
   }
 
-  .grade-tab {
-    flex: 0 0 135px;
+  .quest-dual-viewport::-webkit-scrollbar {
+    display: none;
   }
 
-  .hero-question-showcase {
-    flex-direction: column;
-    max-height: none;
-    min-height: auto;
-    gap: 12px;
+  .quest-panel {
+    flex: 0 0 100%;
+    min-width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    border-radius: 14px;
+    padding: 14px;
+    box-sizing: border-box;
   }
 
-  .visual-clue-stage {
-    flex: none;
-    width: 100%;
-    max-height: 130px;
-  }
-
-  .clue-artwork-wrap {
-    height: 70px;
+  .panel-explain {
+    border-left: 1px solid var(--panel-border);
   }
 
   .options-grid {
     gap: 10px;
-    min-height: 180px;
   }
 }
 
-/* 스마트폰 세로 모드 (가로 640px 이하) */
+/* 스마트폰 세로 모드 (가로 640px 이하): 1열 최적화 및 터치 친화적 UI */
 @media (max-width: 640px) {
   .app-container,
   .tv-safe-area {
-    padding: 8px 10px 36px;
-    gap: 8px;
+    padding: 6px 8px 16px;
+    gap: 6px;
     min-height: 100vh;
   }
 
-  /* 헤더 모바일 최적화 */
+  /* 헤더 모바일 콤팩트 원라인 정렬 */
   .hud-header {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 10px 12px;
-    gap: 10px;
-  }
-
-  .header-left-group {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .logo-area .game-title {
-    font-size: 16px;
-  }
-
-  .grade-tag {
-    font-size: 11px;
-    padding: 1px 7px;
-  }
-
-  .battle-toggle-wrap {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(10, 16, 38, 0.6);
-    padding: 4px 8px;
-    border-radius: 10px;
-  }
-
-  .hud-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 5px;
-    width: 100%;
-  }
-
-  .hud-stats .stat-card {
-    padding: 4px 6px;
-    min-width: 0;
-    align-items: center;
-    text-align: center;
-  }
-
-  .hud-stats .stat-label {
-    font-size: 9px;
-  }
-
-  .hud-stats .stat-value {
-    font-size: 13px;
-  }
-
-  .timer-card {
-    grid-column: 1 / -1;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 4px 10px;
-  }
-
-  .timer-bar-wrap {
-    flex: 1;
-    height: 8px;
-  }
-
-  .timer-number {
-    font-size: 12px;
-    min-width: 28px;
-  }
-
-  .voice-status-card {
-    width: 100%;
-    justify-content: center;
     padding: 6px 10px;
-  }
-
-  /* 학년 탭 모바일 터치 스크롤 */
-  .grade-selector-bar {
-    margin: 4px 0 8px 0;
     gap: 6px;
+    border-radius: 12px;
   }
 
-  .grade-tab {
-    flex: 0 0 112px;
-    height: 44px;
+  .header-left-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .hamburger-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .logo-area .game-badge {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .logo-area .game-title {
+    font-size: 14px;
+    gap: 5px;
+  }
+
+  .grade-tag {
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+
+  .hud-stats {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .hud-stats .stat-card {
+    padding: 3px 6px;
+    min-width: 0;
+    align-items: center;
+    text-align: center;
+    border-radius: 6px;
+  }
+
+  .hud-stats .stat-label {
+    font-size: 8px;
+  }
+
+  .hud-stats .stat-value {
+    font-size: 11px;
+  }
+
+  .timer-card {
+    min-width: 65px;
     padding: 3px 6px;
   }
 
-  .grade-tab .tab-badge {
-    font-size: 12px;
+  .timer-bar-wrap {
+    width: 45px;
+    height: 5px;
   }
 
-  .grade-tab .tab-sub {
-    font-size: 9px;
+  .timer-number {
+    font-size: 10px;
   }
 
-  /* 문제 스테이지 모바일 카드 */
-  .grammar-stage-section {
-    padding: 12px;
-    border-radius: 14px;
-    gap: 10px;
+  /* 뷰포트 패널 모바일 최적화 */
+  .quest-panel {
+    padding: 10px 12px;
+    border-radius: 12px;
+    gap: 8px;
   }
 
   .category-pill-wrap {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
     margin-bottom: 2px;
   }
 
   .category-pill {
-    font-size: 13px;
-    padding: 4px 12px;
+    font-size: 12px;
+    padding: 3px 10px;
   }
 
   .concept-guide-btn {
-    font-size: 12px;
-    padding: 4px 12px;
+    font-size: 11px;
+    padding: 3px 10px;
   }
 
   .hero-question-showcase {
     margin-bottom: 6px;
-    gap: 8px;
-  }
-
-  .visual-clue-card {
-    padding: 8px 10px;
-  }
-
-  .clue-artwork-wrap {
-    height: 60px;
-  }
-
-  .clue-tag-text {
-    font-size: 11px;
   }
 
   .sentence-board {
-    padding: 12px 14px;
+    padding: 10px 12px;
     border-radius: 12px;
+    min-height: auto;
   }
 
   .target-sentence {
-    font-size: 17px;
-    line-height: 1.5;
+    font-size: 16px;
+    line-height: 1.45;
   }
 
   .blank-box {
-    padding: 2px 8px;
-    font-size: 16px;
-    min-width: 48px;
+    padding: 1px 6px;
+    font-size: 15px;
+    min-width: 44px;
+    margin: 0 4px;
   }
 
   .sentence-translation {
-    font-size: 13px;
-    margin-top: 4px;
+    font-size: 12px;
+    margin-top: 3px;
   }
 
   /* 모바일 1열 보기 카드 */
   .options-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    gap: 8px;
+    gap: 6px;
   }
 
   .option-card {
-    padding: 12px 16px;
-    min-height: 52px;
-    border-radius: 12px;
+    padding: 9px 12px;
+    min-height: 46px;
+    border-radius: 10px;
   }
 
   .option-card .opt-key-badge {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
   }
 
   .option-card .opt-text {
-    font-size: 20px;
+    font-size: 17px;
   }
 
   /* 어순 배열 모바일 최적화 */
   .scramble-prompt-card {
-    padding: 12px;
+    padding: 10px;
   }
 
   .scramble-sentence-preview {
-    font-size: 14px;
-    padding: 8px;
+    font-size: 13px;
+    padding: 6px;
   }
 
   .scramble-track {
-    gap: 6px;
-    padding: 8px 4px;
+    gap: 5px;
+    padding: 6px 4px;
   }
 
   .scramble-block {
-    padding: 8px 12px;
-    font-size: 15px;
-    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 8px;
   }
 
   .scramble-action-bar {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 
   .scramble-btn {
     width: 100%;
     justify-content: center;
-    height: 46px;
-    font-size: 14px;
+    height: 42px;
+    font-size: 13px;
   }
 
   /* 섀도잉 컨트롤 모바일 2x2 그리드 */
   .shadowing-controls {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
   }
 
   .shadow-btn {
     width: 100%;
-    padding: 10px 6px;
-    font-size: 12px;
+    padding: 8px 4px;
+    font-size: 11px;
     justify-content: center;
+  }
+
+  /* 하단 네비게이션 바 모바일 콤팩트 */
+  .bottom-nav-bar {
+    padding: 6px 8px;
+    gap: 6px;
+    border-radius: 10px;
+  }
+
+  .nav-arrow-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .nav-question-track {
+    gap: 4px;
+    padding: 2px 4px;
+  }
+
+  .nav-dot {
+    width: 22px;
+    height: 22px;
+    font-size: 9.5px;
   }
 
   /* 모달 팝업 모바일 최적화 */
@@ -2658,39 +3089,40 @@ button,
   .help-modal-card {
     width: 95vw;
     max-height: 92vh;
-    padding: 14px;
-    margin: 4vh auto;
+    padding: 12px;
+    margin: 3vh auto;
   }
 
   .help-grid {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
   }
 
   .overlay-card {
     width: 94%;
-    max-width: 400px;
-    padding: 22px 16px;
+    max-width: 380px;
+    padding: 18px 14px;
   }
 
   .overlay-title {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .overlay-desc {
-    font-size: 13px;
+    font-size: 12.5px;
     line-height: 1.5;
   }
 
   .overlay-controls-guide {
-    gap: 6px;
-    margin: 12px 0 16px 0;
+    gap: 5px;
+    margin: 10px 0 14px 0;
   }
 
   .guide-item {
-    font-size: 12px;
+    font-size: 11px;
   }
 }
+
 
 
 

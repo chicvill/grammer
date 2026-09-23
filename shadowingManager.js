@@ -23,6 +23,10 @@ class ShadowingManager {
     this.audioChunks = [];
     this.shadowStream = null;
     this.shadowRecognizer = null;
+    this.accumulatedHeard = '';
+    this.currentTargetFull = '';
+    this.maxRecordTimeout = null;
+    this.wasVoiceCommanderActive = false;
 
     this.bindEvents();
   }
@@ -73,6 +77,24 @@ class ShadowingManager {
   // 새 문제 로드 시 이전 녹음 및 오디오 메모리 해제
   resetUI() {
     this.cleanupAudio();
+    if (this.maxRecordTimeout) {
+      clearTimeout(this.maxRecordTimeout);
+      this.maxRecordTimeout = null;
+    }
+    this.isRecording = false;
+    if (this.shadowRecognizer) {
+      this.shadowRecognizer.onend = null;
+      try { this.shadowRecognizer.stop(); } catch (e) {}
+      this.shadowRecognizer = null;
+    }
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try { this.mediaRecorder.stop(); } catch (e) {}
+    }
+    if (this.shadowStream) {
+      try { this.shadowStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+      this.shadowStream = null;
+    }
+    this.accumulatedHeard = '';
     if (this.resultBox) {
       this.resultBox.style.display = 'none';
     }
@@ -102,17 +124,40 @@ class ShadowingManager {
       const q = window.gameApp.currentQuestion;
       target = (q.audioText || q.full || q.sentence.replace('_____', q.answerWord || ''));
     }
-    const targetFull = (target || '').replace(/[.?!]/g, '').trim().toLowerCase();
+    this.currentTargetFull = (target || '').replace(/[.?!,;:]/g, '').trim().toLowerCase();
+
+    // VoiceCommander가 마이크를 잡고 있다면 섀도잉 녹음 중에는 일시 정지 (마이크 충돌 방지)
+    this.wasVoiceCommanderActive = false;
+    if (window.gameApp && window.gameApp.voiceCommander && window.gameApp.voiceCommander.isListening) {
+      this.wasVoiceCommanderActive = true;
+      window.gameApp.voiceCommander.stop();
+    }
 
     this.isRecording = true;
     this.audioChunks = [];
+    this.accumulatedHeard = '';
 
     if (this.recordBtn) {
       this.recordBtn.classList.add('recording');
-      this.recordBtn.innerHTML = '<span>⏹️ 녹음 중... (다 읽고 클릭 시 완료)</span>';
+      this.recordBtn.innerHTML = '<span>⏹️ 녹음 중... (다 읽은 후 클릭하여 완료)</span>';
     }
 
-    // 1. MediaRecorder 오디오 스트림 녹음
+    if (this.resultBox) {
+      this.resultBox.style.display = 'flex';
+      if (this.scoreStars) this.scoreStars.textContent = '🔴 REC (녹음 중)';
+      if (this.scoreNumber) this.scoreNumber.textContent = '음성 인식 대기 중...';
+      if (this.heardText) this.heardText.textContent = '마이크에 문장 전체를 편안하게 읽으세요...';
+    }
+
+    // 최대 30초 안전 타이머 (사용자가 완료 버튼을 누르지 않아도 무한 대기 방지)
+    if (this.maxRecordTimeout) clearTimeout(this.maxRecordTimeout);
+    this.maxRecordTimeout = setTimeout(() => {
+      if (this.isRecording) {
+        this.stopRecording();
+      }
+    }, 30000);
+
+    // 1. MediaRecorder 오디오 스트림 녹음 (사용자 본인 목소리 녹음)
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         this.shadowStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -138,9 +183,6 @@ class ShadowingManager {
             if (this.playUserVoiceBtn) {
               this.playUserVoiceBtn.classList.add('ready');
             }
-            if (this.resultBox) {
-              this.resultBox.style.display = 'flex';
-            }
           }
         };
 
@@ -150,31 +192,41 @@ class ShadowingManager {
       console.warn('MediaRecorder 녹음 스트림 접근 불가:', err);
     }
 
-    // 2. Web Speech API 음성 인식기 시작
+    // 2. Web Speech API 음성 인식기 시작 (영어 실시간 텍스트 누적 추출)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       try {
         this.shadowRecognizer = new SpeechRecognition();
         this.shadowRecognizer.lang = 'en-US';
-        this.shadowRecognizer.interimResults = false;
-        this.shadowRecognizer.maxAlternatives = 1;
+        this.shadowRecognizer.continuous = true;       // 문장 도중 1~2초 침묵 시 꺼짐 방지!
+        this.shadowRecognizer.interimResults = true;    // 실시간 인식 누적
+        this.shadowRecognizer.maxAlternatives = 3;
 
         this.shadowRecognizer.onresult = (e) => {
-          const heard = e.results[0][0].transcript.toLowerCase().trim();
-          const score = this.calculateSimilarity(heard, targetFull);
-          this.stopRecording(score, heard);
-        };
-
-        this.shadowRecognizer.onerror = (e) => {
-          console.warn('[Shadow STT Error]:', e);
-          if (this.isRecording) {
-            this.stopRecording();
+          let fullTranscript = '';
+          for (let i = 0; i < e.results.length; i++) {
+            fullTranscript += e.results[i][0].transcript + ' ';
+          }
+          this.accumulatedHeard = fullTranscript.trim();
+          if (this.heardText && this.isRecording) {
+            this.heardText.textContent = `실시간 인식: "${this.accumulatedHeard}"`;
+          }
+          if (this.scoreNumber && this.isRecording) {
+            this.scoreNumber.textContent = '말씀하시는 중... 🎙️';
           }
         };
 
+        this.shadowRecognizer.onerror = (e) => {
+          console.warn('[Shadow STT Error]:', e.error);
+          // no-speech나 aborted 오류 시 자동으로 녹음을 끊지 않음
+        };
+
         this.shadowRecognizer.onend = () => {
-          if (this.isRecording) {
-            this.stopRecording();
+          // 브라우저의 기본 침묵 타임아웃 등으로 꺼질 경우, 사용자가 아직 녹음 중이면 즉시 재시작
+          if (this.isRecording && this.shadowRecognizer) {
+            try {
+              this.shadowRecognizer.start();
+            } catch (err) {}
           }
         };
 
@@ -190,6 +242,11 @@ class ShadowingManager {
     if (!this.isRecording) return;
     this.isRecording = false;
 
+    if (this.maxRecordTimeout) {
+      clearTimeout(this.maxRecordTimeout);
+      this.maxRecordTimeout = null;
+    }
+
     if (this.recordBtn) {
       this.recordBtn.classList.remove('recording');
       this.recordBtn.innerHTML = '<span>🎙️ 다시 따라 말하기</span>';
@@ -197,6 +254,7 @@ class ShadowingManager {
 
     // 1. STT 중지
     if (this.shadowRecognizer) {
+      this.shadowRecognizer.onend = null; // 재시작 방지
       try { this.shadowRecognizer.stop(); } catch (e) {}
       this.shadowRecognizer = null;
     }
@@ -214,19 +272,31 @@ class ShadowingManager {
       } catch (e) {}
     }
 
-    // 4. 결과 UI 업데이트
+    // 4. 결과 판정 및 점수 계산
+    const finalHeard = (heard || this.accumulatedHeard || '').trim();
+    let calculatedScore = score;
+
+    if (calculatedScore === null) {
+      if (finalHeard.length > 0 && this.currentTargetFull.length > 0) {
+        calculatedScore = this.calculateSimilarity(finalHeard.toLowerCase(), this.currentTargetFull);
+      } else {
+        calculatedScore = null;
+      }
+    }
+
+    // 5. 결과 UI 업데이트
     if (this.resultBox) {
       this.resultBox.style.display = 'flex';
     }
 
-    if (score !== null) {
-      if (this.scoreNumber) this.scoreNumber.textContent = `발음 정확도: ${score}점`;
-      if (this.heardText) this.heardText.textContent = `인식된 발음: "${heard}"`;
+    if (calculatedScore !== null) {
+      if (this.scoreNumber) this.scoreNumber.textContent = `발음 정확도: ${calculatedScore}점`;
+      if (this.heardText) this.heardText.textContent = `인식된 발음: "${finalHeard}"`;
       if (this.scoreStars) {
-        if (score >= 90) {
+        if (calculatedScore >= 85) {
           this.scoreStars.textContent = '⭐⭐⭐ (원어민 수준!)';
           if (window.soundFx) window.soundFx.playCombo();
-        } else if (score >= 70) {
+        } else if (calculatedScore >= 65) {
           this.scoreStars.textContent = '⭐⭐ (훌륭해요!)';
           if (window.soundFx) window.soundFx.playCorrect();
         } else {
@@ -236,12 +306,12 @@ class ShadowingManager {
       }
     } else {
       if (this.scoreStars) this.scoreStars.textContent = '🎙️ 녹음 완료!';
-      if (this.scoreNumber) this.scoreNumber.textContent = '내 목소리 확인';
-      if (this.heardText) this.heardText.textContent = '녹음이 저장되었습니다. 옆의 [내 목소리 다시 듣기]를 눌러보세요!';
+      if (this.scoreNumber) this.scoreNumber.textContent = '목소리 녹음 완료';
+      if (this.heardText) this.heardText.textContent = finalHeard ? `인식된 발음: "${finalHeard}"` : '녹음이 저장되었습니다. [내 목소리 다시 듣기]를 눌러보세요!';
       if (window.soundFx) window.soundFx.playCorrect();
     }
 
-    // 5. AI 원어민 발음 정밀 클리닉 & 음소 교정 코칭 렌더링
+    // 6. AI 원어민 발음 정밀 클리닉 & 음소 교정 코칭 렌더링
     const clinicPanel = document.getElementById('pronunciationClinicPanel');
     if (clinicPanel && window.pronunciationCoach) {
       let targetSentence = '';
@@ -249,10 +319,20 @@ class ShadowingManager {
         const q = window.gameApp.currentQuestion;
         targetSentence = q.audioText || q.full || q.sentence.replace('_____', q.answerWord || '');
       }
-      window.pronunciationCoach.renderClinic(clinicPanel, targetSentence, heard, score || 80);
+      window.pronunciationCoach.renderClinic(clinicPanel, targetSentence, finalHeard, calculatedScore || 75);
     }
 
-    // 5. [내 목소리 다시 듣기] 버튼으로 자동 포커스
+    // 7. VoiceCommander 재개 (섀도잉 전 켜져 있었던 경우)
+    if (this.wasVoiceCommanderActive && window.gameApp && window.gameApp.voiceCommander) {
+      this.wasVoiceCommanderActive = false;
+      setTimeout(() => {
+        if (window.gameApp && window.gameApp.voiceCommander && !this.isRecording) {
+          window.gameApp.voiceCommander.start();
+        }
+      }, 600);
+    }
+
+    // 8. [내 목소리 다시 듣기] 버튼으로 자동 포커스
     setTimeout(() => {
       if (this.playUserVoiceBtn) {
         this.playUserVoiceBtn.classList.add('ready');
@@ -263,14 +343,25 @@ class ShadowingManager {
 
   // 발음 단어 유사도 계산
   calculateSimilarity(s1, s2) {
-    const words1 = s1.split(/\s+/);
-    const words2 = s2.split(/\s+/);
+    if (!s1 || !s2) return 50;
+    const clean1 = s1.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+    const clean2 = s2.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+    if (clean1 === clean2) return 100;
+
+    const words1 = clean1.split(/\s+/).filter(Boolean);
+    const words2 = clean2.split(/\s+/).filter(Boolean);
+    if (words1.length === 0 || words2.length === 0) return 50;
+
     let matches = 0;
     words1.forEach(w => {
-      if (words2.includes(w)) matches++;
+      if (words2.includes(w)) {
+        matches++;
+      } else if (words2.some(w2 => w2.includes(w) || w.includes(w2))) {
+        matches += 0.5;
+      }
     });
     const ratio = matches / Math.max(words1.length, words2.length);
-    return Math.min(100, Math.max(60, Math.round(ratio * 100)));
+    return Math.min(100, Math.max(50, Math.round(ratio * 100)));
   }
 
   // 사용자 녹음 목소리 재생

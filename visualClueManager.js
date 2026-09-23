@@ -815,20 +815,14 @@ class VisualClueManager {
     };
   }
 
-  // DOM에 비주얼 단서 렌더링
+  // DOM에 비주얼 단서 렌더링 (배경 일러스트 워터마크 모드, 하단 텍스트 제거)
   renderInto(containerElement, question) {
     if (!containerElement) return;
     const clue = this.getClueData(question);
     
     containerElement.innerHTML = `
-      <div class="visual-clue-card" id="currentVisualClue" style="--clue-theme: ${clue.color};">
-        <div class="clue-artwork-wrap">
-          ${clue.svg}
-        </div>
-        <div class="clue-hint-pill">
-          <span class="clue-icon-bulb">💡</span>
-          <span class="clue-tag-text">${clue.tag}</span>
-        </div>
+      <div class="visual-clue-bg-art" id="currentVisualClue" style="--clue-theme: ${clue.color};">
+        ${clue.svg}
       </div>
     `;
   }

@@ -35,7 +35,6 @@ class GrammarQuestGame {
     this.categoryTag = document.getElementById('categoryTag');
     this.targetSentence = document.getElementById('targetSentence');
     this.sentenceTranslation = document.getElementById('sentenceTranslation');
-    this.visualClueStage = document.getElementById('visualClueStage');
     this.heroQuestionShowcase = document.getElementById('heroQuestionShowcase');
     
     // 선택형 2x2 그리드
@@ -99,6 +98,33 @@ class GrammarQuestGame {
     this.expResultBadge = document.getElementById('expResultBadge');
     this.expContent = document.getElementById('expContent');
 
+    // 햄버거 메뉴 및 좌측 슬라이드 드로어 DOM
+    this.currentGradeBadge = document.getElementById('currentGradeBadge');
+    this.hamburgerBtn = document.getElementById('hamburgerBtn');
+    this.drawerOverlay = document.getElementById('drawerOverlay');
+    this.drawerCloseBtn = document.getElementById('drawerCloseBtn');
+    this.drawerMicToggleBtn = document.getElementById('drawerMicToggleBtn');
+    this.drawerMicBtnText = document.getElementById('drawerMicBtnText');
+    this.drawerMicStatusText = document.getElementById('drawerMicStatusText');
+    this.drawerBattleStatusText = document.getElementById('drawerBattleStatusText');
+    this.helpBtn = document.getElementById('helpBtn');
+
+    // 모바일 뷰포트 전환 탭 & 메인 듀얼 뷰포트
+    this.mobileViewportTabs = document.getElementById('mobileViewportTabs');
+    this.mTabSolve = document.getElementById('mTabSolve');
+    this.mTabExplain = document.getElementById('mTabExplain');
+    this.mExplainBadge = document.getElementById('mExplainBadge');
+    this.questDualViewport = document.getElementById('questDualViewport');
+    this.panelSolve = document.getElementById('panelSolve');
+    this.panelExplain = document.getElementById('panelExplain');
+    this.explainPlaceholder = document.getElementById('explainPlaceholder');
+
+    // 하단 전후 문제 이동 네비게이션
+    this.prevQuestionBtn = document.getElementById('prevQuestionBtn');
+    this.nextQuestionBtn = document.getElementById('nextQuestionBtn');
+    this.nextBtnLabel = document.getElementById('nextBtnLabel');
+    this.navQuestionTrack = document.getElementById('navQuestionTrack');
+
     this.gameOverlay = document.getElementById('gameOverlay');
     this.overlayIcon = document.getElementById('overlayIcon');
     this.overlayTitle = document.getElementById('overlayTitle');
@@ -110,32 +136,189 @@ class GrammarQuestGame {
     // 음성 인식기 초기화
     this.voiceCommander = new VoiceCommander(this.handleVoiceAction.bind(this));
 
+    this.setupDrawer();
+    this.setupMobileTabs();
+    this.setupNavigation();
     this.updateProgressHUD();
     this.updateGradeTabsUI();
+    this.updateGradeBadge();
     this.bindEvents();
-
-    // 초기 화면용 기본 비주얼 단서 렌더링 (STEM & AI)
-    if (window.visualClueManager && this.visualClueStage) {
-      window.visualClueManager.renderInto(this.visualClueStage, {
-        sentence: "Artificial intelligence and robotics _____ transforming modern science.",
-        translation: "인공지능과 로봇공학은 현대 과학을 변화시키고 있다.",
-        category: "Be동사 현재형 [AI 첨단기술 🤖]"
-      });
-    }
     
     setTimeout(() => {
       this.startBtn.focus();
     }, 150);
   }
 
+  get gradeName() {
+    const map = {
+      'elem-low': '초등 3~4',
+      'elem-high': '초등 5~6',
+      'mid-1': '중학 1학년',
+      'mid-2': '중학 2학년',
+      'mid-3': '중학 3학년',
+      'high': '고등 / 수능'
+    };
+    return map[this.currentGrade] || '중학 1학년';
+  }
+
   // 학년 변경 메소드
   setGrade(grade) {
-    if (this.currentGrade === grade && this.gameState === 'quiz') return;
     this.currentGrade = grade;
     localStorage.setItem('GRAMMAR_CURRENT_GRADE', grade);
     this.updateGradeTabsUI();
+    this.updateGradeBadge();
+    this.toggleDrawer(false);
     window.soundFx.playCorrect();
     this.startNewGame();
+  }
+
+  updateGradeBadge() {
+    if (this.currentGradeBadge) {
+      this.currentGradeBadge.textContent = this.gradeName;
+    }
+  }
+
+  setupDrawer() {
+    if (this.hamburgerBtn) {
+      this.hamburgerBtn.addEventListener('click', () => this.toggleDrawer());
+    }
+    if (this.drawerCloseBtn) {
+      this.drawerCloseBtn.addEventListener('click', () => this.toggleDrawer(false));
+    }
+    if (this.drawerOverlay) {
+      this.drawerOverlay.addEventListener('click', (e) => {
+        if (e.target === this.drawerOverlay) {
+          this.toggleDrawer(false);
+        }
+      });
+    }
+    if (this.drawerMicToggleBtn) {
+      this.drawerMicToggleBtn.addEventListener('click', () => {
+        this.voiceCommander.toggle();
+        this.updateMicUI();
+      });
+    }
+    if (this.helpBtn) {
+      this.helpBtn.addEventListener('click', () => {
+        this.toggleDrawer(false);
+        if (this.helpModalManager) this.helpModalManager.open();
+      });
+    }
+  }
+
+  toggleDrawer(open) {
+    if (!this.drawerOverlay) return;
+    const shouldOpen = (open !== undefined) ? open : !this.drawerOverlay.classList.contains('active');
+    this.drawerOverlay.classList.toggle('active', shouldOpen);
+    if (window.soundFx) window.soundFx.playMove();
+  }
+
+  updateMicUI() {
+    const isListening = this.voiceCommander && this.voiceCommander.isListening;
+    if (this.drawerMicStatusText) {
+      this.drawerMicStatusText.textContent = isListening ? '마이크 켜짐 🎙️' : '마이크 꺼짐 (V키)';
+    }
+    if (this.drawerMicBtnText) {
+      this.drawerMicBtnText.textContent = isListening ? '마이크 끄기' : '마이크 켜기';
+    }
+    const voiceStatusText = document.getElementById('voiceStatusText');
+    if (voiceStatusText) {
+      voiceStatusText.textContent = isListening ? '마이크 ON 🎙️' : '마이크 OFF (V)';
+    }
+    const voiceStatusCard = document.getElementById('voiceStatusCard');
+    if (voiceStatusCard) {
+      voiceStatusCard.classList.toggle('listening', isListening);
+    }
+  }
+
+  setupMobileTabs() {
+    if (this.mTabSolve) {
+      this.mTabSolve.addEventListener('click', () => this.switchMobileTab('solve'));
+    }
+    if (this.mTabExplain) {
+      this.mTabExplain.addEventListener('click', () => this.switchMobileTab('explain'));
+    }
+
+    if (this.questDualViewport) {
+      this.questDualViewport.addEventListener('scroll', () => {
+        const scrollLeft = this.questDualViewport.scrollLeft;
+        const width = this.questDualViewport.offsetWidth;
+        if (width > 0) {
+          const isExplain = scrollLeft > width * 0.45;
+          if (this.mTabSolve) this.mTabSolve.classList.toggle('active', !isExplain);
+          if (this.mTabExplain) this.mTabExplain.classList.toggle('active', isExplain);
+        }
+      }, { passive: true });
+    }
+  }
+
+  switchMobileTab(target) {
+    if (!this.questDualViewport) return;
+    if (target === 'solve') {
+      this.questDualViewport.scrollTo({ left: 0, behavior: 'smooth' });
+      if (this.mTabSolve) this.mTabSolve.classList.add('active');
+      if (this.mTabExplain) this.mTabExplain.classList.remove('active');
+    } else {
+      const explainEl = document.getElementById('panelExplain');
+      const leftPos = explainEl ? explainEl.offsetLeft : this.questDualViewport.offsetWidth;
+      this.questDualViewport.scrollTo({ left: leftPos, behavior: 'smooth' });
+      if (this.mTabSolve) this.mTabSolve.classList.remove('active');
+      if (this.mTabExplain) this.mTabExplain.classList.add('active');
+    }
+  }
+
+  setupNavigation() {
+    if (this.prevQuestionBtn) {
+      this.prevQuestionBtn.addEventListener('click', () => this.prevQuestion());
+    }
+    if (this.nextQuestionBtn) {
+      this.nextQuestionBtn.addEventListener('click', () => this.nextQuestion());
+    }
+  }
+
+  prevQuestion() {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      if (window.soundFx) window.soundFx.playMove();
+      this.loadQuestion();
+    }
+  }
+
+  jumpToQuestion(idx) {
+    if (idx >= 0 && idx < this.questions.length && idx !== this.currentIndex) {
+      this.currentIndex = idx;
+      if (window.soundFx) window.soundFx.playMove();
+      this.loadQuestion();
+    }
+  }
+
+  renderQuestionTrack() {
+    if (!this.navQuestionTrack) return;
+    this.navQuestionTrack.innerHTML = '';
+
+    this.questions.forEach((q, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'nav-dot';
+      if (idx === this.currentIndex) dot.classList.add('active');
+      if (q.isAnswered) {
+        dot.classList.add(q.isCorrect ? 'correct' : 'wrong');
+      }
+      dot.textContent = idx + 1;
+      dot.title = `${idx + 1}번 문제로 이동`;
+      dot.addEventListener('click', () => this.jumpToQuestion(idx));
+      this.navQuestionTrack.appendChild(dot);
+    });
+
+    if (this.prevQuestionBtn) {
+      this.prevQuestionBtn.disabled = (this.currentIndex === 0);
+    }
+    if (this.nextQuestionBtn) {
+      const isLast = (this.currentIndex === this.questions.length - 1);
+      const isCurrentAnswered = this.currentQuestion && this.currentQuestion.isAnswered;
+      if (this.nextBtnLabel) {
+        this.nextBtnLabel.textContent = (isLast && isCurrentAnswered) ? '결과 리포트' : '다음 문제';
+      }
+    }
   }
 
   updateGradeTabsUI() {
@@ -207,8 +390,15 @@ class GrammarQuestGame {
         return;
       }
 
-      // 단축키 C 또는 M 또는 F1: 핵심 문법 개념 카드 열기 / 닫기
-      if (key === 'c' || key === 'C' || key === 'm' || key === 'M' || key === 'F1') {
+      // 단축키 M: 설정 & 학년 선택 사이드 드로어 메뉴 토글
+      if (key === 'm' || key === 'M') {
+        e.preventDefault();
+        this.toggleDrawer();
+        return;
+      }
+
+      // 단축키 C 또는 F1: 핵심 문법 개념 카드 열기 / 닫기
+      if (key === 'c' || key === 'C' || key === 'F1') {
         e.preventDefault();
         if (this.conceptModalManager && this.conceptModalManager.isOpen) {
           this.conceptModalManager.close();
@@ -225,18 +415,31 @@ class GrammarQuestGame {
         return;
       }
 
-      // 도움말 모달이 열려있을 때 ESC / Enter / Space로 닫기
-      if (this.helpModalManager && this.helpModalManager.isOpen) {
-        if (['Escape', 'Enter', ' ', 'Backspace'].includes(key)) {
+      // 이전 / 다음 문제 이동 단축키 (Alt+Left / Alt+Right)
+      if (e.altKey && key === 'ArrowLeft') {
+        e.preventDefault();
+        this.prevQuestion();
+        return;
+      }
+      if (e.altKey && key === 'ArrowRight') {
+        e.preventDefault();
+        this.nextQuestion();
+        return;
+      }
+
+      // 드로어 또는 모달이 열려있을 때 ESC로 닫기
+      if (key === 'Escape') {
+        if (this.drawerOverlay && this.drawerOverlay.classList.contains('active')) {
+          e.preventDefault();
+          this.toggleDrawer(false);
+          return;
+        }
+        if (this.helpModalManager && this.helpModalManager.isOpen) {
           e.preventDefault();
           this.helpModalManager.close();
           return;
         }
-      }
-
-      // 문법 개념 모달이 열려있을 때 ESC / Enter / Space로 닫기
-      if (this.conceptModalManager && this.conceptModalManager.isOpen) {
-        if (['Escape', 'Enter', ' ', 'Backspace'].includes(key)) {
+        if (this.conceptModalManager && this.conceptModalManager.isOpen) {
           e.preventDefault();
           this.conceptModalManager.close();
           return;
@@ -563,9 +766,11 @@ class GrammarQuestGame {
     this.optionCards.forEach((card, i) => {
       card.classList.toggle('focused', i === idx);
     });
-    this.shortcutChips.forEach((chip, i) => {
-      if (chip) chip.classList.toggle('active', i === idx);
-    });
+    if (this.shortcutChips && Array.isArray(this.shortcutChips)) {
+      this.shortcutChips.forEach((chip, i) => {
+        if (chip) chip.classList.toggle('active', i === idx);
+      });
+    }
 
     // 상단 [📖 핵심 문법 개념] 버튼 포커스 스타일 동기화
     if (this.conceptGuideBtn) {
@@ -607,6 +812,14 @@ class GrammarQuestGame {
     if (window.grammarGenerator) {
       set = window.grammarGenerator.generateSet(this.TOTAL_QUESTIONS, this.wrongQuestions, this.currentGrade);
     }
+    set.forEach(q => {
+      q.isAnswered = false;
+      q.userAnswer = null;
+      q.isCorrect = null;
+      q.feedbackText = '';
+      q.spokenSentence = null;
+      q.similarity = null;
+    });
     return set;
   }
 
@@ -625,22 +838,15 @@ class GrammarQuestGame {
     this.gameOverlay.classList.remove('active');
     window.soundFx.playCorrect();
 
-    // 마이크 자동 시작 제거: 권한 팝업 방지 및 대기 모드 유지 (리모컨 마이크 버튼 또는 V키로 직접 켤 때만 작동)
-    // if (this.voiceCommander.isSupported && !this.voiceCommander.isListening) {
-    //   this.voiceCommander.start();
-    // }
-
     this.updateProgressHUD();
     this.loadQuestion();
   }
 
-  // 문제 화면 로드
+  // 문제 화면 로드 (신규 풀이 or 이전/다음 탐색 시 기존 상태 복원)
   loadQuestion() {
-    this.gameState = 'quiz';
-    this.isAnswered = false;
-    this.timeLeft = this.QUESTION_TIME;
-
     const q = this.currentQuestion;
+    if (!q) return;
+
     const isWrongReview = this.wrongQuestions.some(wq => wq.sentence === q.sentence);
 
     this.qNumText.textContent = `${this.currentIndex + 1} / ${this.questions.length}`;
@@ -679,19 +885,88 @@ class GrammarQuestGame {
     }
     this.sentenceTranslation.textContent = `"${q.translation}"`;
 
-    // 비주얼 일러스트 & 상황 단서 렌더링
-    if (window.visualClueManager && this.visualClueStage) {
-      window.visualClueManager.renderInto(this.visualClueStage, q);
-    }
-
-    this.explanationBox.classList.remove('active');
     if (this.shadowingManager) {
       this.shadowingManager.resetUI();
     }
 
-    // === 유형별 화면 세팅 ===
+    // === 1. 이미 풀었던 문제 탐색 시: 정답/해설 복원 모드 ===
+    if (q.isAnswered) {
+      this.isAnswered = true;
+      this.gameState = 'review';
+      if (this.timer) clearInterval(this.timer);
+
+      // 해설 패널 활성화 & 플레이스홀더 숨김
+      if (this.explainPlaceholder) this.explainPlaceholder.style.display = 'none';
+      if (this.explanationBox) this.explanationBox.classList.add('active');
+
+      this.expResultBadge.className = q.isCorrect ? 'exp-badge correct' : 'exp-badge wrong';
+      this.expResultBadge.textContent = q.feedbackText || (q.isCorrect ? '정답! ✅' : '오답 🔄');
+      this.expContent.textContent = q.explanation;
+
+      // 유형별 UI 복원
+      if (q.type === 'choice') {
+        if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
+        this.optionsGrid.style.display = 'grid';
+        this.speechStageWrap.style.display = 'none';
+        if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
+
+        q.options.forEach((optText, i) => {
+          this.optionTexts[i].textContent = optText;
+          let cls = 'option-card focusable';
+          if (i === q.answer) cls += ' correct-choice';
+          else if (i === q.userAnswer && !q.isCorrect) cls += ' wrong-choice';
+          this.optionCards[i].className = cls;
+        });
+
+        const blank = document.getElementById('activeBlank');
+        if (blank) {
+          blank.textContent = q.options[q.answer];
+          blank.style.color = q.isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
+          blank.style.borderColor = q.isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
+        }
+      } else if (q.type === 'scramble') {
+        if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
+        if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
+        this.optionsGrid.style.display = 'none';
+        this.speechStageWrap.style.display = 'none';
+        const full = q.audioText || q.full || q.sentence.replace('_____', q.answerWord || '');
+        this.targetSentence.innerHTML = `<span style="color: var(--accent-green); text-shadow: 0 0 16px rgba(0,255,136,0.5);">${full}</span>`;
+      } else {
+        if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
+        this.optionsGrid.style.display = 'none';
+        this.speechStageWrap.style.display = 'flex';
+        if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'none';
+        const blank = document.getElementById('activeBlank');
+        if (blank) {
+          blank.textContent = q.answerWord || '';
+          blank.style.color = 'var(--accent-green)';
+        }
+        if (q.type === 'shadowing' && q.spokenSentence && window.pronunciationCoach) {
+          const clinicPanel = document.getElementById('pronunciationClinicPanel');
+          if (clinicPanel) {
+            const fullTarget = q.audioText || q.full || q.sentence.replace('_____', q.answerWord || '');
+            window.pronunciationCoach.renderClinic(clinicPanel, fullTarget, q.spokenSentence, q.similarity || 85);
+          }
+        }
+      }
+
+      this.renderQuestionTrack();
+      return;
+    }
+
+    // === 2. 아직 풀지 않은 새 문제 풀이 모드 ===
+    this.gameState = 'quiz';
+    this.isAnswered = false;
+    this.timeLeft = this.QUESTION_TIME;
+
+    if (this.explainPlaceholder) this.explainPlaceholder.style.display = 'flex';
+    if (this.explanationBox) this.explanationBox.classList.remove('active');
+
+    // 모바일 탭을 1. 문제 풀기로 자동 이동
+    this.switchMobileTab('solve');
+
+    // 유형별 활성화 세팅
     if (q.type === 'choice') {
-      // 1. 4지선다 선택형
       if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
       this.optionsGrid.style.display = 'grid';
       this.speechStageWrap.style.display = 'none';
@@ -704,8 +979,6 @@ class GrammarQuestGame {
       this.setOptionFocus(0);
 
     } else if (q.type === 'scramble') {
-      // 2. 단어 어순 배열 (Sentence Scramble) 블록 스왑형
-      // 상단 정답 노출 방지 및 단어 블록/버튼의 온전한 화면 확보를 위해 쇼케이스 숨김
       if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'none';
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'none';
@@ -718,7 +991,6 @@ class GrammarQuestGame {
       }
 
     } else if (q.type === 'speaking') {
-      // 3. 보기가 없는 주관식 말하기형
       if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'flex';
@@ -730,7 +1002,6 @@ class GrammarQuestGame {
       this.speechLiveHeard.textContent = '마이크에 답을 말해보세요...';
 
     } else if (q.type === 'listening') {
-      // 4. 듣고 답하는 리스닝 평가형
       if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'flex';
@@ -740,13 +1011,11 @@ class GrammarQuestGame {
       this.speechInstruction.textContent = '🔊 원어민 소리를 듣고 빠진 단어를 영어로 말하세요!';
       this.speechLiveHeard.textContent = '마이크에 답을 말해보세요...';
 
-      // 문제 로드 즉시 원어민 TTS 자동 발음 1회 재생!
       setTimeout(() => {
         this.playListeningAudio();
       }, 300);
 
     } else if (q.type === 'shadowing') {
-      // 5. 문장 전체 섀도잉형
       if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'flex';
@@ -757,12 +1026,12 @@ class GrammarQuestGame {
       this.speechInstruction.textContent = '🎙️ 원어민 소리를 듣고, 문장 전체를 마이크로 따라 읽어보세요!';
       this.speechLiveHeard.textContent = '원어민 소리를 들은 뒤 문장 전체를 말해보세요...';
 
-      // 문제 로드 즉시 원어민 TTS 자동 발음 1회 재생!
       setTimeout(() => {
         this.playListeningAudio();
       }, 300);
     }
 
+    this.renderQuestionTrack();
     this.startTimer();
   }
 
@@ -821,6 +1090,11 @@ class GrammarQuestGame {
     if (this.timer) clearInterval(this.timer);
 
     const q = this.currentQuestion;
+    if (q) {
+      q.isAnswered = true;
+      q.userAnswer = spokenWord;
+      q.isCorrect = isCorrect;
+    }
     const target = q.answerWord || q.missingWord || (q.options ? q.options[q.answer] : '');
     const blank = document.getElementById('activeBlank');
 
@@ -848,10 +1122,6 @@ class GrammarQuestGame {
         blank.style.color = 'var(--accent-green)';
         blank.style.borderColor = 'var(--accent-green)';
         blank.style.boxShadow = '0 0 20px var(--accent-green)';
-      }
-
-      if (window.visualClueManager) {
-        window.visualClueManager.triggerSuccessReaction();
       }
 
       if (this.streak >= 3) {
@@ -901,6 +1171,11 @@ class GrammarQuestGame {
 
     const q = this.currentQuestion;
     const isCorrect = chosenIndex === q.answer;
+    if (q) {
+      q.isAnswered = true;
+      q.userAnswer = chosenIndex;
+      q.isCorrect = isCorrect;
+    }
     const blank = document.getElementById('activeBlank');
 
     if (isCorrect) {
@@ -923,10 +1198,6 @@ class GrammarQuestGame {
         blank.style.color = 'var(--accent-green)';
         blank.style.borderColor = 'var(--accent-green)';
         blank.style.boxShadow = '0 0 20px var(--accent-green)';
-      }
-
-      if (window.visualClueManager) {
-        window.visualClueManager.triggerSuccessReaction();
       }
 
       if (this.streak >= 3) {
@@ -978,6 +1249,11 @@ class GrammarQuestGame {
     if (this.timer) clearInterval(this.timer);
 
     const q = this.currentQuestion;
+    if (q) {
+      q.isAnswered = true;
+      q.userAnswer = assembled;
+      q.isCorrect = isCorrect;
+    }
     const blank = document.getElementById('activeBlank');
 
     if (isCorrect) {
@@ -999,10 +1275,6 @@ class GrammarQuestGame {
         blank.style.color = 'var(--accent-green)';
         blank.style.borderColor = 'var(--accent-green)';
         blank.style.boxShadow = '0 0 20px var(--accent-green)';
-      }
-
-      if (window.visualClueManager) {
-        window.visualClueManager.triggerSuccessReaction();
       }
 
       window.soundFx.playCorrect();
@@ -1041,6 +1313,13 @@ class GrammarQuestGame {
     if (this.timer) clearInterval(this.timer);
 
     const q = this.currentQuestion;
+    if (q) {
+      q.isAnswered = true;
+      q.userAnswer = spokenSentence;
+      q.spokenSentence = spokenSentence;
+      q.similarity = similarity;
+      q.isCorrect = isCorrect;
+    }
     if (this.speechLiveHeard) {
       this.speechLiveHeard.textContent = `인식된 발음: "${spokenSentence}" (정확도 ${similarity}점)`;
     }
@@ -1058,10 +1337,6 @@ class GrammarQuestGame {
       const streakBonus = Math.max(0, (this.streak - 1) * 30);
       const earned = 140 + timeBonus + streakBonus;
       this.addScore(earned);
-
-      if (window.visualClueManager) {
-        window.visualClueManager.triggerSuccessReaction();
-      }
 
       window.soundFx.playCorrect();
       this.expResultBadge.className = 'exp-badge correct';
@@ -1110,6 +1385,11 @@ class GrammarQuestGame {
     if (this.timer) clearInterval(this.timer);
 
     const q = this.currentQuestion;
+    if (q) {
+      q.isAnswered = true;
+      q.feedbackText = this.expResultBadge.textContent;
+    }
+
     // 어순 배열 문제의 경우, 해설이 뜰 때 복잡한 단어 트랙을 숨기고
     // 상단 문장 보드에 완성된 정답 문장을 깔끔하게 보여주어 해설 상자와 절대 겹치지 않게 함!
     if (q && q.type === 'scramble') {
@@ -1120,7 +1400,17 @@ class GrammarQuestGame {
       if (q.translation) this.sentenceTranslation.textContent = `"${q.translation}"`;
     }
 
+    if (this.explainPlaceholder) this.explainPlaceholder.style.display = 'none';
     this.explanationBox.classList.add('active');
+
+    this.renderQuestionTrack();
+
+    // 스마트폰/태블릿(960px 이하)에서는 문제 풀이 후 해설 탭으로 자동 이동
+    if (window.innerWidth <= 960) {
+      setTimeout(() => {
+        this.switchMobileTab('explain');
+      }, 350);
+    }
   }
 
   // 2. 점수 가산 & 2인 배틀 모드 스코어 관리
@@ -1179,6 +1469,10 @@ class GrammarQuestGame {
     this.streakText.textContent = '0 🔥';
 
     const q = this.currentQuestion;
+    if (q) {
+      q.isAnswered = true;
+      q.isCorrect = false;
+    }
     if (!this.wrongQuestions.some(wq => wq.sentence === q.sentence)) {
       this.wrongQuestions.push(q);
     }
@@ -1268,17 +1562,19 @@ class GrammarQuestGame {
   }
 
   nextQuestion() {
-    this.currentIndex++;
-    if (this.isBattleMode) {
-      // 턴 교체
-      this.currentTurnPlayer = this.currentTurnPlayer === 1 ? 2 : 1;
-      this.updateBattleHUD();
-    }
-
-    if (this.currentIndex >= this.questions.length) {
-      this.showFinalReport();
-    } else {
+    if (this.currentIndex < this.questions.length - 1) {
+      this.currentIndex++;
+      if (this.isBattleMode) {
+        // 턴 교체
+        this.currentTurnPlayer = this.currentTurnPlayer === 1 ? 2 : 1;
+        this.updateBattleHUD();
+      }
+      if (window.soundFx) window.soundFx.playMove();
       this.loadQuestion();
+    } else {
+      if (this.currentQuestion && this.currentQuestion.isAnswered) {
+        this.showFinalReport();
+      }
     }
   }
 
