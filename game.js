@@ -2,7 +2,8 @@
 class GrammarQuestGame {
   constructor() {
     this.TOTAL_QUESTIONS = 10;
-    this.QUESTION_TIME = 22; // 문제당 22초 (말하기/듣기 고려)
+    this.QUESTION_TIME = 22; // 기본 문제당 22초 (말하기/듣기 고려)
+    this.currentQuestionTime = this.QUESTION_TIME;
 
     this.questions = [];
     this.currentIndex = 0;
@@ -950,6 +951,29 @@ class GrammarQuestGame {
   }
 
   // 문제 화면 로드 (신규 풀이 or 이전/다음 탐색 시 기존 상태 복원)
+  // 문장 길이 및 퀘스트 유형에 따라 지능형 타이머 시간 산출
+  getQuestionTime(q) {
+    if (!q) return this.QUESTION_TIME;
+
+    if (q.type === 'scramble') {
+      const fullText = q.audioText || q.full || (q.sentence ? q.sentence.replace('_____', q.answerWord || '') : '');
+      const words = fullText.trim().split(/\s+/).filter(Boolean);
+      const wordCount = words.length;
+
+      // 단어 어순 배열: 문장 길이에 비례한 지능형 연장
+      // 기본 20초 + 단어당 4.5초 추가 (최소 32초 ~ 최대 90초)
+      // 예: 4단어: 약 38초, 6단어: 약 47초, 8단어: 약 56초, 10단어: 약 65초, 12단어: 약 74초, 14단어: 약 83초
+      const allocatedTime = 20 + Math.round(wordCount * 4.5);
+      return Math.min(90, Math.max(32, allocatedTime));
+    }
+
+    if (q.type === 'shadowing') {
+      return 28; // 문장 전체 따라 말하기도 넉넉하게 28초
+    }
+
+    return this.QUESTION_TIME; // 일반 선택형/주관식 22초
+  }
+
   loadQuestion() {
     const q = this.currentQuestion;
     if (!q) return;
@@ -1066,7 +1090,8 @@ class GrammarQuestGame {
     // === 2. 아직 풀지 않은 새 문제 풀이 모드 ===
     this.gameState = 'quiz';
     this.isAnswered = false;
-    this.timeLeft = this.QUESTION_TIME;
+    this.currentQuestionTime = this.getQuestionTime(q);
+    this.timeLeft = this.currentQuestionTime;
 
     if (this.explainPlaceholder) this.explainPlaceholder.style.display = 'flex';
     if (this.explanationBox) this.explanationBox.classList.remove('active');
@@ -1092,6 +1117,13 @@ class GrammarQuestGame {
       this.optionsGrid.style.display = 'none';
       this.speechStageWrap.style.display = 'none';
       if (this.scrambleStageWrap) this.scrambleStageWrap.style.display = 'flex';
+
+      const fullText = q.audioText || q.full || (q.sentence ? q.sentence.replace('_____', q.answerWord || '') : '');
+      const wordCount = fullText.trim().split(/\s+/).filter(Boolean).length;
+      const scrambleBadge = document.querySelector('.scramble-badge');
+      if (scrambleBadge) {
+        scrambleBadge.textContent = `🧩 단어 어순 배열 (${wordCount}단어 · ${this.currentQuestionTime}초)`;
+      }
 
       if (window.scrambleManager) {
         window.scrambleManager.initQuestion(q, (isCorrect, assembled) => {
@@ -1211,13 +1243,17 @@ class GrammarQuestGame {
   }
 
   updateTimerUI() {
-    const percent = Math.max(0, (this.timeLeft / this.QUESTION_TIME) * 100);
+    const maxTime = this.currentQuestionTime || this.QUESTION_TIME || 22;
+    const percent = Math.max(0, (this.timeLeft / maxTime) * 100);
     this.timerBar.style.width = `${percent}%`;
     this.timerNumber.textContent = `${this.timeLeft}s`;
 
-    if (this.timeLeft <= 5) {
+    const isUrgent = this.timeLeft <= 5 || percent <= 15;
+    const isWarning = this.timeLeft <= 10 || percent <= 30;
+
+    if (isUrgent) {
       this.timerBar.style.backgroundColor = 'var(--accent-red)';
-    } else if (this.timeLeft <= 10) {
+    } else if (isWarning) {
       this.timerBar.style.backgroundColor = 'var(--accent-gold)';
     } else {
       this.timerBar.style.backgroundColor = 'var(--accent-cyan)';
@@ -1484,7 +1520,8 @@ class GrammarQuestGame {
       localStorage.setItem('GRAMMAR_TOTAL_SOLVED', this.totalSolvedCount.toString());
       this.updateProgressHUD();
 
-      const timeBonus = this.timeLeft * 6;
+      const maxTime = this.currentQuestionTime || 30;
+      const timeBonus = Math.min(150, Math.round((this.timeLeft / maxTime) * 80));
       const streakBonus = Math.max(0, (this.streak - 1) * 30);
       const earned = 150 + timeBonus + streakBonus;
       this.addScore(earned);
