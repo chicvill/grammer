@@ -27,6 +27,8 @@ class ShadowingManager {
     this.currentTargetFull = '';
     this.maxRecordTimeout = null;
     this.wasVoiceCommanderActive = false;
+    this.silenceTimeout = null;
+    this.hasSpoken = false;
 
     this.bindEvents();
   }
@@ -77,10 +79,15 @@ class ShadowingManager {
   // 새 문제 로드 시 이전 녹음 및 오디오 메모리 해제
   resetUI() {
     this.cleanupAudio();
+    if (this.silenceTimeout) {
+      clearTimeout(this.silenceTimeout);
+      this.silenceTimeout = null;
+    }
     if (this.maxRecordTimeout) {
       clearTimeout(this.maxRecordTimeout);
       this.maxRecordTimeout = null;
     }
+    this.hasSpoken = false;
     this.isRecording = false;
     if (this.shadowRecognizer) {
       this.shadowRecognizer.onend = null;
@@ -136,16 +143,21 @@ class ShadowingManager {
     this.isRecording = true;
     this.audioChunks = [];
     this.accumulatedHeard = '';
+    this.hasSpoken = false;
+    if (this.silenceTimeout) {
+      clearTimeout(this.silenceTimeout);
+      this.silenceTimeout = null;
+    }
 
     if (this.recordBtn) {
       this.recordBtn.classList.add('recording');
-      this.recordBtn.innerHTML = '<span>⏹️ 녹음 중... (다 읽은 후 클릭하여 완료)</span>';
+      this.recordBtn.innerHTML = '<span>🎙️ 녹음 중... (다 읽으면 자동 완료)</span>';
     }
 
     if (this.resultBox) {
       this.resultBox.style.display = 'flex';
       if (this.scoreStars) this.scoreStars.textContent = '🔴 REC (녹음 중)';
-      if (this.scoreNumber) this.scoreNumber.textContent = '음성 인식 대기 중...';
+      if (this.scoreNumber) this.scoreNumber.textContent = '음성 인식 대기 중... (다 읽으면 자동 완료)';
       if (this.heardText) this.heardText.textContent = '마이크에 문장 전체를 편안하게 읽으세요...';
     }
 
@@ -198,9 +210,43 @@ class ShadowingManager {
       try {
         this.shadowRecognizer = new SpeechRecognition();
         this.shadowRecognizer.lang = 'en-US';
-        this.shadowRecognizer.continuous = true;       // 문장 도중 1~2초 침묵 시 꺼짐 방지!
+        this.shadowRecognizer.continuous = true;       // 문장 도중 1~2초 침묵 시 끊김 방지
         this.shadowRecognizer.interimResults = true;    // 실시간 인식 누적
         this.shadowRecognizer.maxAlternatives = 3;
+
+        // 사용자가 문장을 다 읽은 후 침묵 감지 시 자동 완료 타이머
+        const triggerAutoCompleteTimer = (customDelay = null) => {
+          if (!this.isRecording || !this.hasSpoken) return;
+
+          const targetWords = (this.currentTargetFull || '').split(/\s+/).filter(Boolean);
+          const heardWords = (this.accumulatedHeard || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+
+          let delay = 1500;
+          if (customDelay !== null) {
+            delay = customDelay;
+          } else if (targetWords.length > 0) {
+            const similarity = this.calculateSimilarity(this.accumulatedHeard.toLowerCase(), this.currentTargetFull);
+            if (similarity >= 65 || heardWords.length >= Math.max(1, targetWords.length - 1)) {
+              // 거의 다 읽었거나 전체 문장과 높은 일치도 -> 800ms 후 즉시 자동 완료
+              delay = 800;
+            } else if (heardWords.length >= Math.ceil(targetWords.length * 0.5)) {
+              // 문장의 절반 이상 읽음 -> 1200ms
+              delay = 1200;
+            } else {
+              // 문장 초반 발화 -> 1800ms
+              delay = 1800;
+            }
+          }
+
+          if (this.silenceTimeout) clearTimeout(this.silenceTimeout);
+          this.silenceTimeout = setTimeout(() => {
+            if (this.isRecording) {
+              if (this.scoreNumber) this.scoreNumber.textContent = '인식 완료! 채점 중... ✨';
+              if (this.recordBtn) this.recordBtn.innerHTML = '<span>✨ 분석 및 완료 중...</span>';
+              this.stopRecording();
+            }
+          }, delay);
+        };
 
         this.shadowRecognizer.onresult = (e) => {
           let fullTranscript = '';
@@ -208,22 +254,40 @@ class ShadowingManager {
             fullTranscript += e.results[i][0].transcript + ' ';
           }
           this.accumulatedHeard = fullTranscript.trim();
+          if (this.accumulatedHeard.length > 0) {
+            this.hasSpoken = true;
+          }
+
           if (this.heardText && this.isRecording) {
             this.heardText.textContent = `실시간 인식: "${this.accumulatedHeard}"`;
           }
           if (this.scoreNumber && this.isRecording) {
-            this.scoreNumber.textContent = '말씀하시는 중... 🎙️';
+            this.scoreNumber.textContent = '말씀하시는 중... 🎙️ (다 읽으면 자동 완료)';
+          }
+
+          // 음성이 들어올 때마다 타이머 갱신 (다 읽고 멈추면 delay 후 자동 완료)
+          triggerAutoCompleteTimer();
+        };
+
+        this.shadowRecognizer.onspeechend = () => {
+          if (this.isRecording && this.hasSpoken) {
+            // 브라우저가 발화 종료를 감지했을 때 빠른 자동 완료 (700ms)
+            triggerAutoCompleteTimer(700);
           }
         };
 
         this.shadowRecognizer.onerror = (e) => {
           console.warn('[Shadow STT Error]:', e.error);
-          // no-speech나 aborted 오류 시 자동으로 녹음을 끊지 않음
         };
 
         this.shadowRecognizer.onend = () => {
-          // 브라우저의 기본 침묵 타임아웃 등으로 꺼질 경우, 사용자가 아직 녹음 중이면 즉시 재시작
           if (this.isRecording && this.shadowRecognizer) {
+            // 이미 문장을 발화한 상태에서 인식이 끝났으면 즉시 자동 완료
+            if (this.hasSpoken && this.accumulatedHeard.length > 0) {
+              this.stopRecording();
+              return;
+            }
+            // 아직 말을 시작하지 않은 경우 대기 유지
             try {
               this.shadowRecognizer.start();
             } catch (err) {}
@@ -242,6 +306,10 @@ class ShadowingManager {
     if (!this.isRecording) return;
     this.isRecording = false;
 
+    if (this.silenceTimeout) {
+      clearTimeout(this.silenceTimeout);
+      this.silenceTimeout = null;
+    }
     if (this.maxRecordTimeout) {
       clearTimeout(this.maxRecordTimeout);
       this.maxRecordTimeout = null;
