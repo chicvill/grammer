@@ -229,6 +229,18 @@ class GrammarQuestGame {
     if (voiceStatusCard) {
       voiceStatusCard.classList.toggle('listening', isListening);
     }
+    const speechMicToggleBtn = document.getElementById('speechMicToggleBtn');
+    if (speechMicToggleBtn) {
+      speechMicToggleBtn.classList.toggle('active', isListening);
+    }
+    const speechMicBtnText = document.getElementById('speechMicBtnText');
+    if (speechMicBtnText) {
+      speechMicBtnText.textContent = isListening ? '🟢 마이크 켜짐 (영어로 답을 말씀하세요)' : '🎙️ 마이크 켜고 음성으로 답하기 (클릭)';
+    }
+    const speechWaveContainer = document.querySelector('.voice-wave-container');
+    if (speechWaveContainer) {
+      speechWaveContainer.classList.toggle('active', isListening);
+    }
   }
 
   setupMobileTabs() {
@@ -601,6 +613,38 @@ class GrammarQuestGame {
       this.voiceCommander.toggle();
       window.soundFx.init();
     });
+
+    // 주관식 말하기 스테이지 전용 마이크 토글 버튼
+    const speechMicToggleBtn = document.getElementById('speechMicToggleBtn');
+    if (speechMicToggleBtn) {
+      speechMicToggleBtn.addEventListener('click', () => {
+        if (this.voiceCommander) {
+          this.voiceCommander.toggle();
+        }
+        if (window.soundFx) window.soundFx.init();
+      });
+    }
+
+    // 주관식 키보드 수동 입력 폼
+    this.speechTextInput = document.getElementById('speechTextInput');
+    this.speechTextSubmitBtn = document.getElementById('speechTextSubmitBtn');
+    if (this.speechTextSubmitBtn && this.speechTextInput) {
+      const submitTextAnswer = () => {
+        const text = this.speechTextInput.value.trim();
+        if (!text) return;
+        if (this.gameState === 'quiz' && !this.isAnswered && (this.currentQuestion.type === 'speaking' || this.currentQuestion.type === 'listening')) {
+          const target = this.currentQuestion.answerWord || this.currentQuestion.missingWord;
+          const isCorrect = this.voiceCommander.matchWord(text, target);
+          this.submitSpokenAnswer(text, isCorrect);
+        }
+      };
+      this.speechTextSubmitBtn.addEventListener('click', submitTextAnswer);
+      this.speechTextInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          submitTextAnswer();
+        }
+      });
+    }
 
     if (this.uiScaleBtn) {
       this.uiScaleBtn.addEventListener('click', () => this.toggleFullscreen());
@@ -999,7 +1043,24 @@ class GrammarQuestGame {
       this.speakingHintBox.style.display = 'block';
       this.speakingHintBox.textContent = q.hint || '영어 단어를 직접 마이크에 말하세요!';
       this.speechInstruction.textContent = '🎙️ 보기가 없습니다! 정답 단어를 영어로 직접 발음하세요.';
-      this.speechLiveHeard.textContent = '마이크에 답을 말해보세요...';
+      
+      const speechTextInput = document.getElementById('speechTextInput');
+      if (speechTextInput) speechTextInput.value = '';
+
+      // 마이크 상태에 따른 안내 및 자동 켜기 시도
+      if (this.voiceCommander) {
+        if (!this.voiceCommander.isListening) {
+          this.voiceCommander.start();
+        }
+        if (this.voiceCommander.isListening) {
+          this.speechLiveHeard.textContent = '🎙️ 듣고 있습니다... 마이크에 영어로 답을 말씀하세요!';
+          this.speechLiveHeard.className = 'speech-live-heard live-listening';
+        } else {
+          this.speechLiveHeard.textContent = '마이크 버튼을 눌러 음성 인식을 시작하거나, 아래에 직접 입력하세요.';
+          this.speechLiveHeard.className = 'speech-live-heard';
+        }
+      }
+      this.updateMicUI();
 
     } else if (q.type === 'listening') {
       if (this.heroQuestionShowcase) this.heroQuestionShowcase.style.display = 'flex';
@@ -1009,7 +1070,23 @@ class GrammarQuestGame {
       this.audioListenBtn.style.display = 'flex';
       this.speakingHintBox.style.display = 'none';
       this.speechInstruction.textContent = '🔊 원어민 소리를 듣고 빠진 단어를 영어로 말하세요!';
-      this.speechLiveHeard.textContent = '마이크에 답을 말해보세요...';
+      
+      const speechTextInput = document.getElementById('speechTextInput');
+      if (speechTextInput) speechTextInput.value = '';
+
+      if (this.voiceCommander) {
+        if (!this.voiceCommander.isListening) {
+          this.voiceCommander.start();
+        }
+        if (this.voiceCommander.isListening) {
+          this.speechLiveHeard.textContent = '🎙️ 듣고 있습니다... 마이크에 영어로 답을 말씀하세요!';
+          this.speechLiveHeard.className = 'speech-live-heard live-listening';
+        } else {
+          this.speechLiveHeard.textContent = '마이크 버튼을 눌러 음성 인식을 시작하거나, 아래에 직접 입력하세요.';
+          this.speechLiveHeard.className = 'speech-live-heard';
+        }
+      }
+      this.updateMicUI();
 
       setTimeout(() => {
         this.playListeningAudio();

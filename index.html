@@ -66,6 +66,7 @@
       <div class="header-mic-pill focusable" id="voiceStatusCard" title="마이크 켜기/끄기 (V키 또는 클릭)">
         <span class="mic-dot" id="headerMicDot"></span>
         <span class="mic-label" id="voiceStatusText">마이크 OFF (V)</span>
+        <span class="mic-heard-preview" id="voiceHeardText" style="display: none;"></span>
       </div>
     </header>
 
@@ -158,11 +159,23 @@
               <div class="wave-bar"></div>
             </div>
 
+            <!-- 마이크 직접 켜기/끄기 대형 제어 버튼 -->
+            <button class="speech-mic-toggle-btn focusable" id="speechMicToggleBtn" tabindex="0">
+              <span class="mic-icon">🎙️</span>
+              <span class="mic-btn-text" id="speechMicBtnText">마이크 켜고 음성으로 답하기</span>
+            </button>
+
             <div class="speech-instruction" id="speechInstruction">
               🎙️ 마이크에 영어로 정답 단어를 직접 말씀하세요!
             </div>
             <div class="speech-live-heard" id="speechLiveHeard">
               인식 대기중...
+            </div>
+
+            <!-- 키보드 직접 입력 비상 탈출 폼 (마이크 불가 환경 대비) -->
+            <div class="speech-manual-fallback" id="speechManualFallback">
+              <input type="text" class="speech-text-input" id="speechTextInput" placeholder="마이크 대신 키보드로 입력 가능 (영어 단어)" autocomplete="off" spellcheck="false" />
+              <button class="speech-submit-btn" id="speechTextSubmitBtn">확인</button>
             </div>
           </div>
         </div>
