@@ -694,20 +694,17 @@ class GrammarQuestGame {
     // 주관식 키보드 수동 입력 폼
     this.speechTextInput = document.getElementById('speechTextInput');
     this.speechTextSubmitBtn = document.getElementById('speechTextSubmitBtn');
-    if (this.speechTextSubmitBtn && this.speechTextInput) {
-      const submitTextAnswer = () => {
-        const text = this.speechTextInput.value.trim();
-        if (!text) return;
-        if (this.gameState === 'quiz' && !this.isAnswered && (this.currentQuestion.type === 'speaking' || this.currentQuestion.type === 'listening')) {
-          const target = this.currentQuestion.answerWord || this.currentQuestion.missingWord;
-          const isCorrect = this.voiceCommander.matchWord(text, target);
-          this.submitSpokenAnswer(text, isCorrect);
-        }
-      };
-      this.speechTextSubmitBtn.addEventListener('click', submitTextAnswer);
+    if (this.speechTextSubmitBtn) {
+      this.speechTextSubmitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.submitTextAnswer();
+      });
+    }
+    if (this.speechTextInput) {
       this.speechTextInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-          submitTextAnswer();
+          e.preventDefault();
+          this.submitTextAnswer();
         }
       });
     }
@@ -1225,6 +1222,80 @@ class GrammarQuestGame {
     } else {
       this.timerBar.style.backgroundColor = 'var(--accent-cyan)';
     }
+  }
+
+  // 키보드 직접 입력 정답 제출 처리 (말하기/듣기/섀도잉/선택형 등 모든 퀘스트 유형 완벽 대응)
+  submitTextAnswer() {
+    if (!this.speechTextInput) return;
+    const text = (this.speechTextInput.value || '').trim();
+    if (!text) return;
+    if (this.isAnswered || this.gameState !== 'quiz') return;
+
+    const q = this.currentQuestion;
+    if (!q) return;
+
+    const target = q.answerWord || q.missingWord || (q.options && q.options[q.answer] !== undefined ? q.options[q.answer] : '');
+    let isCorrect = false;
+
+    // 1. VoiceCommander의 matchWord 활용 (음차/영어/유사도)
+    if (this.voiceCommander && typeof this.voiceCommander.matchWord === 'function') {
+      isCorrect = this.voiceCommander.matchWord(text, target);
+    }
+
+    // 2. 직접 텍스트 비교 (소문자, 영숫자/한글 기준)
+    const cleanInput = text.toLowerCase().replace(/[^a-zA-Z0-9가-힣]/g, '');
+    const cleanTarget = (target || '').toLowerCase().replace(/[^a-zA-Z0-9가-힣]/g, '');
+    if (cleanInput && cleanTarget && (cleanInput === cleanTarget || cleanInput.includes(cleanTarget) || (cleanTarget.includes(cleanInput) && cleanInput.length >= 2))) {
+      isCorrect = true;
+    }
+
+    // 3. acceptableAnswers 목록 대조
+    if (q.acceptableAnswers && Array.isArray(q.acceptableAnswers)) {
+      for (const ans of q.acceptableAnswers) {
+        const cleanAns = String(ans).toLowerCase().replace(/[^a-zA-Z0-9가-힣]/g, '');
+        if (cleanInput && cleanAns && (cleanInput === cleanAns || cleanInput.includes(cleanAns))) {
+          isCorrect = true;
+          break;
+        }
+      }
+    }
+
+    // 4. 문장 전체 입력 대조 (섀도잉 또는 문장 단위 입력)
+    const fullTarget = (q.audioText || q.full || (q.sentence ? q.sentence.replace('_____', target) : '')).toLowerCase().replace(/[^a-zA-Z0-9가-힣]/g, '');
+    if (fullTarget && (cleanInput === fullTarget || cleanInput.includes(cleanTarget))) {
+      isCorrect = true;
+    }
+
+    // 5. 4지선다형 번호(1, 2, 3, 4) 또는 보기 단어 입력
+    if (q.type === 'choice' && q.options) {
+      const numIdx = parseInt(text, 10) - 1;
+      if (numIdx >= 0 && numIdx < q.options.length) {
+        this.setOptionFocus(numIdx);
+        this.selectOption(numIdx);
+        this.speechTextInput.blur();
+        return;
+      }
+      for (let i = 0; i < q.options.length; i++) {
+        const optClean = q.options[i].toLowerCase().replace(/[^a-zA-Z0-9가-힣]/g, '');
+        if (cleanInput === optClean) {
+          this.setOptionFocus(i);
+          this.selectOption(i);
+          this.speechTextInput.blur();
+          return;
+        }
+      }
+    }
+
+    // 6. 섀도잉 문제인 경우
+    if (q.type === 'shadowing') {
+      this.speechTextInput.blur();
+      this.submitShadowingAnswer(text, isCorrect ? 95 : 40, isCorrect);
+      return;
+    }
+
+    // 7. 주관식 말하기, 듣기 및 일반 제출
+    this.speechTextInput.blur();
+    this.submitSpokenAnswer(text, isCorrect);
   }
 
   // 주관식 말하기/듣기 단어 발음 제출 처리
