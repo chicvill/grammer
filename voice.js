@@ -444,24 +444,24 @@ class VoiceCommander {
         return { type: 'replayAudio' };
       }
 
-      // 학년 변경 음성 명령
-      if (/^(초등3|초3|초4|초등3학년|초등4학년|초등기초)$/.test(clean) || clean.includes('초3') || clean.includes('초등3')) {
-        return { type: 'changeGrade', grade: 'elem-low' };
+      // 난이도 레벨 변경 음성 명령 (Level 1 ~ 6 및 기존 명칭 지원)
+      if (/^(레벨1|level1|lv1|1단계|초등3|초3|초4|초등기초)$/.test(clean) || clean.includes('레벨1') || clean.includes('level1')) {
+        return { type: 'changeGrade', grade: 1 };
       }
-      if (/^(초등5|초5|초6|초등5학년|초등6학년|초등심화)$/.test(clean) || clean.includes('초5') || clean.includes('초등5')) {
-        return { type: 'changeGrade', grade: 'elem-high' };
+      if (/^(레벨2|level2|lv2|2단계|초등5|초5|초6|초등심화)$/.test(clean) || clean.includes('레벨2') || clean.includes('level2')) {
+        return { type: 'changeGrade', grade: 2 };
       }
-      if (/^(중1|중학교1|중학교1학년|중1학년)$/.test(clean) || clean.includes('중1')) {
-        return { type: 'changeGrade', grade: 'mid-1' };
+      if (/^(레벨3|level3|lv3|3단계|중1|중학교1|중1학년)$/.test(clean) || clean.includes('레벨3') || clean.includes('level3')) {
+        return { type: 'changeGrade', grade: 3 };
       }
-      if (/^(중2|중학교2|중학교2학년|중2학년)$/.test(clean) || clean.includes('중2')) {
-        return { type: 'changeGrade', grade: 'mid-2' };
+      if (/^(레벨4|level4|lv4|4단계|중2|중학교2|중2학년)$/.test(clean) || clean.includes('레벨4') || clean.includes('level4')) {
+        return { type: 'changeGrade', grade: 4 };
       }
-      if (/^(중3|중학교3|중학교3학년|중3학년)$/.test(clean) || clean.includes('중3')) {
-        return { type: 'changeGrade', grade: 'mid-3' };
+      if (/^(레벨5|level5|lv5|5단계|중3|중학교3|중3학년)$/.test(clean) || clean.includes('레벨5') || clean.includes('level5')) {
+        return { type: 'changeGrade', grade: 5 };
       }
-      if (/^(고등|고1|고2|고3|수능|고등학교|수능어법)$/.test(clean) || clean.includes('수능') || clean.includes('고등')) {
-        return { type: 'changeGrade', grade: 'high' };
+      if (/^(레벨6|level6|lv6|6단계|고등|고1|고2|고3|수능|수능어법)$/.test(clean) || clean.includes('레벨6') || clean.includes('level6')) {
+        return { type: 'changeGrade', grade: 6 };
       }
 
       // 방향키 이동

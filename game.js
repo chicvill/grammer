@@ -16,10 +16,13 @@ class GrammarQuestGame {
     this.isAnswered = false;
     this.gameState = 'ready'; // 'ready', 'quiz', 'review', 'finished'
 
-    // 현재 선택된 학년 ('elem-low', 'elem-high', 'mid-1', 'mid-2', 'mid-3', 'high')
-    this.currentGrade = localStorage.getItem('GRAMMAR_CURRENT_GRADE') || 'mid-1';
+    // 학습자 AI 실시간 적응형 레벨 (1 ~ 6, 기본: 2 기초)
+    const savedLevel = localStorage.getItem('GRAMMAR_ADAPTIVE_LEVEL') || localStorage.getItem('GRAMMAR_CURRENT_GRADE');
+    this.currentLevel = window.grammarGenerator.normalizeLevel(savedLevel || 2);
+    this.consecutiveCorrect = 0;
+    this.consecutiveWrong = 0;
 
-    // 학습 상태 영구 보관 (localStorage)
+    // 학습 상태 영구 보관 (localStorage - 무로그인 브라우저 영구 보존)
     this.totalSolvedCount = parseInt(localStorage.getItem('GRAMMAR_TOTAL_SOLVED') || '0', 10);
     this.wrongQuestions = this.loadStorageArray('GRAMMAR_WRONG_QUESTIONS'); // 틀린 문제 객체 목록
 
@@ -150,32 +153,82 @@ class GrammarQuestGame {
   }
 
   get gradeName() {
-    const map = {
-      'elem-low': '초등 3~4',
-      'elem-high': '초등 5~6',
-      'mid-1': '중학 1학년',
-      'mid-2': '중학 2학년',
-      'mid-3': '중학 3학년',
-      'high': '고등 / 수능'
-    };
-    return map[this.currentGrade] || '중학 1학년';
+    const cfg = window.grammarGenerator.getLevelConfig(this.currentLevel);
+    return `AI 적응형: ${cfg.badge}`;
   }
 
-  // 학년 변경 메소드
-  setGrade(grade) {
-    this.currentGrade = grade;
-    localStorage.setItem('GRAMMAR_CURRENT_GRADE', grade);
+  // AI 적응형 레벨 변경 메소드
+  setLevel(level) {
+    this.currentLevel = window.grammarGenerator.normalizeLevel(level);
+    this.consecutiveCorrect = 0;
+    this.consecutiveWrong = 0;
+    localStorage.setItem('GRAMMAR_ADAPTIVE_LEVEL', this.currentLevel.toString());
     this.updateGradeTabsUI();
     this.updateGradeBadge();
     this.toggleDrawer(false);
-    window.soundFx.playCorrect();
+    if (window.soundFx) window.soundFx.playCorrect();
     this.startNewGame();
+  }
+
+  setGrade(gradeOrLevel) {
+    this.setLevel(gradeOrLevel);
   }
 
   updateGradeBadge() {
     if (this.currentGradeBadge) {
       this.currentGradeBadge.textContent = this.gradeName;
     }
+  }
+
+  // AI 실시간 적응형 레벨 평가 및 승급/조절 처리
+  processAdaptiveResult(isCorrect) {
+    if (isCorrect) {
+      this.consecutiveCorrect++;
+      this.consecutiveWrong = 0;
+
+      // 2연속 정답 달성 시 상위 레벨로 자동 승급 판정!
+      if (this.consecutiveCorrect >= 2 && this.currentLevel < 6) {
+        const oldLvl = this.currentLevel;
+        this.currentLevel++;
+        this.consecutiveCorrect = 0;
+        localStorage.setItem('GRAMMAR_ADAPTIVE_LEVEL', this.currentLevel.toString());
+        this.updateGradeTabsUI();
+        this.updateGradeBadge();
+        const nextCfg = window.grammarGenerator.getLevelConfig(this.currentLevel);
+        this.showAdaptiveToast(`🚀 AI 수준 상승! ${nextCfg.label} (${nextCfg.title})`);
+      }
+    } else {
+      this.consecutiveWrong++;
+      this.consecutiveCorrect = 0;
+
+      // 2연속 오답 시 기초 다지기를 위해 한 단계 쉬운 수준으로 조절!
+      if (this.consecutiveWrong >= 2 && this.currentLevel > 1) {
+        const oldLvl = this.currentLevel;
+        this.currentLevel--;
+        this.consecutiveWrong = 0;
+        localStorage.setItem('GRAMMAR_ADAPTIVE_LEVEL', this.currentLevel.toString());
+        this.updateGradeTabsUI();
+        this.updateGradeBadge();
+        const prevCfg = window.grammarGenerator.getLevelConfig(this.currentLevel);
+        this.showAdaptiveToast(`🛡️ AI 난이도 조절: ${prevCfg.label} (기초 복습 모드)`);
+      }
+    }
+  }
+
+  showAdaptiveToast(message) {
+    let toast = document.getElementById('adaptiveToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'adaptiveToast';
+      toast.className = 'adaptive-toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3200);
   }
 
   setupDrawer() {
@@ -336,7 +389,8 @@ class GrammarQuestGame {
   updateGradeTabsUI() {
     if (!this.gradeTabs) return;
     this.gradeTabs.forEach(tab => {
-      tab.classList.toggle('active', tab.dataset.grade === this.currentGrade);
+      const tabLvl = window.grammarGenerator.normalizeLevel(tab.dataset.grade);
+      tab.classList.toggle('active', tabLvl === this.currentLevel);
     });
   }
 
@@ -850,11 +904,11 @@ class GrammarQuestGame {
     }
   }
 
-  // 무한 자동 생성기(grammarGenerator)를 통한 10문제 생성 (5대 퀘스트 유형 균등 출제)
+  // 무한 자동 생성기(grammarGenerator)를 통한 10문제 생성 (AI 적응형 CAT 난이도 반영)
   buildQuestionSet() {
     let set = [];
     if (window.grammarGenerator) {
-      set = window.grammarGenerator.generateSet(this.TOTAL_QUESTIONS, this.wrongQuestions, this.currentGrade);
+      set = window.grammarGenerator.generateSet(this.TOTAL_QUESTIONS, this.wrongQuestions, this.currentLevel);
     }
     set.forEach(q => {
       q.isAnswered = false;
@@ -918,12 +972,14 @@ class GrammarQuestGame {
       focusBadge.textContent = typeBadges[q.type] || 'TARGET SENTENCE';
     }
 
-    // 문장 렌더링
-    if (q.type === 'shadowing') {
+    // 문장 렌더링: 문제 풀이 중에는 Be동사 등 핵심 문법 단어를 무조건 [ ? ] 빈칸으로 감추어 질문 대상 명확화!
+    const displaySentence = q.displaySentence || q.sentence;
+    if (q.isAnswered) {
+      // 이미 푼 문제의 경우 완성된 문장을 표시
       const fullSentence = q.audioText || q.full || q.sentence.replace('_____', q.answerWord || '');
       this.targetSentence.innerHTML = `<span class="shadowing-active-sentence" style="color: var(--accent-cyan); font-weight: bold; text-shadow: 0 0 16px rgba(0,240,255,0.4);">${fullSentence}</span>`;
     } else {
-      const displaySentence = q.displaySentence || q.sentence;
+      // 미완료 문제 풀이 중에는 반드시 [ ? ] 빈칸 박스로 감춤
       const blankHtml = displaySentence.replace('_____', `<span class="blank-box" id="activeBlank">[ ? ]</span>`);
       this.targetSentence.innerHTML = blankHtml;
     }
@@ -1172,6 +1228,7 @@ class GrammarQuestGame {
       q.userAnswer = spokenWord;
       q.isCorrect = isCorrect;
     }
+    this.processAdaptiveResult(isCorrect);
     const target = q.answerWord || q.missingWord || (q.options ? q.options[q.answer] : '');
     const blank = document.getElementById('activeBlank');
 
@@ -1253,6 +1310,7 @@ class GrammarQuestGame {
       q.userAnswer = chosenIndex;
       q.isCorrect = isCorrect;
     }
+    this.processAdaptiveResult(isCorrect);
     const blank = document.getElementById('activeBlank');
 
     if (isCorrect) {
@@ -1331,6 +1389,7 @@ class GrammarQuestGame {
       q.userAnswer = assembled;
       q.isCorrect = isCorrect;
     }
+    this.processAdaptiveResult(isCorrect);
     const blank = document.getElementById('activeBlank');
 
     if (isCorrect) {
@@ -1550,6 +1609,7 @@ class GrammarQuestGame {
       q.isAnswered = true;
       q.isCorrect = false;
     }
+    this.processAdaptiveResult(false);
     if (!this.wrongQuestions.some(wq => wq.sentence === q.sentence)) {
       this.wrongQuestions.push(q);
     }

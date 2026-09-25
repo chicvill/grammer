@@ -25,7 +25,7 @@
 
         <div class="logo-area">
           <span class="game-badge">AI STEM QUEST</span>
-          <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag" id="currentGradeBadge">중학 1학년</span></h1>
+          <h1 class="game-title">GRAMMAR QUEST <span class="grade-tag" id="currentGradeBadge">AI 적응형: LV.2 기초</span></h1>
         </div>
 
         <!-- 2인 대전 모드 활성화 시 점수 HUD -->
@@ -342,33 +342,36 @@
       </div>
 
       <div class="drawer-body">
-        <!-- 1. 학습 레벨 (학년 선택) -->
+        <!-- 1. 학습 레벨 (AI 실시간 적응형) -->
         <div class="drawer-section">
-          <div class="drawer-section-title">📚 학습 레벨 (학년 선택)</div>
+          <div class="drawer-section-title">🎯 학습 난이도 단계 (AI 실시간 적응형)</div>
+          <div class="drawer-adaptive-desc" style="font-size: 13px; color: var(--accent-cyan); margin-bottom: 10px; opacity: 0.85;">
+            🤖 학습자의 정답률과 연속 정답에 따라 실시간으로 최적 수준이 자동 조정됩니다.
+          </div>
           <div class="drawer-grade-grid" id="gradeSelectorBar">
-            <button class="grade-tab focusable" data-grade="elem-low" tabindex="0">
-              <span class="tab-badge">초등 3~4</span>
-              <span class="tab-sub">파닉스·Be동사</span>
+            <button class="grade-tab focusable" data-grade="1" tabindex="0">
+              <span class="tab-badge">Level 1: 입문</span>
+              <span class="tab-sub">Be동사·지시대명사</span>
             </button>
-            <button class="grade-tab focusable" data-grade="elem-high" tabindex="0">
-              <span class="tab-badge">초등 5~6</span>
-              <span class="tab-sub">진행형·조동사</span>
+            <button class="grade-tab focusable active" data-grade="2" tabindex="0">
+              <span class="tab-badge">Level 2: 기초</span>
+              <span class="tab-sub">현재진행·조동사 can</span>
             </button>
-            <button class="grade-tab focusable active" data-grade="mid-1" tabindex="0">
-              <span class="tab-badge">중학 1학년</span>
-              <span class="tab-sub">3인칭단수·과거</span>
+            <button class="grade-tab focusable" data-grade="3" tabindex="0">
+              <span class="tab-badge">Level 3: 발전</span>
+              <span class="tab-sub">3인칭단수·불규칙과거</span>
             </button>
-            <button class="grade-tab focusable" data-grade="mid-2" tabindex="0">
-              <span class="tab-badge">중학 2학년</span>
-              <span class="tab-sub">to부정사·수동태</span>
+            <button class="grade-tab focusable" data-grade="4" tabindex="0">
+              <span class="tab-badge">Level 4: 도약</span>
+              <span class="tab-sub">동명사·수동태·비교급</span>
             </button>
-            <button class="grade-tab focusable" data-grade="mid-3" tabindex="0">
-              <span class="tab-badge">중학 3학년</span>
-              <span class="tab-sub">현재완료·관계사</span>
+            <button class="grade-tab focusable" data-grade="5" tabindex="0">
+              <span class="tab-badge">Level 5: 숙련</span>
+              <span class="tab-sub">현재완료·관계대명사</span>
             </button>
-            <button class="grade-tab focusable" data-grade="high" tabindex="0">
-              <span class="tab-badge">고등 / 수능</span>
-              <span class="tab-sub">수일치·어법실전</span>
+            <button class="grade-tab focusable" data-grade="6" tabindex="0">
+              <span class="tab-badge">Level 6: 마스터</span>
+              <span class="tab-sub">수일치·관계사·가정법</span>
             </button>
           </div>
         </div>

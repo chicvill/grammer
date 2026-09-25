@@ -1,17 +1,47 @@
-// 초등 3학년 ~ 고등 3학년(수능) 전 학년 맞춤형 무한 영문법 생성기
+// 영문법 전 레벨 맞춤형 무한 영문법 생성기 & AI 실시간 적응형(Adaptive) 엔진
 class MultiGradeGrammarGenerator {
   constructor() {
-    this.currentGrade = 'mid-1'; // 기본: 중1 ('elem-low', 'elem-high', 'mid-1', 'mid-2', 'mid-3', 'high')
+    this.currentLevel = 2; // 기본: Level 2 기초 (1 ~ 6)
 
-    // 학년별 메타데이터
-    this.gradeConfigs = {
-      'elem-low': { label: '초등 3~4학년', badge: '초등 기초', color: '#00ffcc' },
-      'elem-high': { label: '초등 5~6학년', badge: '초등 심화', color: '#00d2ff' },
-      'mid-1': { label: '중학 1학년', badge: '중등 기초', color: '#ffc800' },
-      'mid-2': { label: '중학 2학년', badge: '중등 발전', color: '#ff9900' },
-      'mid-3': { label: '중학 3학년', badge: '중등 완성', color: '#ff007f' },
-      'high': { label: '고등 1~3 / 수능', badge: '수능 어법', color: '#b800ff' }
+    // 레벨별 메타데이터 (학년 대신 문법 단계별 숙련도 체계)
+    this.levelConfigs = {
+      1: { label: 'Level 1: 입문', badge: 'LV.1 입문', title: 'Be동사 · 지시대명사', color: '#00ffcc', gradeKey: 'elem-low' },
+      2: { label: 'Level 2: 기초', badge: 'LV.2 기초', title: '현재진행 · 조동사 can', color: '#00d2ff', gradeKey: 'elem-high' },
+      3: { label: 'Level 3: 발전', badge: 'LV.3 발전', title: '3인칭 단수 · 불규칙 과거', color: '#ffc800', gradeKey: 'mid-1' },
+      4: { label: 'Level 4: 도약', badge: 'LV.4 도약', title: '동명사 · 수동태 · 비교급', color: '#ff9900', gradeKey: 'mid-2' },
+      5: { label: 'Level 5: 숙련', badge: 'LV.5 숙련', title: '현재완료 · 관계대명사', color: '#ff007f', gradeKey: 'mid-3' },
+      6: { label: 'Level 6: 마스터', badge: 'LV.6 마스터', title: '수일치 · 관계사 · 가정법', color: '#b800ff', gradeKey: 'high' }
     };
+
+    // 기존 학년 키와의 상호 호환 매핑
+    this.gradeToLevelMap = {
+      'elem-low': 1,
+      'elem-high': 2,
+      'mid-1': 3,
+      'mid-2': 4,
+      'mid-3': 5,
+      'high': 6
+    };
+  }
+
+  // 레벨 값 정규화 (숫자 1~6 또는 기존 학년 문자열 수용)
+  normalizeLevel(val) {
+    if (typeof val === 'number') {
+      return Math.max(1, Math.min(6, Math.round(val)));
+    }
+    if (this.gradeToLevelMap[val]) {
+      return this.gradeToLevelMap[val];
+    }
+    const parsed = parseInt(val, 10);
+    if (!isNaN(parsed)) {
+      return Math.max(1, Math.min(6, parsed));
+    }
+    return 2;
+  }
+
+  getLevelConfig(levelOrGrade) {
+    const lvl = this.normalizeLevel(levelOrGrade);
+    return this.levelConfigs[lvl] || this.levelConfigs[2];
   }
 
   pickRandom(arr) {
@@ -29,9 +59,9 @@ class MultiGradeGrammarGenerator {
   }
 
   // ========================================================
-  // 1. [초등 3~4학년] Be동사 기초 & 지시대명사 (AI & 미래 기술)
+  // 1. [Level 1: 입문] Be동사 기초 & 지시대명사 (AI & 미래 기술)
   // ========================================================
-  genElemLow(type) {
+  genLevel1(type) {
     const templates = [
       // Be동사 현재형 (수학, 과학, 공학, AI 테크 융합)
       () => {
@@ -52,7 +82,7 @@ class MultiGradeGrammarGenerator {
         const full = `${item.sub} ${item.ans} ${item.comp}.`;
         const options = this.shuffle(["am", "are", "is", "be"]);
         return {
-          category: "초등 3~4 Be동사 [STEM & AI 💻]",
+          category: "LV.1 Be동사 기초 [STEM & AI 💻]",
           sentence, full, ko: item.ko, ans: item.ans, options,
           tip: `주어 '${item.sub}' 뒤에 오는 알맞은 짝꿍 Be동사는 '${item.ans}'입니다.`
         };
@@ -73,19 +103,19 @@ class MultiGradeGrammarGenerator {
         const sentence = `${item.sub} _____ ${item.obj}.`;
         const full = `${item.sub} ${item.ans} ${item.obj}.`;
         return {
-          category: "초등 3~4 지시대명사 [첨단 과학 장비 🔬]",
+          category: "LV.1 지시대명사 [첨단 과학 장비 🔬]",
           sentence, full, ko: item.ko, ans: item.ans, options: this.shuffle(item.options),
           tip: `'${item.sub}'는 ${item.sub.endsWith('e') || item.sub === 'These' ? '복수' : '단수'}이므로 '${item.ans}'를 씁니다.`
         };
       }
     ];
-    return this.wrapQuestion(this.pickRandom(templates)(), type, 'elem-low');
+    return this.wrapQuestion(this.pickRandom(templates)(), type, 1);
   }
 
   // ========================================================
-  // 2. [초등 5~6학년] 현재진행형(be + ing) & 조동사 can (AI, 로봇, 공학)
+  // 2. [Level 2: 기초] 현재진행형(be + ing) & 조동사 can (AI, 로봇, 공학)
   // ========================================================
-  genElemHigh(type) {
+  genLevel2(type) {
     const templates = [
       // 현재진행형 (be + -ing)
       () => {
@@ -104,7 +134,7 @@ class MultiGradeGrammarGenerator {
         const full = `${item.sub} ${item.ing} ${item.obj}.`;
         const options = this.shuffle([item.ing, item.base, `${item.base}s`, `${item.base}ed`]);
         return {
-          category: "초등 5~6 현재진행형 [스마트 연구소 & AI 🤖]",
+          category: "LV.2 현재진행형 [스마트 연구소 & AI 🤖]",
           sentence, full, ko: item.ko, ans: item.ing, options,
           tip: "'지금 ~하는 중이다'라는 현재진행형은 be동사 + 동사-ing 형태를 씁니다."
         };
@@ -124,19 +154,19 @@ class MultiGradeGrammarGenerator {
         const full = `${item.sub} ${item.base} ${item.obj}.`;
         const options = this.shuffle([item.base, item.s, `${item.base}ing`, `${item.base}ed`]);
         return {
-          category: "초등 5~6 조동사 can [미래 첨단 컴퓨팅 ⚡]",
+          category: "LV.2 조동사 can [미래 첨단 컴퓨팅 ⚡]",
           sentence, full, ko: item.ko, ans: item.base, options,
           tip: "조동사 can 뒤에는 언제나 '동사원형'을 씁니다."
         };
       }
     ];
-    return this.wrapQuestion(this.pickRandom(templates)(), type, 'elem-high');
+    return this.wrapQuestion(this.pickRandom(templates)(), type, 2);
   }
 
   // ========================================================
-  // 3. [중학 1학년] 3인칭 단수, Be/일반과거, do/does (수학 알고리즘 & 우주과학)
+  // 3. [Level 3: 발전] 3인칭 단수, Be/일반과거, do/does (수학 알고리즘 & 우주과학)
   // ========================================================
-  genMid1(type) {
+  genLevel3(type) {
     const templates = [
       () => {
         const subjects = [
@@ -163,7 +193,7 @@ class MultiGradeGrammarGenerator {
         const full = `${sub.name} ${ans} ${v.obj}.`;
         const options = this.shuffle([v.base, v.s, `${v.base}ing`, `${v.base}ed`]);
         return {
-          category: "중1 일반동사 현재형 [빅데이터 & AI 📈]",
+          category: "LV.3 일반동사 현재형 [빅데이터 & AI 📈]",
           sentence, full, ko: `${sub.ko} ${v.ko}.`, ans, options,
           tip: sub.isThird ? `주어 '${sub.name}'가 3인칭 단수이므로 동사에 -s/-es를 붙인 '${ans}'가 정답입니다.` : `주어가 복수/1,2인칭이므로 동사원형 '${ans}'를 씁니다.`
         };
@@ -182,19 +212,19 @@ class MultiGradeGrammarGenerator {
         const full = `${item.sub} ${item.ans} ${item.obj}.`;
         const options = this.shuffle([item.base, item.ans, `${item.base}s`, `${item.base}ing`]);
         return {
-          category: "중1 불규칙 과거시제 [우주 탐사 & 수학 발견 🚀]",
+          category: "LV.3 불규칙 과거시제 [우주 탐사 & 수학 발견 🚀]",
           sentence, full, ko: item.ko, ans: item.ans, options,
           tip: `과거 표현이 있으므로 '${item.base}'의 불규칙 과거형인 '${item.ans}'를 씁니다.`
         };
       }
     ];
-    return this.wrapQuestion(this.pickRandom(templates)(), type, 'mid-1');
+    return this.wrapQuestion(this.pickRandom(templates)(), type, 3);
   }
 
   // ========================================================
-  // 4. [중학 2학년] to부정사, 동명사, 수동태(be p.p.), 비교급 (소프트웨어 & 공학 물리)
+  // 4. [Level 4: 도약] to부정사, 동명사, 수동태(be p.p.), 비교급 (소프트웨어 & 공학 물리)
   // ========================================================
-  genMid2(type) {
+  genLevel4(type) {
     const templates = [
       // 동명사만을 목적어로 취하는 동사 (enjoy, finish, practice, avoid, keep, suggest)
       () => {
@@ -211,7 +241,7 @@ class MultiGradeGrammarGenerator {
         const full = `I ${item.v} ${item.ing} ${item.obj}.`;
         const options = this.shuffle([item.ing, item.to, item.ing.replace('ing', ''), `${item.ing.replace('ing', '')}ed`]);
         return {
-          category: "중2 동명사 목적어 [AI 프로그래밍 & 공학 💾]",
+          category: "LV.4 동명사 목적어 [AI 프로그래밍 & 공학 💾]",
           sentence, full, ko: item.ko, ans: item.ing, options,
           tip: `'${item.v}' 동사 뒤에는 to부정사가 아닌 '동명사(-ing)'를 목적어로 씁니다.`
         };
@@ -231,7 +261,7 @@ class MultiGradeGrammarGenerator {
         const full = `${item.sub} ${item.be} ${item.pp} ${item.by}.`;
         const options = this.shuffle([item.pp, item.base, `${item.base}s`, `${item.base}ing`]);
         return {
-          category: "중2 수동태 (be + p.p.) [첨단 과학 기술 & 반도체 🛰️]",
+          category: "LV.4 수동태 (be + p.p.) [첨단 과학 기술 & 반도체 🛰️]",
           sentence, full, ko: item.ko, ans: item.pp, options,
           tip: "수동태는 'be동사 + 과거분사(p.p.)' 형태이며 '~에 의해 되다'라는 뜻입니다."
         };
@@ -251,19 +281,19 @@ class MultiGradeGrammarGenerator {
         const full = `${item.sub} ${item.ans} ${item.than}.`;
         const options = this.shuffle([item.ans, item.base, `${item.base}est`, `more ${item.base}`]);
         return {
-          category: "중2 비교급 [컴퓨팅 성능 & 나노물리 🚀]",
+          category: "LV.4 비교급 [컴퓨팅 성능 & 나노물리 🚀]",
           sentence, full, ko: item.ko, ans: item.ans, options,
           tip: "뒤에 '~보다'를 뜻하는 than이 있으므로 형용사의 비교급(-er)을 씁니다."
         };
       }
     ];
-    return this.wrapQuestion(this.pickRandom(templates)(), type, 'mid-2');
+    return this.wrapQuestion(this.pickRandom(templates)(), type, 4);
   }
 
   // ========================================================
-  // 5. [중학 3학년] 현재완료(have p.p.), 관계대명사(who/which/that) (첨단 연구 & AI)
+  // 5. [Level 5: 숙련] 현재완료(have p.p.), 관계대명사(who/which/that) (첨단 연구 & AI)
   // ========================================================
-  genMid3(type) {
+  genLevel5(type) {
     const templates = [
       // 현재완료 시제 (have/has + p.p.)
       () => {
@@ -280,7 +310,7 @@ class MultiGradeGrammarGenerator {
         const full = `${item.sub} ${item.ans} ${item.obj}.`;
         const options = this.shuffle([item.ans, item.base, `${item.base}s`, `${item.base}ing`]);
         return {
-          category: "중3 현재완료 (have + p.p.) [우주 탐사 & 바이오 테크 🌌]",
+          category: "LV.5 현재완료 (have + p.p.) [우주 탐사 & 바이오 테크 🌌]",
           sentence, full, ko: item.ko, ans: item.ans, options,
           tip: "과거부터 현재까지의 경험/계속/완료를 나타내는 현재완료는 have/has + 과거분사(p.p.)를 씁니다."
         };
@@ -300,20 +330,20 @@ class MultiGradeGrammarGenerator {
         const full = `${item.ant} ${item.ans} ${item.rest}.`;
         const options = this.shuffle([item.ans, item.wrong, "what", "where"]);
         return {
-          category: "중3 관계대명사 [AI 연구진 & 공학 시스템 🤖]",
+          category: "LV.5 관계대명사 [AI 연구진 & 공학 시스템 🤖]",
           sentence, full, ko: item.ko, ans: item.ans, options, tip: item.tip
         };
       }
     ];
-    return this.wrapQuestion(this.pickRandom(templates)(), type, 'mid-3');
+    return this.wrapQuestion(this.pickRandom(templates)(), type, 5);
   }
 
   // ========================================================
-  // 6. [고등 1~3 / 수능] 수능 어법 5대 유형 (수일치, what vs that, 가정법) (미래 과학 철학 & AI)
+  // 6. [Level 6: 마스터] 고급 어법 (수일치, what vs that, 가정법) (미래 과학 철학 & AI)
   // ========================================================
-  genHigh(type) {
+  genLevel6(type) {
     const templates = [
-      // 수능 1순위: 복잡한 주어-동사 수일치
+      // 수능/고급 1순위: 복잡한 주어-동사 수일치
       () => {
         const items = [
           { sub: "The number of parameters in modern AI models", ans: "is", wrong: "are", rest: "increasing exponentially every year", ko: "현대 AI 모델의 파라미터 수는 매년 기하급수적으로 증가하고 있다", tip: "'The number of(~의 수)'가 핵심 주어이므로 단수동사 'is'를 씁니다." },
@@ -327,11 +357,11 @@ class MultiGradeGrammarGenerator {
         const full = `${item.sub} ${item.ans} ${item.rest}.`;
         const options = this.shuffle([item.ans, item.wrong, "being", "been"]);
         return {
-          category: "수능 어법: 주어-동사 수일치 [빅데이터 & 입자물리 🌌]",
+          category: "LV.6 주어-동사 수일치 [빅데이터 & 입자물리 🌌]",
           sentence, full, ko: item.ko, ans: item.ans, options, tip: item.tip
         };
       },
-      // 수능 2순위: 관계사 what vs 접속사 that
+      // 수능/고급 2순위: 관계사 what vs 접속사 that
       () => {
         const items = [
           { lead: "The researcher demonstrated", ans: "what", wrong: "that", rest: "the neural network learned from quantum simulations", ko: "그 연구원은 신경망이 양자 시뮬레이션으로부터 학습한 것을 시연했다", tip: "learned의 목적어가 빠진 불완전한 문장이며 선행사가 없으므로 선행사를 포함한 관계대명사 'what'이 정답입니다." },
@@ -345,11 +375,11 @@ class MultiGradeGrammarGenerator {
         const full = `${item.lead} ${item.ans} ${item.rest}.`;
         const options = this.shuffle([item.ans, item.wrong, "which", "how"]);
         return {
-          category: "수능 어법: that vs what [AI 과학 연구 & 암호학 🔬]",
+          category: "LV.6 that vs what [AI 과학 연구 & 암호학 🔬]",
           sentence, full, ko: item.ko, ans: item.ans, options, tip: item.tip
         };
       },
-      // 수능 3순위: 가정법 과거 및 과거완료
+      // 수능/고급 3순위: 가정법 과거 및 과거완료
       () => {
         const items = [
           { ifClause: "If quantum computers", ans: "were", wrong: "am", main: "commercially available, scientists could simulate complex molecules instantly", ko: "만약 양자 컴퓨터가 상용화된다면, 과학자들은 복잡한 분자 구조를 즉시 시뮬레이션할 텐데", tip: "현재 사실의 반대를 나타내는 가정법 과거에서는 be동사로 인칭에 관계없이 'were'를 씁니다." },
@@ -362,21 +392,49 @@ class MultiGradeGrammarGenerator {
         const full = `${item.ifClause} ${item.ans} ${item.main}.`;
         const options = this.shuffle([item.ans, item.wrong, "was", "would adjust"]);
         return {
-          category: "고등 어법: 가정법 [양자 & 우주 시뮬레이션 ⚛️]",
+          category: "LV.6 가정법 [양자 & 우주 시뮬레이션 ⚛️]",
           sentence, full, ko: item.ko, ans: item.ans, options, tip: item.tip
         };
       }
     ];
-    return this.wrapQuestion(this.pickRandom(templates)(), type, 'high');
+    return this.wrapQuestion(this.pickRandom(templates)(), type, 6);
   }
 
-  // 공통 래퍼
-  wrapQuestion(data, type, grade) {
+  // 레벨 번호에 따른 생성기 매핑
+  getGenFunc(level) {
+    const lvl = this.normalizeLevel(level);
+    switch (lvl) {
+      case 1: return this.genLevel1.bind(this);
+      case 2: return this.genLevel2.bind(this);
+      case 3: return this.genLevel3.bind(this);
+      case 4: return this.genLevel4.bind(this);
+      case 5: return this.genLevel5.bind(this);
+      case 6: return this.genLevel6.bind(this);
+      default: return this.genLevel2.bind(this);
+    }
+  }
+
+  // 기존 genElemLow 등의 하위 호환성 유지
+  genElemLow(type) { return this.genLevel1(type); }
+  genElemHigh(type) { return this.genLevel2(type); }
+  genMid1(type) { return this.genLevel3(type); }
+  genMid2(type) { return this.genLevel4(type); }
+  genMid3(type) { return this.genLevel5(type); }
+  genHigh(type) { return this.genLevel6(type); }
+
+  // 공통 문제 래퍼
+  wrapQuestion(data, type, levelNum) {
     const answerIndex = data.options.indexOf(data.ans);
+    const lvl = this.normalizeLevel(levelNum);
+    const cfg = this.levelConfigs[lvl] || this.levelConfigs[2];
+
     return {
-      id: `gen-${grade}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-      type: type, // 'choice', 'speaking', 'listening'
-      grade: grade,
+      id: `gen-lvl${lvl}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      level: lvl,
+      grade: cfg.gradeKey,
+      levelLabel: cfg.label,
+      levelBadge: cfg.badge,
+      type: type, // 'choice', 'speaking', 'listening', 'scramble'
       category: data.category,
       sentence: data.sentence,
       displaySentence: data.sentence,
@@ -392,46 +450,76 @@ class MultiGradeGrammarGenerator {
     };
   }
 
-  // 외부 호출 함수: 학년별 1세트(10문제) 생성 (5가지 퀘스트 유형 균등 배정)
-  generateSet(count = 10, priorityWrong = [], grade = 'mid-1') {
-    this.currentGrade = grade;
-    const questionTypes = ['choice', 'scramble', 'speaking', 'listening', 'shadowing'];
+  // ========================================================
+  // AI 적응형(Adaptive) 1세트(10문제) 생성 엔진 (CAT)
+  // 학습자의 현재 레벨을 중심으로 도전(상위) 및 복습(하위) 문제를 정교하게 조합
+  // ========================================================
+  generateSet(count = 10, priorityWrong = [], levelOrGrade = 2) {
+    const currentLevel = this.normalizeLevel(levelOrGrade);
+    this.currentLevel = currentLevel;
+
+    // 4대 문법 평가 유형 (정답 사전 노출 방지)
+    const questionTypes = ['choice', 'choice', 'scramble', 'speaking', 'listening'];
     const generated = [];
 
-    // 이전에 틀렸던 문제 중 해당 학년 문제 우선 추가
+    // 1. 오답 복습 우선 포함 (학습자 레벨과 인접한 오답 우선)
     if (priorityWrong && priorityWrong.length > 0) {
-      const matchWrong = priorityWrong.filter(w => w.grade === grade);
-      matchWrong.forEach(mw => generated.push(mw));
+      const matchWrong = priorityWrong.filter(w => {
+        const wLvl = w.level || this.normalizeLevel(w.grade);
+        return Math.abs(wLvl - currentLevel) <= 1;
+      });
+      matchWrong.slice(0, 3).forEach(mw => generated.push(mw));
     }
 
-    let genFunc;
-    switch (grade) {
-      case 'elem-low': genFunc = this.genElemLow.bind(this); break;
-      case 'elem-high': genFunc = this.genElemHigh.bind(this); break;
-      case 'mid-1': genFunc = this.genMid1.bind(this); break;
-      case 'mid-2': genFunc = this.genMid2.bind(this); break;
-      case 'mid-3': genFunc = this.genMid3.bind(this); break;
-      case 'high': genFunc = this.genHigh.bind(this); break;
-      default: genFunc = this.genMid1.bind(this);
+    // 2. 적응형 레벨 분포 풀 생성 (10문제 기준: 현재 레벨 60% + 상위 레벨 20% + 하위 레벨 20%)
+    const levelDistribution = [];
+    let countCurrent = Math.round(count * 0.6);
+    let countUpper = Math.round(count * 0.2);
+    let countLower = count - countCurrent - countUpper;
+
+    if (currentLevel === 1) {
+      countCurrent = Math.round(count * 0.7);
+      countUpper = count - countCurrent;
+      countLower = 0;
+    } else if (currentLevel === 6) {
+      countCurrent = Math.round(count * 0.7);
+      countLower = count - countCurrent;
+      countUpper = 0;
     }
 
-    // 5가지 퀘스트 유형(선택형, 어순배열, 말하기, 듣기, 섀도잉)이 골고루 배정되도록 타입 풀 생성
+    const upperLevel = Math.min(6, currentLevel + 1);
+    const lowerLevel = Math.max(1, currentLevel - 1);
+
+    for (let i = 0; i < countCurrent; i++) levelDistribution.push(currentLevel);
+    for (let i = 0; i < countUpper; i++) levelDistribution.push(upperLevel);
+    for (let i = 0; i < countLower; i++) levelDistribution.push(lowerLevel);
+
+    const shuffledLevels = this.shuffle(levelDistribution);
+
+    // 3. 문제 유형 풀 생성
     const typePool = [];
     while (typePool.length < count) {
       typePool.push(...this.shuffle(questionTypes));
     }
 
+    // 4. 문제 생성 루프
     let attempts = 0;
-    while (generated.length < count && attempts < 60) {
+    while (generated.length < count && attempts < 80) {
       attempts++;
+      const targetLvl = shuffledLevels[generated.length] || currentLevel;
       const qType = typePool[generated.length] || this.pickRandom(questionTypes);
+      const genFunc = this.getGenFunc(targetLvl);
       const newQ = genFunc(qType);
+
       if (!generated.some(g => g.sentence === newQ.sentence)) {
         generated.push(newQ);
       }
     }
 
-    return this.shuffle(generated.slice(0, count));
+    // 초반 1~2문제는 학습자 레벨 또는 하위 레벨로 배치하여 자신감 부여
+    generated.sort((a, b) => (a.level || currentLevel) - (b.level || currentLevel));
+
+    return generated.slice(0, count);
   }
 }
 

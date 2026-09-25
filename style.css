@@ -3255,6 +3255,31 @@ button,
   }
 }
 
+/* AI 실시간 적응형 레벨 알림 토스트 */
+.adaptive-toast {
+  position: fixed;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(10, 15, 36, 0.95);
+  border: 1.5px solid var(--accent-cyan);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 30px;
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow: 0 8px 32px rgba(0, 240, 255, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.35s cubic-bezier(0.2, 0.9, 0.2, 1);
+  z-index: 9999;
+  letter-spacing: 0.5px;
+}
 
-
-
+.adaptive-toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
