@@ -421,6 +421,18 @@ class GrammarQuestGame {
 
   bindEvents() {
     window.addEventListener('keydown', (e) => {
+      // 1. input, textarea 등 텍스트 입력 필드에 포커스가 있을 때는 전역 게임 단축키(M, V, C, F, 방향키, 스페이스 등) 무시!
+      const targetTag = e.target && e.target.tagName;
+      const isInputFocused = targetTag === 'INPUT' || targetTag === 'TEXTAREA' || (e.target && e.target.isContentEditable);
+
+      if (isInputFocused) {
+        // ESC 키일 때만 입력창 포커스 해제 허용, 그 외의 모든 타이핑은 그대로 통과!
+        if (e.key === 'Escape') {
+          e.target.blur();
+        }
+        return;
+      }
+
       const key = e.key;
 
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'Tab'].includes(key)) {
