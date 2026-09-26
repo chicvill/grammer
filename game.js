@@ -1096,6 +1096,14 @@ class GrammarQuestGame {
     if (this.explainPlaceholder) this.explainPlaceholder.style.display = 'flex';
     if (this.explanationBox) this.explanationBox.classList.remove('active');
 
+    // AI 오답/쌍둥이/힌트 카드 초기화
+    const aimCard = document.getElementById('aiMisconceptionCard');
+    if (aimCard) aimCard.style.display = 'none';
+    const twinCard = document.getElementById('aiTwinCard');
+    if (twinCard) twinCard.style.display = 'none';
+    const socraticBubble = document.getElementById('aiSocraticBubble');
+    if (socraticBubble) socraticBubble.style.display = 'none';
+
     // 모바일 탭을 1. 문제 풀기로 자동 이동
     this.switchMobileTab('solve');
 
@@ -1430,6 +1438,9 @@ class GrammarQuestGame {
       q.isCorrect = isCorrect;
     }
     this.processAdaptiveResult(isCorrect);
+    if (window.aiLearningEngine) {
+      window.aiLearningEngine.onAnswerEvaluated(q, isCorrect, q.options ? q.options[chosenIndex] : chosenIndex);
+    }
     const blank = document.getElementById('activeBlank');
 
     if (isCorrect) {
@@ -1509,6 +1520,9 @@ class GrammarQuestGame {
       q.isCorrect = isCorrect;
     }
     this.processAdaptiveResult(isCorrect);
+    if (window.aiLearningEngine) {
+      window.aiLearningEngine.onAnswerEvaluated(q, isCorrect, text);
+    }
     const blank = document.getElementById('activeBlank');
 
     if (isCorrect) {
@@ -1884,7 +1898,19 @@ class GrammarQuestGame {
           ${wrongCount > 0 ? `⚠️ 틀린 문제 ${wrongCount}개는 다음 게임에 최우선 다시 출제됩니다.` : '🎉 현재 누적된 오답이 없습니다!'}
         </span><br>
         획득 점수: <span style="color: var(--accent-gold); font-size: 24px; font-weight: 800;">${this.score}점</span>
+        <div style="margin-top: 14px;">
+          <button type="button" class="concept-guide-btn" id="overlayRadarBtn" style="margin: 0 auto; padding: 7px 18px; font-size: 13.5px; border-radius: 20px;">
+            <span>📊 나의 실시간 문법 뇌 지도 & 처방전 확인</span>
+          </button>
+        </div>
       `;
+
+      setTimeout(() => {
+        const radarBtn = document.getElementById('overlayRadarBtn');
+        if (radarBtn && window.aiLearningEngine) {
+          radarBtn.addEventListener('click', () => window.aiLearningEngine.knowledgeGraph.showModal());
+        }
+      }, 50);
     }
 
     this.startBtnText.textContent = '새로운 문장 생성 & 도전 (OK / "시작")';

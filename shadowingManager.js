@@ -120,6 +120,8 @@ class ShadowingManager {
       clinicPanel.style.display = 'none';
       clinicPanel.innerHTML = '';
     }
+    const pcContainer = document.getElementById('aiPitchContourContainer');
+    if (pcContainer) pcContainer.innerHTML = '';
   }
 
   // 섀도잉 녹음 시작 (마이크 스트림 & 음성인식 병행)
@@ -170,14 +172,29 @@ class ShadowingManager {
     }, 30000);
 
     // 1. MediaRecorder 오디오 스트림 녹음 (사용자 본인 목소리 녹음)
+    this._mediaRecordingAvailable = false;
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         this.shadowStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+        // iOS Safari: audio/mp4, Android Chrome: audio/webm;codecs=opus, Firefox: audio/ogg
         const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
           ? 'audio/webm;codecs=opus'
-          : (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus') ? 'audio/ogg;codecs=opus' : '');
+          : MediaRecorder.isTypeSupported('audio/mp4')
+            ? 'audio/mp4'
+            : MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')
+              ? 'audio/ogg;codecs=opus'
+              : '';
 
-        this.mediaRecorder = mimeType ? new MediaRecorder(this.shadowStream, { mimeType }) : new MediaRecorder(this.shadowStream);
+        // mimeType과 stream을 클로저로 미리 캡처 (onstop 비동기 실행 시 참조 손실 방지)
+        const capturedMimeType = mimeType || 'audio/webm';
+        const capturedStream = this.shadowStream;
+
+        this.mediaRecorder = mimeType
+          ? new MediaRecorder(this.shadowStream, { mimeType })
+          : new MediaRecorder(this.shadowStream);
+
+        this._mediaRecordingAvailable = true;
 
         this.mediaRecorder.ondataavailable = (e) => {
           if (e.data && e.data.size > 0) {
@@ -186,22 +203,37 @@ class ShadowingManager {
         };
 
         this.mediaRecorder.onstop = () => {
+          // ⚠️ 스트림 트랙 해제는 onstop 안에서 (모바일: stop() 직후 트랙 해제 시 ondataavailable 미발화 버그 방지)
+          try {
+            if (capturedStream) capturedStream.getTracks().forEach(t => t.stop());
+          } catch (e) {}
+          if (this.shadowStream === capturedStream) this.shadowStream = null;
+
           if (this.audioChunks.length > 0) {
-            if (this.currentUserAudioUrl) {
-              URL.revokeObjectURL(this.currentUserAudioUrl);
-            }
-            const blob = new Blob(this.audioChunks, { type: this.mediaRecorder.mimeType || 'audio/webm' });
+            if (this.currentUserAudioUrl) URL.revokeObjectURL(this.currentUserAudioUrl);
+            const blob = new Blob(this.audioChunks, { type: capturedMimeType });
             this.currentUserAudioUrl = URL.createObjectURL(blob);
+            // ✅ URL이 실제로 생성된 후에만 ready 표시 (250ms setTimeout 제거의 대안)
             if (this.playUserVoiceBtn) {
               this.playUserVoiceBtn.classList.add('ready');
+              this.playUserVoiceBtn.focus();
             }
+            if (this.playUserVoiceText) {
+              this.playUserVoiceText.textContent = '내 목소리 다시 듣기 ▶';
+            }
+          } else {
+            // 청크가 비어있으면 녹음 실패로 처리
+            this._mediaRecordingAvailable = false;
+            if (this.playUserVoiceBtn) this.playUserVoiceBtn.classList.remove('ready');
           }
+          this.mediaRecorder = null;
         };
 
         this.mediaRecorder.start(100);
       }
     } catch (err) {
       console.warn('MediaRecorder 녹음 스트림 접근 불가:', err);
+      this._mediaRecordingAvailable = false;
     }
 
     // 2. Web Speech API 음성 인식기 시작 (영어 실시간 텍스트 누적 추출)
@@ -327,17 +359,16 @@ class ShadowingManager {
       this.shadowRecognizer = null;
     }
 
-    // 2. MediaRecorder 중지
+    // 2. MediaRecorder 중지 → onstop 내부에서 스트림 트랙 해제 (모바일 비동기 race 방지)
     if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
       try { this.mediaRecorder.stop(); } catch (e) {}
-    }
-
-    // 3. 마이크 트랙 해제
-    if (this.shadowStream) {
-      try {
-        this.shadowStream.getTracks().forEach(t => t.stop());
+      // onstop이 비동기로 capturedStream.getTracks().stop() + null 처리
+    } else {
+      // MediaRecorder 없거나 이미 inactive → 직접 스트림 정리
+      if (this.shadowStream) {
+        try { this.shadowStream.getTracks().forEach(t => t.stop()); } catch (e) {}
         this.shadowStream = null;
-      } catch (e) {}
+      }
     }
 
     // 4. 결과 판정 및 점수 계산
@@ -379,15 +410,23 @@ class ShadowingManager {
       if (window.soundFx) window.soundFx.playCorrect();
     }
 
-    // 6. AI 원어민 발음 정밀 클리닉 & 음소 교정 코칭 렌더링
+    // 6. AI 원어민 발음 정밀 클리닉 & 음소 교정 코칭 & 피치 컨투어 렌더링
+    let targetSentence = '';
+    if (window.gameApp && window.gameApp.currentQuestion) {
+      const q = window.gameApp.currentQuestion;
+      targetSentence = q.audioText || q.full || (q.sentence ? q.sentence.replace('_____', q.answerWord || '') : '');
+    } else if (this.currentTargetFull) {
+      targetSentence = this.currentTargetFull;
+    }
+
     const clinicPanel = document.getElementById('pronunciationClinicPanel');
     if (clinicPanel && window.pronunciationCoach) {
-      let targetSentence = '';
-      if (window.gameApp && window.gameApp.currentQuestion) {
-        const q = window.gameApp.currentQuestion;
-        targetSentence = q.audioText || q.full || q.sentence.replace('_____', q.answerWord || '');
-      }
       window.pronunciationCoach.renderClinic(clinicPanel, targetSentence, finalHeard, calculatedScore || 75);
+    }
+
+    // AI 실시간 피치 억양 컨투어 렌더링
+    if (window.aiLearningEngine && window.aiLearningEngine.pitchContour) {
+      window.aiLearningEngine.pitchContour.render('aiPitchContourContainer', targetSentence, this.currentUserAudioUrl, calculatedScore || 75);
     }
 
     // 7. VoiceCommander 재개 (섀도잉 전 켜져 있었던 경우)
@@ -400,13 +439,6 @@ class ShadowingManager {
       }, 600);
     }
 
-    // 8. [내 목소리 다시 듣기] 버튼으로 자동 포커스
-    setTimeout(() => {
-      if (this.playUserVoiceBtn) {
-        this.playUserVoiceBtn.classList.add('ready');
-        this.playUserVoiceBtn.focus();
-      }
-    }, 250);
   }
 
   // 발음 단어 유사도 계산
@@ -435,7 +467,11 @@ class ShadowingManager {
   // 사용자 녹음 목소리 재생
   playUserVoice() {
     if (!this.currentUserAudioUrl) {
-      alert('🎙️ 먼저 바로 옆의 [따라 말하기 시작] 버튼을 눌러 마이크로 문장을 읽고 녹음해 보세요!');
+      if (this._mediaRecordingAvailable === false) {
+        alert('⚠️ 마이크 접근 권한이 없거나 브라우저에서 녹음을 지원하지 않아 녹음이 진행되지 않았습니다.\n(음성 인식 결과만 표시되었습니다)');
+      } else {
+        alert('🎙️ 먼저 바로 옆의 [따라 말하기 시작] 버튼을 눌러 마이크로 문장을 읽고 녹음해 보세요!');
+      }
       return;
     }
 

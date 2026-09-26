@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Pretendard:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260926_compact">
+  <link rel="stylesheet" href="style.css?v=20260926_mobile_hud">
 </head>
 <body>
   <!-- 메인 앱 컨테이너 (반응형 PC & 모바일 지원) -->
@@ -15,6 +15,7 @@
     
     <!-- 상단 헤더 & HUD -->
     <header class="hud-header">
+      <!-- 1행: 햄버거 + 로고 + 마이크 버튼 -->
       <div class="header-left-group">
         <!-- 햄버거 사이드 메뉴 토글 버튼 -->
         <button class="hamburger-btn focusable" id="hamburgerBtn" aria-label="메뉴 및 설정 열기" title="설정 & 메뉴 열기 (M키)">
@@ -34,8 +35,16 @@
           <div class="vs-tag">VS</div>
           <div class="player-score-tag p2" id="p2Tag"><span class="p-dot"></span>2P: <span id="p2Score">0</span></div>
         </div>
+
+        <!-- 상단 미니 마이크 상태 인디케이터 (로고 우측 끝) -->
+        <div class="header-mic-pill focusable" id="voiceStatusCard" title="마이크 켜기/끄기 (V키 또는 클릭)">
+          <span class="mic-dot" id="headerMicDot"></span>
+          <span class="mic-label" id="voiceStatusText">마이크 OFF (V)</span>
+          <span class="mic-heard-preview" id="voiceHeardText" style="display: none;"></span>
+        </div>
       </div>
 
+      <!-- 2행: 통계 카드 (QUESTION / SOLVED / SCORE / STREAK / TIME) -->
       <div class="hud-stats">
         <div class="stat-card">
           <span class="stat-label">QUESTION</span>
@@ -60,13 +69,6 @@
           </div>
           <span class="timer-number" id="timerNumber">20s</span>
         </div>
-      </div>
-
-      <!-- 상단 미니 마이크 상태 인디케이터 -->
-      <div class="header-mic-pill focusable" id="voiceStatusCard" title="마이크 켜기/끄기 (V키 또는 클릭)">
-        <span class="mic-dot" id="headerMicDot"></span>
-        <span class="mic-label" id="voiceStatusText">마이크 OFF (V)</span>
-        <span class="mic-heard-preview" id="voiceHeardText" style="display: none;"></span>
       </div>
     </header>
 
@@ -93,10 +95,17 @@
             <span class="category-pill" id="categoryTag">Be동사 현재형</span>
             <button class="concept-guide-btn focusable" id="conceptGuideBtn" tabindex="0" title="이 문제의 핵심 문법 개념 보기 (음성으로 '설명' 또는 C키)">
               <span class="icon">📖</span>
-              <span class="text">핵심 문법 개념</span>
+              <span class="text">핵심 문법</span>
+            </button>
+            <button class="concept-guide-btn ai-socratic-btn focusable" id="aiSocraticHintBtn" tabindex="0" title="AI 소크라테스 힌트 코치 (H키 또는 음성으로 '힌트')">
+              <span class="icon">💡</span>
+              <span class="text">AI 힌트 코치 (H)</span>
             </button>
           </div>
         </div>
+
+        <!-- 소크라테스식 AI 인터랙티브 힌트 말풍선 -->
+        <div class="ai-socratic-bubble" id="aiSocraticBubble" style="display: none;"></div>
 
         <!-- 영문법 Hero 문제 쇼케이스 보드 (100% 와이드 텍스트 집중형 보드) -->
         <div class="hero-question-showcase" id="heroQuestionShowcase">
@@ -239,6 +248,12 @@
             주어가 'Artificial intelligence and robotics'로 2개의 첨단 기술 분야(복수)이므로 복수형 be동사 'are'를 씁니다.
           </p>
 
+          <!-- 1. AI 오답 선택 심리 역추적 카드 -->
+          <div class="ai-misconception-card" id="aiMisconceptionCard" style="display: none;"></div>
+
+          <!-- 2. AI 즉석 쌍둥이 확인 문항 카드 -->
+          <div class="ai-twin-card" id="aiTwinCard" style="display: none;"></div>
+
           <!-- 문장 전체 섀도잉 & 발음 점수 평가 패널 -->
           <div class="shadowing-panel" id="shadowingPanel">
             <div class="shadowing-header">
@@ -278,6 +293,8 @@
 
               <!-- AI 원어민 발음 정밀 클리닉 & 교정 코칭 패널 (V vs B, P vs F, R vs L, TH, 강세) -->
               <div class="pronunciation-clinic-panel" id="pronunciationClinicPanel" style="display: none;"></div>
+              <!-- 3. AI 실시간 피치 억양 컨투어 시각화 -->
+              <div id="aiPitchContourContainer"></div>
             </div>
           </div>
         </div>
@@ -404,7 +421,21 @@
           </div>
         </div>
 
-        <!-- 4. 도움말 & 전체화면 -->
+        <!-- 4. AI 실시간 문법 뇌 지도 리포트 -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">🧠 AI 실시간 문법 뇌 지도</div>
+          <div class="drawer-action-card">
+            <div class="drawer-action-info">
+              <span class="drawer-action-label">8대 문법 영역 정밀 진단</span>
+              <span class="drawer-action-desc">실시간 방사형 레이더 차트 & AI 족집게 처방전</span>
+            </div>
+            <button class="drawer-toggle-btn focusable" id="openKnowledgeRadarBtn">
+              <span class="toggle-text">뇌 지도 보기</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. 도움말 & 전체화면 -->
         <div class="drawer-section">
           <div class="drawer-section-title">🛠️ 부가 도구</div>
           <div class="drawer-btn-row">
@@ -561,7 +592,8 @@
   <script src="conceptModalManager.js?v=20260922_11"></script>
   <script src="helpModalManager.js?v=20260922_11"></script>
   <script src="pronunciationCoach.js?v=20260922_12"></script>
-  <script src="shadowingManager.js?v=20260926_autocomp"></script>
+  <script src="shadowingManager.js?v=20260926_pitch_fix"></script>
+  <script src="aiLearningEngine.js?v=20260926_pitch_fix"></script>
   <script src="audio.js?v=20260922_11"></script>
   <script src="voice.js?v=20260922_11"></script>
   <script src="game.js?v=20260926_scramble_time"></script>
